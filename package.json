@@ -1,0 +1,153 @@
+{
+  "name": "currents",
+  "displayName": "Currents",
+  "description": "Currents.dev test reporting for VS Code — view runs, errors, and fix tests with AI",
+  "version": "0.0.1",
+  "publisher": "currents-dev",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "currents",
+          "title": "Currents",
+          "icon": "resources/currents-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "currents": [
+        {
+          "id": "currents-runs",
+          "name": "Runs",
+          "type": "webview"
+        }
+      ]
+    },
+    "viewsWelcome": [],
+    "commands": [
+      {
+        "command": "currents.setApiKey",
+        "title": "Set API Key",
+        "category": "Currents",
+        "icon": "$(key)"
+      },
+      {
+        "command": "currents.removeApiKey",
+        "title": "Remove API Key",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.selectProject",
+        "title": "Select Project",
+        "category": "Currents",
+        "icon": "$(project)"
+      },
+      {
+        "command": "currents.refreshRuns",
+        "title": "Refresh Runs",
+        "category": "Currents",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "currents.filterByBranch",
+        "title": "Filter by Branch",
+        "category": "Currents",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "currents.filterByAuthor",
+        "title": "Filter by Author",
+        "category": "Currents",
+        "icon": "$(person)"
+      },
+      {
+        "command": "currents.clearFilters",
+        "title": "Clear Filters",
+        "category": "Currents",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "currents.loadMoreRuns",
+        "title": "Load More Runs",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.openRun",
+        "title": "View Run Details",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.fixWithAgent",
+        "title": "Fix with Agent",
+        "category": "Currents",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "currents.openInDashboard",
+        "title": "Open in Dashboard",
+        "category": "Currents",
+        "icon": "$(link-external)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "currents.refreshRuns",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@1"
+        },
+        {
+          "command": "currents.filterByBranch",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@2"
+        },
+        {
+          "command": "currents.filterByAuthor",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@3"
+        },
+        {
+          "command": "currents.clearFilters",
+          "when": "view == currents-runs && currents.hasFilters",
+          "group": "navigation@4"
+        },
+        {
+          "command": "currents.selectProject",
+          "when": "view == currents-runs && currents.authenticated",
+          "group": "navigation@5"
+        },
+        {
+          "command": "currents.setApiKey",
+          "when": "view == currents-runs",
+          "group": "overflow"
+        }
+      ],
+      "view/item/context": []
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.25.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.7.0"
+  }
+}
