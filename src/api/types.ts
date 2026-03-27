@@ -38,8 +38,8 @@ export interface RunFeedItem {
   } | null;
   groups: RunGroup[];
   meta: RunMeta;
-  completionState: "complete" | "incomplete" | "cancelled" | "timedOut";
-  status: "passed" | "failed" | "running" | "cancelled" | "timedOut";
+  completionState: string;
+  status: string;
 }
 
 export interface RunGroup {

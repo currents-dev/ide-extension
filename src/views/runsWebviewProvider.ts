@@ -13,6 +13,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private lastCursor: string | undefined;
   private filters: RunFilters = {};
   private loading = false;
+  private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
 
@@ -28,7 +29,9 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     this.lastCursor = undefined;
     if (projectId) {
       this.fetchRuns();
+      this.startAutoRefresh();
     } else {
+      this.stopAutoRefresh();
       this.sendState();
     }
   }
@@ -169,6 +172,25 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     return parts.join(" | ");
   }
 
+  private startAutoRefresh(): void {
+    this.stopAutoRefresh();
+    this.autoRefreshTimer = setInterval(() => {
+      if (this.client && this.projectId && !this.loading) {
+        this.runs = [];
+        this.hasMore = false;
+        this.lastCursor = undefined;
+        this.fetchRuns();
+      }
+    }, 30_000);
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = undefined;
+    }
+  }
+
   private getHtml(): string {
     return `<!DOCTYPE html>
 <html lang="en">
@@ -205,18 +227,28 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     margin-bottom: 6px;
   }
   .run-status {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 10px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    padding: 1px 6px;
-    border-radius: 3px;
+    letter-spacing: 0.4px;
+    padding: 2px 8px;
+    border-radius: 4px;
   }
-  .status-passed { color: var(--vscode-testing-iconPassed); }
-  .status-failed { color: var(--vscode-testing-iconFailed); }
-  .status-running { color: var(--vscode-testing-iconQueued); }
-  .status-cancelled, .status-timedOut {
+  .status-passed {
+    color: var(--vscode-testing-iconPassed);
+    background: color-mix(in srgb, var(--vscode-testing-iconPassed) 15%, transparent);
+  }
+  .status-failed {
+    color: var(--vscode-testing-iconFailed);
+    background: color-mix(in srgb, var(--vscode-testing-iconFailed) 15%, transparent);
+  }
+  .status-running {
+    color: var(--vscode-testing-iconQueued);
+    background: color-mix(in srgb, var(--vscode-testing-iconQueued) 15%, transparent);
+  }
+  .status-cancelled, .status-timedout {
     color: var(--vscode-disabledForeground);
+    background: color-mix(in srgb, var(--vscode-disabledForeground) 15%, transparent);
   }
 
   .run-duration {
@@ -327,6 +359,19 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     align-items: center;
     gap: 4px;
   }
+
+  .live-indicator {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--vscode-testing-iconQueued);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
 </style>
 </head>
 <body>
@@ -416,9 +461,14 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         const duration = formatDuration(run.durationMs);
         const ago = timeAgo(run.createdAt);
 
+        const statusLower = (run.status || '').toLowerCase();
+        const isLive = isRunInProgress(run.completionState);
         html += '<div class="run-card" data-run-id="' + run.runId + '">';
         html += '  <div class="run-header">';
-        html += '    <span class="run-status status-' + run.status + '">\u25CF ' + run.status + '</span>';
+        html += '    <span class="run-status status-' + escHtml(statusLower) + '">' + escHtml(statusLower) + '</span>';
+        if (isLive) {
+          html += '    <span class="live-indicator">\u25CF live</span>';
+        }
         html += '    <span class="run-duration">' + (duration ? duration + ' \u00B7 ' : '') + ago + '</span>';
         html += '  </div>';
         html += '  <div class="run-title">' + escHtml(commitMsg) + '</div>';
@@ -471,6 +521,11 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       }
     }
 
+    function isRunInProgress(completionState) {
+      const v = (completionState || '').toLowerCase();
+      return v === 'incomplete' || v === 'in_progress';
+    }
+
     function escHtml(s) {
       const d = document.createElement('div');
       d.textContent = s;
@@ -489,6 +544,7 @@ function serializeRun(run: RunFeedItem) {
   return {
     runId: run.runId,
     status: run.status,
+    completionState: run.completionState,
     createdAt: run.createdAt,
     durationMs: run.durationMs,
     commitMessage: run.meta.commit?.message?.split("\n")[0] || "",

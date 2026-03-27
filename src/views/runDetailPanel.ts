@@ -29,6 +29,7 @@ interface SerializedSpec {
 
 export class RunDetailPanelProvider {
   private panels = new Map<string, vscode.WebviewPanel>();
+  private pollTimers = new Map<string, ReturnType<typeof setInterval>>();
   private client: CurrentsApiClient | undefined;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
@@ -59,7 +60,10 @@ export class RunDetailPanelProvider {
 
     panel.iconPath = new vscode.ThemeIcon("beaker");
     this.panels.set(run.runId, panel);
-    panel.onDidDispose(() => this.panels.delete(run.runId));
+    panel.onDidDispose(() => {
+      this.panels.delete(run.runId);
+      this.stopPolling(run.runId);
+    });
 
     panel.webview.onDidReceiveMessage(async (msg) => {
       switch (msg.type) {
@@ -96,6 +100,8 @@ export class RunDetailPanelProvider {
     try {
       log("RunDetailPanel: fetching run", run.runId);
       const { data: fullRun } = await this.client.getRun(run.runId);
+
+      const isInProgress = isRunInProgress(fullRun.completionState);
 
       const failedSpecs = fullRun.specs.filter(
         (s: RunSpec) => s.results && s.results.stats.failures > 0
@@ -136,12 +142,31 @@ export class RunDetailPanelProvider {
         specErrors.filter((s) => s.errors.length > 0).length
       );
 
+      let totalPasses = 0,
+        totalFailures = 0,
+        totalSkipped = 0,
+        totalPending = 0,
+        totalFlaky = 0,
+        totalTests = 0;
+      for (const g of fullRun.groups) {
+        totalPasses += g.tests.passes;
+        totalFailures += g.tests.failures;
+        totalSkipped += g.tests.skipped;
+        totalPending += g.tests.pending;
+        totalFlaky += g.tests.flaky;
+        totalTests += g.tests.overall;
+      }
+
       panel.webview.postMessage({
         type: "runData",
         specs: specErrors,
+        completionState: fullRun.completionState,
+        status: fullRun.status,
+        stats: { totalTests, totalPasses, totalFailures, totalSkipped, totalPending, totalFlaky },
         allSpecs: fullRun.specs.map((s: RunSpec) => ({
           spec: s.spec,
           instanceId: s.instanceId,
+          completed: s.completedAt !== null,
           testCount: s.results?.stats.tests ?? 0,
           passes: s.results?.stats.passes ?? 0,
           failures: s.results?.stats.failures ?? 0,
@@ -151,11 +176,40 @@ export class RunDetailPanelProvider {
           duration: s.results?.stats.wallClockDuration ?? 0,
         })),
       });
+
+      if (isInProgress) {
+        this.startPolling(panel, run);
+      } else {
+        this.stopPolling(run.runId);
+      }
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Unknown error";
       log("RunDetailPanel: error fetching run data:", msg);
       panel.webview.postMessage({ type: "error", message: msg });
+    }
+  }
+
+  private startPolling(
+    panel: vscode.WebviewPanel,
+    run: RunFeedItem
+  ): void {
+    if (this.pollTimers.has(run.runId)) {
+      return;
+    }
+    const timer = setInterval(() => {
+      if (panel.visible) {
+        this.loadRunData(panel, run);
+      }
+    }, 10_000);
+    this.pollTimers.set(run.runId, timer);
+  }
+
+  private stopPolling(runId: string): void {
+    const timer = this.pollTimers.get(runId);
+    if (timer) {
+      clearInterval(timer);
+      this.pollTimers.delete(runId);
     }
   }
 
@@ -293,7 +347,32 @@ export class RunDetailPanelProvider {
     background: color-mix(in srgb, var(--vscode-testing-iconQueued) 20%, transparent);
     color: var(--vscode-testing-iconQueued);
   }
-  .status-cancelled, .status-timedOut {
+
+  .progress-bar-container {
+    padding: 12px 24px;
+    display: none;
+  }
+  .progress-bar-container.visible { display: block; }
+  .progress-bar-label {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 4px;
+  }
+  .progress-bar-track {
+    height: 4px;
+    background: var(--vscode-progressBar-background, var(--vscode-widget-border));
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0.2;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--vscode-progressBar-background, var(--vscode-testing-iconQueued));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    opacity: 1;
+  }
+  .status-cancelled, .status-timedout {
     background: color-mix(in srgb, var(--vscode-disabledForeground) 20%, transparent);
     color: var(--vscode-disabledForeground);
   }
@@ -451,6 +530,10 @@ export class RunDetailPanelProvider {
   .dot-failed { background: var(--vscode-testing-iconFailed); }
   .dot-passed { background: var(--vscode-testing-iconPassed); }
   .dot-flaky { background: var(--vscode-editorWarning-foreground); }
+  .dot-pending {
+    background: var(--vscode-testing-iconQueued, var(--vscode-descriptionForeground));
+    animation: pulse 2s ease-in-out infinite;
+  }
 
   .spec-name {
     font-weight: 500;
@@ -551,7 +634,7 @@ export class RunDetailPanelProvider {
 <body>
   <div class="header">
     <div class="header-top">
-      <span class="status-badge status-${esc(run.status)}">${esc(run.status)}</span>
+      <span class="status-badge status-${esc(run.status.toLowerCase())}" id="status-badge">${esc(run.status.toLowerCase())}</span>
       <span class="commit-message">${esc(commitMsg)}</span>
       <div class="header-actions">
         <button class="header-btn" id="btn-dashboard">↗ Dashboard</button>
@@ -572,12 +655,17 @@ export class RunDetailPanelProvider {
     }
   </div>
 
-  <div class="stats-bar">
+  <div class="stats-bar" id="stats-bar">
     <span class="stat-item c-total"><span class="stat-num">${totalTests}</span> <span class="stat-label">tests</span></span>
     <span class="stat-item c-pass"><span class="stat-num">${totalPasses}</span> <span class="stat-label">passed</span></span>
     <span class="stat-item c-fail"><span class="stat-num">${totalFailures}</span> <span class="stat-label">failed</span></span>
     <span class="stat-item c-skip"><span class="stat-num">${totalSkipped + totalPending}</span> <span class="stat-label">skipped</span></span>
     ${totalFlaky > 0 ? `<span class="stat-item c-flaky"><span class="stat-num">${totalFlaky}</span> <span class="stat-label">flaky</span></span>` : ""}
+  </div>
+
+  <div class="progress-bar-container${isRunInProgress(run.completionState) ? " visible" : ""}" id="progress-container">
+    <div class="progress-bar-label" id="progress-label">Receiving results…</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div></div>
   </div>
 
   <div class="content" id="content">
@@ -597,24 +685,76 @@ export class RunDetailPanelProvider {
     window.addEventListener('message', (event) => {
       const msg = event.data;
       if (msg.type === 'runData') {
+        lastAllSpecs = msg.allSpecs || [];
         renderSpecs(msg.specs);
+        updateLiveState(msg);
       } else if (msg.type === 'error') {
         document.getElementById('content').innerHTML =
           '<div class="error-state">Failed to load: ' + escHtml(msg.message) + '</div>';
       }
     });
 
+    function isInProgress(completionState) {
+      var v = (completionState || '').toLowerCase();
+      return v === 'incomplete' || v === 'in_progress';
+    }
+
+    function updateLiveState(msg) {
+      const isLive = isInProgress(msg.completionState);
+      const statusBadge = document.getElementById('status-badge');
+      const progressContainer = document.getElementById('progress-container');
+      const progressFill = document.getElementById('progress-fill');
+      const progressLabel = document.getElementById('progress-label');
+
+      if (statusBadge && msg.status) {
+        var statusLower = msg.status.toLowerCase();
+        statusBadge.className = 'status-badge status-' + statusLower;
+        statusBadge.textContent = statusLower;
+      }
+
+      if (msg.stats) {
+        const statsBar = document.getElementById('stats-bar');
+        if (statsBar) {
+          let html = '<span class="stat-item c-total"><span class="stat-num">' + msg.stats.totalTests + '</span> <span class="stat-label">tests</span></span>';
+          html += '<span class="stat-item c-pass"><span class="stat-num">' + msg.stats.totalPasses + '</span> <span class="stat-label">passed</span></span>';
+          html += '<span class="stat-item c-fail"><span class="stat-num">' + msg.stats.totalFailures + '</span> <span class="stat-label">failed</span></span>';
+          html += '<span class="stat-item c-skip"><span class="stat-num">' + (msg.stats.totalSkipped + msg.stats.totalPending) + '</span> <span class="stat-label">skipped</span></span>';
+          if (msg.stats.totalFlaky > 0) {
+            html += '<span class="stat-item c-flaky"><span class="stat-num">' + msg.stats.totalFlaky + '</span> <span class="stat-label">flaky</span></span>';
+          }
+          statsBar.innerHTML = html;
+        }
+      }
+
+      if (progressContainer && msg.allSpecs) {
+        const total = msg.allSpecs.length;
+        const completed = msg.allSpecs.filter(function(s) { return s.completed; }).length;
+        if (isLive && total > 0) {
+          progressContainer.classList.add('visible');
+          const pct = Math.round((completed / total) * 100);
+          progressFill.style.width = pct + '%';
+          progressLabel.textContent = completed + ' / ' + total + ' specs completed';
+        } else {
+          progressContainer.classList.remove('visible');
+        }
+      }
+    }
+
+    let lastAllSpecs = [];
     function renderSpecs(specs) {
       const content = document.getElementById('content');
 
       const withErrors = specs.filter(s => s.errors.length > 0);
 
-      if (withErrors.length === 0) {
+      if (withErrors.length === 0 && lastAllSpecs.filter(function(s) { return !s.completed; }).length === 0) {
         content.innerHTML = '<div class="empty-errors">No errors found in this run.</div>';
         return;
       }
 
-      let html = '<div class="section-title">Errors by spec file (' + withErrors.length + ' files)</div>';
+      let html = '';
+      if (withErrors.length > 0) {
+        html += '<div class="section-title">Errors by spec file (' + withErrors.length + ' files)</div>';
+      }
 
       for (const spec of withErrors) {
         html += '<div class="spec-group">';
@@ -654,6 +794,24 @@ export class RunDetailPanelProvider {
 
         html += '  </div>';
         html += '</div>';
+      }
+
+      const pendingSpecs = lastAllSpecs.filter(function(s) { return !s.completed; });
+      if (pendingSpecs.length > 0) {
+        html += '<div class="section-title" style="margin-top: 20px">In Progress (' + pendingSpecs.length + ' specs)</div>';
+        for (const ps of pendingSpecs) {
+          html += '<div class="spec-group">';
+          html += '  <div class="spec-header">';
+          html += '    <span class="spec-status-dot dot-pending"></span>';
+          html += '    <span class="spec-name">' + escHtml(ps.spec) + '</span>';
+          html += '    <span class="spec-meta"><span>waiting for results\u2026</span></span>';
+          html += '  </div>';
+          html += '</div>';
+        }
+      }
+
+      if (withErrors.length === 0 && pendingSpecs.length > 0) {
+        html += '<div class="empty-errors" style="margin-top: 12px">No errors so far.</div>';
       }
 
       content.innerHTML = html;
@@ -736,6 +894,11 @@ function serializeTest(t: InstanceTest): SerializedError {
       error: a.error ?? null,
     })),
   };
+}
+
+function isRunInProgress(completionState: string): boolean {
+  const v = completionState.toLowerCase();
+  return v === "incomplete" || v === "in_progress";
 }
 
 function esc(s: string): string {

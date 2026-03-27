@@ -18,6 +18,11 @@ export class RunsTreeProvider
   private lastCursor: string | undefined;
   private filters: RunFilters = {};
   private loading = false;
+  private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
+
+  constructor() {
+    this.startAutoRefresh();
+  }
 
   setClient(client: CurrentsApiClient | undefined): void {
     this.client = client;
@@ -149,16 +154,36 @@ export class RunsTreeProvider
     return parts.join(" | ");
   }
 
+  private startAutoRefresh(): void {
+    this.stopAutoRefresh();
+    this.autoRefreshTimer = setInterval(() => {
+      if (this.client && this.projectId) {
+        this.reset();
+      }
+    }, 30_000);
+  }
+
+  private stopAutoRefresh(): void {
+    if (this.autoRefreshTimer) {
+      clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = undefined;
+    }
+  }
+
   dispose(): void {
+    this.stopAutoRefresh();
     this._onDidChangeTreeData.dispose();
   }
 }
 
 // --- Tree items ---
 
-function statusThemeIcon(
-  status: RunFeedItem["status"]
-): vscode.ThemeIcon {
+function isRunInProgress(completionState: string): boolean {
+  const v = completionState.toLowerCase();
+  return v === "incomplete" || v === "in_progress";
+}
+
+function statusThemeIcon(status: string): vscode.ThemeIcon {
   switch (status) {
     case "passed":
       return new vscode.ThemeIcon(
@@ -180,7 +205,7 @@ function statusThemeIcon(
         "circle-slash",
         new vscode.ThemeColor("disabledForeground")
       );
-    case "timedOut":
+    case "timedout":
       return new vscode.ThemeIcon(
         "watch",
         new vscode.ThemeColor("testing.iconFailed")
@@ -217,7 +242,7 @@ export class RunItem extends vscode.TreeItem {
 
     this.run = run;
     this.contextValue = "run";
-    this.iconPath = statusThemeIcon(run.status);
+    this.iconPath = statusThemeIcon(run.status.toLowerCase());
 
     const branch = run.meta.commit?.branch || "—";
     const { passes, failures, skipped, flaky } = aggregateTests(run);
@@ -226,7 +251,8 @@ export class RunItem extends vscode.TreeItem {
       parts.push(`\u2622 ${flaky}`);
     }
 
-    this.description = `${branch}  \u00B7  ${parts.join("  ")}`;
+    const isLive = isRunInProgress(run.completionState);
+    this.description = `${branch}  \u00B7  ${parts.join("  ")}${isLive ? "  \u00B7  \u25CF live" : ""}`;
 
     const date = new Date(run.createdAt).toLocaleString();
     const author = run.meta.commit?.authorName || "Unknown";

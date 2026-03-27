@@ -1,0 +1,152 @@
+{
+  "status": "OK",
+  "data": {
+    "runId": "88daf1f3dca30e40",
+    "projectId": "GtO78i",
+    "createdAt": "2026-03-27T15:58:11.146Z",
+    "durationMs": 56,
+    "tags": ["web-app", "actions", "annotations", "attachments"],
+    "timeout": {
+      "isTimeout": false
+    },
+    "groups": [
+      {
+        "instances": {
+          "overall": 3,
+          "claimed": 2,
+          "complete": 0,
+          "passes": 0,
+          "failures": 0
+        },
+        "tests": {
+          "overall": 5,
+          "tests": 25,
+          "passes": 5,
+          "failures": 0,
+          "pending": 0,
+          "skipped": 0,
+          "flaky": 0,
+          "retries": 0
+        },
+        "groupId": "web-app",
+        "platform": {
+          "osName": "linux",
+          "osVersion": "Ubuntu - 22.04",
+          "browserName": "web-app",
+          "browserVersion": ""
+        },
+        "coverageEnabled": false,
+        "tags": ["annotations", "attachments", "actions", "web-app"],
+        "durationMs": 56,
+        "specCount": 3
+      }
+    ],
+    "meta": {
+      "ciBuildId": "web-23655227654-1",
+      "commit": {
+        "branch": "main",
+        "remoteOrigin": "https://github.com/currents-dev/demo-data",
+        "authorEmail": "jane.smith@example.com",
+        "authorName": "Jane Smith",
+        "message": "docs: add troubleshooting guide",
+        "sha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+        "ghaEventData": {
+          "headRef": "main",
+          "headSha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+          "baseRef": "main",
+          "baseSha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+          "issueUrl": "https://api.github.com/repos/owner/repo/issues/590",
+          "htmlUrl": "https://github.com/owner/repo/pull/439",
+          "prTitle": "docs: add troubleshooting guide",
+          "senderAvatarUrl": "https://avatars.githubusercontent.com/u/8869",
+          "senderHtmlUrl": "https://github.com/JaneSmith"
+        },
+        "replacedCommitData": {
+          "sha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+          "branch": "main",
+          "message": "docs: add troubleshooting guide\n"
+        }
+      },
+      "framework": {
+        "type": "pw",
+        "version": "1.50.1",
+        "clientVersion": "1.9.4"
+      }
+    },
+    "specs": [
+      {
+        "instanceId": "c08e65107ca73ccb",
+        "spec": "web-app/onboarding.spec.ts",
+        "groupId": "web-app",
+        "claimedAt": "2026-03-27T15:58:10.210Z",
+        "completedAt": null,
+        "machineId": "3K86yOGDu7SI",
+        "tags": ["actions", "web-app"],
+        "inactivityTimeoutMs": null,
+        "results": {
+          "stats": {
+            "tests": 6,
+            "passes": 3,
+            "failures": 0,
+            "pending": 0,
+            "skipped": 0,
+            "flaky": 0,
+            "wallClockStartedAt": "2026-03-27T15:58:10.210Z",
+            "overall": 6
+          },
+          "flaky": 0,
+          "videoUrl": null
+        }
+      },
+      {
+        "instanceId": "8388c981fd278b85",
+        "spec": "web-app/payments.spec.ts",
+        "groupId": "web-app",
+        "claimedAt": "2026-03-27T15:58:10.266Z",
+        "completedAt": null,
+        "machineId": "3K86yOGDu7SI",
+        "tags": ["annotations", "web-app"],
+        "inactivityTimeoutMs": null,
+        "results": {
+          "stats": {
+            "tests": 9,
+            "passes": 3,
+            "failures": 0,
+            "pending": 0,
+            "skipped": 0,
+            "flaky": 0,
+            "wallClockStartedAt": "2026-03-27T15:58:10.266Z",
+            "overall": 9
+          },
+          "flaky": 0,
+          "videoUrl": null
+        }
+      },
+      {
+        "instanceId": "aa441e0b50d50c42",
+        "spec": "web-app/reports.spec.ts",
+        "groupId": "web-app",
+        "claimedAt": null,
+        "completedAt": null,
+        "machineId": "",
+        "tags": ["annotations", "attachments", "web-app"],
+        "inactivityTimeoutMs": null,
+        "results": {
+          "stats": {
+            "tests": 10,
+            "passes": 0,
+            "failures": 0,
+            "pending": 0,
+            "skipped": 0,
+            "flaky": 0,
+            "overall": 10
+          },
+          "flaky": 0,
+          "videoUrl": null
+        }
+      }
+    ],
+    "completionState": "IN_PROGRESS",
+    "status": "RUNNING"
+  }
+}
