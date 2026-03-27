@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { AuthManager } from "./auth.js";
 import { RunsWebviewProvider } from "./views/runsWebviewProvider.js";
 import { RunDetailPanelProvider } from "./views/runDetailPanel.js";
+import { SettingsWebviewProvider } from "./views/settingsWebviewProvider.js";
 import { registerCommands } from "./commands.js";
 import { getCurrentBranch } from "./git.js";
 import { initLog, log } from "./log.js";
@@ -16,11 +17,19 @@ export async function activate(
   const auth = new AuthManager(context.secrets);
   const runsProvider = new RunsWebviewProvider(context.extensionUri);
   const runDetailPanel = new RunDetailPanelProvider(context.extensionUri);
+  runDetailPanel.onActiveRunChanged = (runId) => {
+    runsProvider.setActiveRunId(runId);
+  };
+  const settingsProvider = new SettingsWebviewProvider(context.extensionUri);
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       RunsWebviewProvider.viewType,
       runsProvider
+    ),
+    vscode.window.registerWebviewViewProvider(
+      SettingsWebviewProvider.viewType,
+      settingsProvider
     )
   );
 
@@ -30,6 +39,7 @@ export async function activate(
     auth,
     runsProvider,
     runDetailPanel,
+    settingsProvider,
     context,
   });
   context.subscriptions.push(...commands);
@@ -41,6 +51,8 @@ export async function activate(
     authenticated
   );
 
+  settingsProvider.setHasApiKey(authenticated);
+
   if (authenticated) {
     runsProvider.setClient(auth.client);
     runDetailPanel.setClient(auth.client);
@@ -48,18 +60,23 @@ export async function activate(
     const savedProjectId = context.workspaceState.get<string>(
       "currents.projectId"
     );
+    const savedProjectName = context.workspaceState.get<string>(
+      "currents.projectName"
+    );
+    settingsProvider.setProjectName(savedProjectName);
+
     if (savedProjectId) {
       await vscode.commands.executeCommand(
         "setContext",
         "currents.projectSelected",
         true
       );
-      runsProvider.setProjectId(savedProjectId);
 
       const branch = await getCurrentBranch();
       if (branch) {
         runsProvider.setFilters({ branches: [branch] });
       }
+      runsProvider.setProjectId(savedProjectId);
     } else {
       await vscode.commands.executeCommand(
         "setContext",

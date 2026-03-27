@@ -1,0 +1,1557 @@
+{
+  "status": "OK",
+  "data": {
+    "_id": "69c6aec6f0d929caf22482ea",
+    "instanceId": "38373d1f1a1cff9d",
+    "orgId": "66bbb5abbb9cf27576750d22",
+    "__v": 0,
+    "commit": {
+      "remoteOrigin": "https://github.com/currents-dev/demo-data",
+      "branch": "docs/troubleshooting",
+      "authorName": "John Doe",
+      "authorEmail": "john.doe@example.com",
+      "message": "docs: add troubleshooting guide",
+      "sha": "9108e7cfde0d49d469001503eb767fe4b8af0d2d",
+      "ghaEventData": {
+        "headRef": "docs/troubleshooting",
+        "headSha": "9108e7cfde0d49d469001503eb767fe4b8af0d2d",
+        "baseRef": "main",
+        "baseSha": "9108e7cfde0d49d469001503eb767fe4b8af0d2d",
+        "issueUrl": "https://api.github.com/repos/owner/repo/issues/120",
+        "htmlUrl": "https://github.com/owner/repo/pull/71",
+        "prTitle": "docs: add troubleshooting guide",
+        "senderAvatarUrl": "https://avatars.githubusercontent.com/u/6850",
+        "senderHtmlUrl": "https://github.com/JohnDoe"
+      },
+      "replacedCommitData": {
+        "sha": "9108e7cfde0d49d469001503eb767fe4b8af0d2d",
+        "branch": "docs/troubleshooting",
+        "message": "docs: add troubleshooting guide\n"
+      }
+    },
+    "createdAt": "2026-03-27T16:22:30.522Z",
+    "framework": {
+      "clientVersion": "1.9.4",
+      "type": "pw",
+      "version": "1.50.1"
+    },
+    "groupId": "web-app",
+    "machineId": "vK67TERL9EUv",
+    "platform": {
+      "osName": "linux",
+      "osVersion": "Ubuntu - 22.04",
+      "browserName": "web-app",
+      "browserVersion": ""
+    },
+    "projectId": "GtO78i",
+    "results": {
+      "stats": {
+        "overall": 10,
+        "tests": 10,
+        "passes": 9,
+        "failures": 1,
+        "pending": 0,
+        "skipped": 0,
+        "flaky": 1,
+        "retries": 0,
+        "wallClockStartedAt": "2026-03-27T16:22:55.129Z",
+        "wallClockEndedAt": "2026-03-27T16:23:27.133Z",
+        "wallClockDuration": 32004
+      },
+      "tests": [
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should generate a summary report with key metrics"
+          ],
+          "startTime": "2026-03-27T16:22:55.129Z",
+          "endTime": "2026-03-27T16:22:57.208Z",
+          "duration": 2079,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should generate a summary report with key metrics"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should allow filtering of reports by date range"
+          ],
+          "startTime": "2026-03-27T16:22:57.345Z",
+          "endTime": "2026-03-27T16:23:00.401Z",
+          "duration": 3056,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should allow filtering of reports by date range"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should export reports in various formats (PDF, CSV, Excel)"
+          ],
+          "startTime": "2026-03-27T16:23:00.570Z",
+          "endTime": "2026-03-27T16:23:02.585Z",
+          "duration": 2015,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should export reports in various formats (PDF, CSV, Excel)"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should display interactive charts and graphs"
+          ],
+          "startTime": "2026-03-27T16:23:02.726Z",
+          "endTime": "2026-03-27T16:23:04.884Z",
+          "duration": 2158,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should display interactive charts and graphs"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should allow customization of report templates"
+          ],
+          "startTime": "2026-03-27T16:23:05.046Z",
+          "endTime": "2026-03-27T16:23:07.890Z",
+          "duration": 2844,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should allow customization of report templates"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should schedule automated report generation"
+          ],
+          "startTime": "2026-03-27T16:23:08.057Z",
+          "endTime": "2026-03-27T16:23:10.002Z",
+          "duration": 1945,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should schedule automated report generation"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should provide access controls for sensitive report data"
+          ],
+          "startTime": "2026-03-27T16:23:10.124Z",
+          "endTime": "2026-03-27T16:23:12.123Z",
+          "duration": 1999,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should provide access controls for sensitive report data"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should integrate with third-party analytics tools"
+          ],
+          "startTime": "2026-03-27T16:23:12.212Z",
+          "endTime": "2026-03-27T16:23:13.523Z",
+          "duration": 1311,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should integrate with third-party analytics tools"
+          ]
+        },
+        {
+          "_s": "failed",
+          "_d": true,
+          "_f": false,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should generate real-time reports for live data"
+          ],
+          "startTime": "2026-03-27T16:23:13.607Z",
+          "endTime": "2026-03-27T16:23:22.452Z",
+          "duration": 8845,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should generate real-time reports for live data"
+          ]
+        },
+        {
+          "_s": "passed",
+          "_d": true,
+          "_f": true,
+          "groupId": "web-app",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "spec": "web-app/reports.spec.ts",
+          "title": [
+            "@web-app @annotations @attachments",
+            "should allow collaboration and sharing of reports"
+          ],
+          "startTime": "2026-03-27T16:23:23.156Z",
+          "endTime": "2026-03-27T16:23:27.133Z",
+          "duration": 3977,
+          "originalTitle": [
+            "@web-app @annotations @attachments",
+            "should allow collaboration and sharing of reports"
+          ]
+        }
+      ],
+      "attachments": [
+        {
+          "id": "bad711b533cf63f93e2c6e6831310b39",
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/XLjs94TO6v1EXXXQ.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=72af8413238c84d8bfa9b03c4751f15057066604dbe6cd22db0c1228742ccdbc&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:22:59.023Z"
+        },
+        {
+          "id": "b01f4cddee4d2ebb355870534ff91cde",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/IO8TlbIVkVj1s5LC.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b7744bcc4ff620969294fa6b777fb3bcb272730acd8d0d0410acc86a800bb7d9&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:14.699Z"
+        },
+        {
+          "id": "40fb743aa0a8b05d6fe60cbcf082b627",
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/vs93uKRC3bmxX8xA.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=092bc8e6ffa032a3b82a7e285929e0b389ecee9a2ffba53932207d72d398f48c&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:10.859Z"
+        },
+        {
+          "id": "d5957978d1ef3049208fa49611c7678e",
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/7HRBctB1s84yLAXe.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=8a9b6eb6c156d99e2ad1eaee0e4197fea809d15324ccfb85373ba0f091a9f28f&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:12.728Z"
+        },
+        {
+          "id": "cecd5d5d83af31974bbad41241a0fa98",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 2,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/QUir0lA8mIPKRsK8.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=076d202389cc06c63a323ff48647e8671603b212280a861da1b8f82ab33d79ad&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:19.132Z"
+        },
+        {
+          "id": "0c16c0a3662b1f8bac102f23fe60ac7f",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/KIbJKMRMDNGsavdn.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b3d67a0f3d1a6b6749aaa01f92089ed70931f9e2d0a3c12a8f80bd41a2f2a412&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:23.858Z"
+        },
+        {
+          "id": "364d2e36f8607506077e0e4280317967",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 2,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/sOTaNMQcHdLWzPql.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=df74b90b938fcd777c546cde269ca8aea813378994e4116a3019615e7864410b&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:19.127Z"
+        },
+        {
+          "id": "d2a4c8e5e81b25c129cdd22033e2eb78",
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/7znSWU0r7dtLMY4Z.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b1ed06b6c670985ba2db3f2b3c7b619d4df360d9e44d251f9c22e4470a0147af&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:06.377Z"
+        },
+        {
+          "id": "a01b1b18b253ff6e5f73c5f73b7a16ff",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/NRdeDDEDKvUqS0Ep.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=f12f005602421817b3c08f234ab681f795f41e1225f379138791d59c7fb9009c&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:14.701Z"
+        },
+        {
+          "id": "7da31e1532cb506c644ec5f9ce665298",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 3,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/gbsWVVKkwTUAIACt.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=875cc3943a1366d3ede13772f6d2a2565c2572ca50fbfe364f74a95e7742b62a&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:21.771Z"
+        },
+        {
+          "id": "2c87d75b5ff658ac842aa8c0417b91d8",
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/FNLQ5U2zHxVnPrXb.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=46b47bb9024aad8712e234eea612976e89cd9d51d88ba06a6e935fd2ad3d6d65&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:08.927Z"
+        },
+        {
+          "id": "0f76689c472219d4359898b4b57447f4",
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/qkMrAfReaZ95yBsW.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=e1f51698847bba492104a27758978d433c86406a67927fdc1d99033982f92757&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:22:56.599Z"
+        },
+        {
+          "id": "c7bce4d55f60d077191407bf47edbc43",
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/EnNzVscjF2sLy5lA.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=330ae73b20da285ce7d6ade17221e37ea37adc167c96b0f40edf0e0c1a09aee4&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:12.727Z"
+        },
+        {
+          "id": "f1ac4e0cd3538b08ad6af727f5ed135b",
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/8lKWimnuym3q9VcL.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=e110ee955d65b1585d7f0e8306b88cf727563809c66d68bcd02542c3176ac8f0&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:22:59.024Z"
+        },
+        {
+          "id": "d53b2bcf7bc29538e43a957dcd25e7af",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 1,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/3cZI2xNnozMHlXMr.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=913f300bacbf3cc1ec59463a8fef4707d8a52c2eac7548cfbfbe55121bbed7e9&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:17.023Z"
+        },
+        {
+          "id": "5221794303c579572af1f99110c91c0f",
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/MAPRxLH7C4ecpsxf.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=6ce0cdbe3c4c55984ab80b5107ffd9bd309bcfd4bd000aaaef951066525c8a45&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:03.394Z"
+        },
+        {
+          "id": "c7c4289335ec9dc31f1bf6f431e433e8",
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/ZrvTSSpqRJTcSagC.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=9d90bbd48492d7146f75ea84c0007681ff4879ce45b8d6dff9f297974f9849f9&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:22:56.598Z"
+        },
+        {
+          "id": "7d4f2bf3ce4d800a2747de14e2843203",
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/nXOqby9GdZVslphx.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=f342138a17901e4f9f3a3ab57f6e4306ab979760966ea106d3f7f070d14aff03&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:06.377Z"
+        },
+        {
+          "id": "d6dc807380e523a6bcab2080a5b6cfba",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 1,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/UWv7iA01eeFdEUTu.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=60f2dc234d789124c095e1304ceee8f1e420645e2ce1b5b2e92b2928664beed7&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:17.022Z"
+        },
+        {
+          "id": "2cd6809a8f56359c030bbf68e00655d5",
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/wYLgliZ7LOIbHNZV.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=47051356f6fffade315ec10853b6a22e8c1611de9ae0ba99f562f7e24a89556d&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:02.051Z"
+        },
+        {
+          "id": "9c4eee6e3af5a7cc30114912b0332a37",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "testAttemptIndex": 3,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/SnmJbWjp2IKpOclQ.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=fd33b949aad00272117b23f6cf04c5df2e6f6fce5587e98cf716a29153ceee67&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:21.775Z"
+        },
+        {
+          "id": "a532127d2fa548b008ea9c1eb32c6b5f",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "testAttemptIndex": 1,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/dbzY7qN9hiYE6ReX.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=4b697a4915700996c1ecfeabe3a94e6fdf5b3ff2f867dd66c2388187ce318e83&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:26.134Z"
+        },
+        {
+          "id": "f5f56da6ecb8474485d4fe84a44ab86d",
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/btlGB7MYr63sQIu8.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=df53d16436dfbb45deb1ecce63ea4a164fae3f7234cec3ea72251ff1ffeefb82&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:08.928Z"
+        },
+        {
+          "id": "f37172658ff33fc6e110433f737a54df",
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/kJXxos9lieUfEzKn.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=a04ae9703c83d382cab01c800258a7bc87957665ee499035721e4a7633faaad0&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:02.035Z"
+        },
+        {
+          "id": "3949718163b3cc894c13977af1d4e95d",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/KxkLnhH4IjqjcUvw.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=8899864d54b04a039bf42a4d5aa0ebfea781466d8316a858b13ffaeee21a5975&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:23.854Z"
+        },
+        {
+          "id": "b32cc21b7d2c42579686881f8599f81a",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "testAttemptIndex": 1,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/IXSZD6fg0V9gXhpm.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=106ec6b32e706bf70b268fd8dd15d816990b298056249781b535309032127226&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:26.126Z"
+        },
+        {
+          "id": "bb25ec6d2c4f3320f88270cb0f78c988",
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/T6t283Ww2ADSM9Qj.md?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=2ca65befa1be291faa746aac55b60e5743242a2d422f0ef013a22cafe1517833&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "text/markdown",
+          "filename": "performance-report-efaf5e8fdbd8d44f2cb04ec36fff897e2d3cb699.md",
+          "createdAt": "2026-03-27T16:23:10.860Z"
+        },
+        {
+          "id": "af88616db21fcb702fb74700592f36b4",
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "testAttemptIndex": 0,
+          "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/mwngNsBzHR5g547A.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=90be6e1d07fd60e623afcd55eb88c4967e66c90f908ea18d6d583c4f58b4dbc2&X-Amz-SignedHeaders=host",
+          "name": "performance-report",
+          "contentType": "application/json",
+          "filename": "performance-report-b75f4d0783b1be5a5bb3323dd31b6e89c8b02148.json",
+          "createdAt": "2026-03-27T16:23:03.393Z"
+        }
+      ],
+      "playwrightTraces": [
+        {
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "traceId": "5c4281bad4dbb6bc6150fe29e728bd1b",
+          "testAttemptIndex": 1,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/pJYY0QA0gNuvaWbv.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=6647a78837dff042a4552df244d9d3b3b401625a008c26507b9495f0b2e9de0a&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "traceId": "1b52556456020371d6a8d2b976f08c76",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/ENJWHRv5TYnPQ8Xr.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=c6f935ca019a37ae33b2deee6feafa93766960597e0b66d16b0146b136dd4a51&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "traceId": "bedba6b41a3a5a1b78f2590afa5fff9c",
+          "testAttemptIndex": 1,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/Wm2BAQ2sGcxA8a47.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=8df1788bf1358a29dc521d61b470580b07c0abeb67fb126ec2c542c815e4c3bf&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "traceId": "cfa84ec29f05f34ee4630d29cdf790e8",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/Yuos14h2mHLoxAi5.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=ef55e65555c91af3a8cdd7386a4c319b26ad84f14c3192b3d0659249c3f09ab8&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "traceId": "7b8a24f78bf83268e2718202a3d5088a",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/KcbFn4L22CwLLrEo.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=a4278ea92ec52c1aae6ee61be49b76ec69d33818fa7d372d949e121b8f9217b6&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "traceId": "bc00f654582db3adf394c77140147c00",
+          "testAttemptIndex": 3,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/ekPkfVbMfRA3ju1G.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=9b27f92fdb74703a888df4802789fd0c0b46760a4ff8ce922b19bf1e209df0f7&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "traceId": "250fed0a29b92dcdd57d26423969f160",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/ia8j2v6jQhGGlqXa.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=7231210724c79ac94e7456d64aaf3099ccf4b641efaa91387d0b0be0e67eaa74&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "traceId": "9655ff33ef3dea0a92479b890ad2a202",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/4y5umjDGpxHeZrCK.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b6b9eff651e8ce5f5a09d14591604193b6cd608e3c51a149b7c2a1d32a4e1a0a&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "traceId": "d0a0362ffea006e40133a3fc0be658e4",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/lWOMm0IzLUAJesOn.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=be4b4e91e5d1394cc74031d65d3e20a02e13840c81fccaafa4eaf107e795fa26&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "traceId": "25d00465bf5f4d88bf2cb433055a4b1e",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/8nYTrCahzHmbGDPW.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=cf90b31dd840df46464d3f21d339e28c122c4c1adf29151970f6dfc5bd37b3b8&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "traceId": "ac333f7d3851be302e8df1ea89c2954b",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/qvaxav8g7y1w24Li.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=4dcc62558dcd000c4f22a2131607ba72d7ca294deaf31abc4033265adadf4fcb&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "traceId": "af56172b9f0eb5cb6bea425d66131060",
+          "testAttemptIndex": 2,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/YlpdKhuVdQAX83WZ.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b80541236e1c699b7b8e553f9a7e6bb59ad6555b2d5f16df00239baa64ad6ce6&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "traceId": "9cd20c2857945b4c8c65a38299d6c5f5",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/wotkY8lHf5UQvfzT.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=7bfd4b8e946c607fccb114603e499d2cf18d4856a13a7d03b4d9a6e95ce24b35&X-Amz-SignedHeaders=host"
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "traceId": "6fcf8a70eb90547e0f29981818dfb3f3",
+          "testAttemptIndex": 0,
+          "name": "trace",
+          "traceURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/6QOzzYkyh6kRrxgq.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=a751a2ba151c72976f2c7433124cbd23ca264b4ba23dbadc241264fa8c1bb4e2&X-Amz-SignedHeaders=host"
+        }
+      ],
+      "screenshots": [
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "9837185b84b8577bde20b2fe046973bd",
+          "testAttemptIndex": 1,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/RjQ4w1djyngUENrY.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=882da1d362fcd6090ecf9d06ee59b9c70cbc6723079c39f89bc7a42b986c69ae&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:17.436Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "screenshotId": "6455ab2f63c4c5f3eca3fe0ee5ed3fb3",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/gEE7Wf5Gvqk8ajNY.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=505b1c8057a92b65997bd25caeff67fbcc9c1f499a72f1c9bc0cb77545f7e094&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:02.031Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "screenshotId": "690af0c1fc09d5908f014c269e1a2e49",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/WMbuAPprblXGdhSF.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=110f1619c1df4c733d999a96f8fe6ec9e63e09e493dc290c6b9792a9716d1723&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:02.329Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "8c2c4dab58726b3f4720117376c14fc8",
+          "testAttemptIndex": 1,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/mW89qhjzcmx4j7ty.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b638e73515f4f07a3ab6999ebe2a2cca7500031add4dc308f1faf816c81d21fb&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:17.018Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "249c8aff5f900a91f9f545253603323f",
+          "testAttemptIndex": 2,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/Q6GEU9dNAPsZiahU.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=c0f901ed6f1d964b58fd769098fb7996166d51f0dc00c97f781525bc18a45128&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:19.804Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "screenshotId": "70fa39ee35a6b83505ade19db48fa547",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/yV5kYMRxIawuycPD.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=0b35c876b50043755528afb9467e007b967430da2dce05f12740c0e0e0ec9150&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:24.561Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "screenshotId": "c27405f792d085f626929675d4e687f0",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/IUadggT4L68Wbvwt.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=4a14d0258414423d2794fe0c03a94f8bfc1ed6a2cb2cf647ba238c45e4effc1e&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:12.722Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "screenshotId": "61b014bfbb8b36479963852d8055f385",
+          "testAttemptIndex": 1,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/uzztpNQjXRnrGRAv.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=62398cc753d419dd27af59ea9f7e27d3500b233b981de49beebc48f906aba8a9&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:26.871Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "screenshotId": "d29f788192ba2eb6e4469913df8ac041",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/iixke2IF3jczicjx.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=8fa172129a6ea4acd63c14e73fb0cb749814ab151cae3a6439f3bbf66a13c23c&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:03.384Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "3c579a62c17e425880804b84da34d4bb",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/VG2Kxh5XI6YCrkCs.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=0c582e7be53fcd913e9f9d171f2f3e71f84ec225f6d8f6cb1af7736c2f942ded&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:15.113Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "screenshotId": "1cc68c170e7f00b3cf9d7cc98f35bfe7",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/0FHVy0iNJh9wEIUI.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=86ca74b6f19a4b73196e32f7b306e6897b9aed47ac6c9725a089e7bc812bef86&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:10.853Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "screenshotId": "0bc574ed492f3f2f38bc37a4af53d408",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/Li600rHVRCPecNU4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=19c81a8485ce164e77b228eece400f2ff8a37281d6d69adb9f001188dca690b8&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:08.921Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "screenshotId": "fb7475cb5378913c1864e3f00e78894f",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/VTwy9Z3OBdJe5OuW.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=0b2a8c4ee1ee57ca4b3c030c0721c630c5e6d8a378c715633ef137d40610a0e7&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:04.500Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "screenshotId": "f588b30aaf073bcbaae39f20b30774f2",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/HuyvfdmDjZvvwpEb.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=b2804a9285029b7853c5a32a99f8da13271656b824c55afe1013d54557cfaadf&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:11.946Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "screenshotId": "fe54bbd102e6160ebbadede0810fded9",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/CsWQknLJqu7A96Nd.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=591119374504cc1aa25f7ac9f5c0f9d2ed231b01b889483183c610a5489963ea&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:23.852Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "screenshotId": "30960e30a6cbb7d1de670081a5d1d592",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/5tpoLB0axuLxhwFG.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=8693d51b93c02e653c785a272210032e626b6df19952706a82bc43a61cac4a2c&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:22:57.030Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "screenshotId": "1fe2069ed7d845db61226519d466444d",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/Mor65gAzcbH6jxRd.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=43a8795c617d8ec7cf68b4aa1cf610d9327cf91e38fa340488829aef5abe7423&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:06.372Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "screenshotId": "76c22da8242324029952bac97ae1ddc9",
+          "testAttemptIndex": 1,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/T8GXSymFuugTFSuM.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=9d857616c7b8fbfe1c318435b1e92774da2f1b12f37073673184bef29c5886c3&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:26.119Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "screenshotId": "c5f77f68d8ce938803494f373a60157b",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/pluVn3Bdf8hgN4yf.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=dd120147a4836e01a5a43737b9707202331daf6bd5804cd303725a60834059aa&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:07.636Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "2b55d6443eceb5848d0cf457661b8bf2",
+          "testAttemptIndex": 3,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/gbZUqHObc0ycNdXL.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=9801df9f3ed18c5b67ed7cc20ee720a2657731326656f5cebc895b43879ee3a7&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:21.766Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "screenshotId": "0e25e34e7ce9ecf0155f55ce7f260249",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/c5xRb07IDWe7McIB.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=c5aca787e080d4da43e7c4186a08df31d2e6d3fa46fd66d2a397d98632e628d9&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:13.385Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "b32d615f2ecbd22e5863aa380a7e87f6",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/pWelsgDWH0qUQbGE.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=de22f9f6cfb1f38e35874cefb063a3b241a087c0434863aac7bfe6011c1e0869&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:14.696Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "screenshotId": "0641571fc7b25ac8a636b27b15dee717",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/Q0ewLQGFNIswLzuq.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=1ed534815d7cd87569106a17769195a1618d7e1fe8d33986678a0732803b8a07&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:22:56.589Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "c79a50b4602b33e5ba66304ccec62159",
+          "testAttemptIndex": 2,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/LcuQJkfFj3PyWiqn.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=2d7d3afb4a5d155916800f09bd112ba9a0be0374648ddd46113b62eae2642ab6&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:19.124Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "screenshotId": "a0c6d608f764bca5c98fd70b7e0be135",
+          "testAttemptIndex": 3,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/a2laAAwcF1PtwwOE.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=1c3a123ad6ab711bc0feaacfbaae25952607e8494c436ad1b5106da951ff7f55&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:22.185Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "screenshotId": "e9ad397424f8984581534d1c6d2d2ee7",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/38GauK8mOf8hQQQ4.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=211bab89e775fc1266f843d6d13fdc00943f281cd0c32f4466f00ff45f49e342&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:09.770Z"
+        },
+        {
+          "name": "icon",
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "screenshotId": "d5dbbfc79db8a3d0f59d710ae905dec0",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/vtfTqzQRWEyV2wF6.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=f2888db2aa72191c7c36774ed4e972e1504b2e983f8c03ffacbb2f42af6d857b&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:22:59.018Z"
+        },
+        {
+          "name": "screenshot",
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "screenshotId": "5052cb99140f15dce3ec08f33007a1b8",
+          "testAttemptIndex": 0,
+          "screenshotURL": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/S1eCfIXzRfjaqbjS.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=78ab8bcd4d78b3e4c7d983f7c9018db93f01181d233167eb3772a8869fd04170&X-Amz-SignedHeaders=host",
+          "takenAt": "2026-03-27T16:23:00.008Z"
+        }
+      ],
+      "videos": [
+        {
+          "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/29O8eia0aADQszUP.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=c8e9972b27e7a9387277ada3ba47438c23e25a40595e518d66307f2b16af6bee&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/6dFT1wexvtazMWhv.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=a9bac1423ff547a3ac3ae9fac7381e8ed1b4d2773ce40eb10135af5849b8cd27&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/V10mz1mvaBnBQgBN.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=520cbf0405a05d84887621377403e52e2cd86f96505406e5f05a30885a9380bb&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/fTYmJ8DB2cxFupai.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=6fce7df47aa7f9b4e56236d1690ae51190dabcf5f77259100d7570671d108bb6&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/pKV9Mq2l3Va8sgVB.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=39b1bfc0311df3c49149e1cdc157de600ae6530409bb3274d40d006823eed45b&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 3
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/mBZmml21oVUfqawQ.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=e4afc074d52e23c2c4bd19d924abd0b4933b16f4f958da26a31973bed7ce541f&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 1
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/pFud3EqRcf7EJ17o.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=51ea30cbc63a0651a0eae65665b4f4ae0f5cc7688d52c15e6d630daed24ec022&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/wxdPGjZ30A3yU9Rq.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=45f9285321bd85195d8c57891ee88740f22cc993a98c75f390f1057a9b1f1f24&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 1
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/CpIMOi0ui9oKR5mk.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=c059cb0cf0bec924eec771b08a1cfeac3eb3698f4a890832b6eeefd1d182344a&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/RJQwgeHYqvYzwLo4.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=7e8a51213bd8c18076d382a7f1f0873e61e465b3305996054f9fd7b4d8718514&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/MwLzSC389jexjSEE.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=53210693a47b2d3368b688d74e2f46d5b627837c00e06350ecff76d3de4fc656&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/N8yMxpWwtz8ClMfk.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=6217e54f75706f0f135b3bb7ceaf8982ababf5f2bbc5e24b1b485d64d4f8ebc5&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 2
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/chGAP0lWAeIOfjr5.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=087a9fe6962a219db5c408273df2c9d856d9389892c0397d3a71aa6e73245ab1&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        },
+        {
+          "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+          "videoUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/9fd9875f8bc899b2/web-app/SRvGciEhdkmyy5Mo.webm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=c9c1749f5ba09cb8b44724b422c8ff472cfe02b7e1b736bedd18d466fbb7b545&X-Amz-SignedHeaders=host",
+          "testAttemptIndex": 0
+        }
+      ],
+      "stdout": {
+        "readUrl": "https://currents-production.e8d8fcf9734e9ea0a5c511fc6813faf3.r2.cloudflarestorage.com/66bbb5abbb9cf27576750d22/stdout_38373d1f1a1cff9d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=3fb06b8edc2ac1c43a923602d6531973%2F20260327%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260327T172858Z&X-Amz-Expires=259200&X-Amz-Signature=893089aecf3f5640947e2de92c83723a83819fbd88f940c08771d617ac0a793b&X-Amz-SignedHeaders=host"
+      }
+    },
+    "runId": "9fd9875f8bc899b2",
+    "schemaVersion": 2,
+    "signature": "ef5fb012d87f9b14d6d526d9300ea5c4",
+    "spec": "web-app/reports.spec.ts",
+    "tags": ["annotations", "attachments", "web-app"],
+    "testList": {
+      "d2ea609703bae19dcdce-1d89861cb7813be2130d": {
+        "testId": "d2ea609703bae19dcdce-1d89861cb7813be2130d",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should generate real-time reports for live data"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should generate real-time reports for live data"
+        ]
+      },
+      "d2ea609703bae19dcdce-208c6d470aa45d378413": {
+        "testId": "d2ea609703bae19dcdce-208c6d470aa45d378413",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should allow collaboration and sharing of reports"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should allow collaboration and sharing of reports"
+        ]
+      },
+      "d2ea609703bae19dcdce-2742e03c771cdbf90ac6": {
+        "testId": "d2ea609703bae19dcdce-2742e03c771cdbf90ac6",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should display interactive charts and graphs"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should display interactive charts and graphs"
+        ]
+      },
+      "d2ea609703bae19dcdce-296481243b0edfa085ad": {
+        "testId": "d2ea609703bae19dcdce-296481243b0edfa085ad",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should allow customization of report templates"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should allow customization of report templates"
+        ]
+      },
+      "d2ea609703bae19dcdce-48cd5b13474300b0a5cf": {
+        "testId": "d2ea609703bae19dcdce-48cd5b13474300b0a5cf",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should export reports in various formats (PDF, CSV, Excel)"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should export reports in various formats (PDF, CSV, Excel)"
+        ]
+      },
+      "d2ea609703bae19dcdce-51b700b022ce65cc33ac": {
+        "testId": "d2ea609703bae19dcdce-51b700b022ce65cc33ac",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should provide access controls for sensitive report data"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should provide access controls for sensitive report data"
+        ]
+      },
+      "d2ea609703bae19dcdce-97bd8982f9105311fece": {
+        "testId": "d2ea609703bae19dcdce-97bd8982f9105311fece",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should schedule automated report generation"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should schedule automated report generation"
+        ]
+      },
+      "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425": {
+        "testId": "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should integrate with third-party analytics tools"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should integrate with third-party analytics tools"
+        ]
+      },
+      "d2ea609703bae19dcdce-b8d09d26ca607a2181a9": {
+        "testId": "d2ea609703bae19dcdce-b8d09d26ca607a2181a9",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should generate a summary report with key metrics"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should generate a summary report with key metrics"
+        ]
+      },
+      "d2ea609703bae19dcdce-e012e3a3e9510e0020bd": {
+        "testId": "d2ea609703bae19dcdce-e012e3a3e9510e0020bd",
+        "title": [
+          "@web-app @annotations @attachments",
+          "should allow filtering of reports by date range"
+        ],
+        "originalTitle": [
+          "@web-app @annotations @attachments",
+          "should allow filtering of reports by date range"
+        ]
+      }
+    },
+    "testTags": {
+      "d2ea609703bae19dcdce-1d89861cb7813be2130d": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-208c6d470aa45d378413": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-2742e03c771cdbf90ac6": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-296481243b0edfa085ad": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-48cd5b13474300b0a5cf": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-51b700b022ce65cc33ac": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-97bd8982f9105311fece": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-b8d09d26ca607a2181a9": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ],
+      "d2ea609703bae19dcdce-e012e3a3e9510e0020bd": [
+        "annotations",
+        "attachments",
+        "web-app"
+      ]
+    },
+    "_t": "2026-03-27T16:23:37.298Z",
+    "claimRecords": {
+      "vK67TERL9EUv_1774628575129": {
+        "machineId": "vK67TERL9EUv",
+        "t": 1774628575129
+      }
+    },
+    "testAnnotations": {
+      "d2ea609703bae19dcdce-b8d09d26ca607a2181a9": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        },
+        {
+          "type": "note",
+          "description": "This test has attachments"
+        },
+        {
+          "type": "note",
+          "description": "This test has performance reports attached"
+        },
+        {
+          "type": "note",
+          "description": "Attachments should have JSON and MD files"
+        }
+      ],
+      "d2ea609703bae19dcdce-e012e3a3e9510e0020bd": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        },
+        {
+          "type": "note",
+          "description": "The date range should allow up to one year"
+        }
+      ],
+      "d2ea609703bae19dcdce-48cd5b13474300b0a5cf": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ],
+      "d2ea609703bae19dcdce-2742e03c771cdbf90ac6": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ],
+      "d2ea609703bae19dcdce-296481243b0edfa085ad": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ],
+      "d2ea609703bae19dcdce-97bd8982f9105311fece": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ],
+      "d2ea609703bae19dcdce-51b700b022ce65cc33ac": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ],
+      "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ],
+      "d2ea609703bae19dcdce-1d89861cb7813be2130d": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        },
+        {
+          "type": "note",
+          "description": "The reports should be generated in real-time"
+        },
+        {
+          "type": "note",
+          "description": "It can be delayed by up to 10 seconds"
+        },
+        {
+          "type": "owner",
+          "description": "@data-team"
+        }
+      ],
+      "d2ea609703bae19dcdce-208c6d470aa45d378413": [
+        {
+          "type": "owner",
+          "description": "Jane Smith"
+        }
+      ]
+    },
+    "testResults": {
+      "d2ea609703bae19dcdce-b8d09d26ca607a2181a9": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "ci07KTgAnWnv2zBQ-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:22:55.129Z",
+            "wallClockDuration": 2079,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 2079,
+        "endTime": "2026-03-27T16:22:57.208Z",
+        "isFlaky": false,
+        "recordId": "ci07KTgAnWnv2zBQ",
+        "startTime": "2026-03-27T16:22:55.129Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-e012e3a3e9510e0020bd": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "JyZeudgxkprdMFaV-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:22:57.345Z",
+            "wallClockDuration": 3056,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 3056,
+        "endTime": "2026-03-27T16:23:00.401Z",
+        "isFlaky": false,
+        "recordId": "JyZeudgxkprdMFaV",
+        "startTime": "2026-03-27T16:22:57.345Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-48cd5b13474300b0a5cf": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "sPCdEQYOhXm23Nl3-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:00.570Z",
+            "wallClockDuration": 2015,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 2015,
+        "endTime": "2026-03-27T16:23:02.585Z",
+        "isFlaky": false,
+        "recordId": "sPCdEQYOhXm23Nl3",
+        "startTime": "2026-03-27T16:23:00.570Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-2742e03c771cdbf90ac6": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "Q4RSi1Wr5BAZY4I8-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:02.726Z",
+            "wallClockDuration": 2158,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 2158,
+        "endTime": "2026-03-27T16:23:04.884Z",
+        "isFlaky": false,
+        "recordId": "Q4RSi1Wr5BAZY4I8",
+        "startTime": "2026-03-27T16:23:02.726Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-296481243b0edfa085ad": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "5R9UePEOEQsdN6tZ-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:05.046Z",
+            "wallClockDuration": 2844,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 2844,
+        "endTime": "2026-03-27T16:23:07.890Z",
+        "isFlaky": false,
+        "recordId": "5R9UePEOEQsdN6tZ",
+        "startTime": "2026-03-27T16:23:05.046Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-97bd8982f9105311fece": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "mnaPJgG1TDc1oCYB-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:08.057Z",
+            "wallClockDuration": 1945,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 1945,
+        "endTime": "2026-03-27T16:23:10.002Z",
+        "isFlaky": false,
+        "recordId": "mnaPJgG1TDc1oCYB",
+        "startTime": "2026-03-27T16:23:08.057Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-51b700b022ce65cc33ac": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "PJarGkWE6Iposf0a-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:10.124Z",
+            "wallClockDuration": 1999,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 1999,
+        "endTime": "2026-03-27T16:23:12.123Z",
+        "isFlaky": false,
+        "recordId": "PJarGkWE6Iposf0a",
+        "startTime": "2026-03-27T16:23:10.124Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-a4a8fbb8c780c1c31425": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "whLIP0bf9cH6SpKf-0",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:12.212Z",
+            "wallClockDuration": 1311,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": null,
+        "duration": 1311,
+        "endTime": "2026-03-27T16:23:13.523Z",
+        "isFlaky": false,
+        "recordId": "whLIP0bf9cH6SpKf",
+        "startTime": "2026-03-27T16:23:12.212Z",
+        "state": "passed"
+      },
+      "d2ea609703bae19dcdce-1d89861cb7813be2130d": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "SMgDZL0UpUPIJh8S-0",
+            "state": "failed",
+            "rawStatus": "failed",
+            "workerIndex": 1,
+            "parallelIndex": 1,
+            "error": {
+              "name": null,
+              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+              "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:242:31\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:241:20",
+              "value": null,
+              "codeFrame": {
+                "frame": "\u001b[0m \u001b[90m 240 |\u001b[39m\n \u001b[90m 241 |\u001b[39m         \u001b[36mawait\u001b[39m test\u001b[33m.\u001b[39mstep(\u001b[32m`Assert real-time generation`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m () \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 242 |\u001b[39m           \u001b[36mawait\u001b[39m expect(\u001b[36mfalse\u001b[39m)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 243 |\u001b[39m         })\u001b[33m;\u001b[39m\n \u001b[90m 244 |\u001b[39m       }\n \u001b[90m 245 |\u001b[39m     )\u001b[33m;\u001b[39m\u001b[0m",
+                "line": 242,
+                "column": 31,
+                "file": "/__w/demo-data/demo-data/tests/web-app/reports.spec.ts"
+              }
+            },
+            "wallClockStartedAt": "2026-03-27T16:23:13.607Z",
+            "wallClockDuration": 1693,
+            "videoTimestamp": null
+          },
+          {
+            "_d": true,
+            "attemptId": "SMgDZL0UpUPIJh8S-1",
+            "state": "failed",
+            "rawStatus": "failed",
+            "workerIndex": 6,
+            "parallelIndex": 0,
+            "error": {
+              "name": null,
+              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+              "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:242:31\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:241:20",
+              "value": null,
+              "codeFrame": {
+                "frame": "\u001b[0m \u001b[90m 240 |\u001b[39m\n \u001b[90m 241 |\u001b[39m         \u001b[36mawait\u001b[39m test\u001b[33m.\u001b[39mstep(\u001b[32m`Assert real-time generation`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m () \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 242 |\u001b[39m           \u001b[36mawait\u001b[39m expect(\u001b[36mfalse\u001b[39m)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 243 |\u001b[39m         })\u001b[33m;\u001b[39m\n \u001b[90m 244 |\u001b[39m       }\n \u001b[90m 245 |\u001b[39m     )\u001b[33m;\u001b[39m\u001b[0m",
+                "line": 242,
+                "column": 31,
+                "file": "/__w/demo-data/demo-data/tests/web-app/reports.spec.ts"
+              }
+            },
+            "wallClockStartedAt": "2026-03-27T16:23:15.964Z",
+            "wallClockDuration": 1735,
+            "videoTimestamp": null
+          },
+          {
+            "_d": true,
+            "attemptId": "SMgDZL0UpUPIJh8S-2",
+            "state": "failed",
+            "rawStatus": "failed",
+            "workerIndex": 7,
+            "parallelIndex": 0,
+            "error": {
+              "name": null,
+              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+              "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:242:31\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:241:20",
+              "value": null,
+              "codeFrame": {
+                "frame": "\u001b[0m \u001b[90m 240 |\u001b[39m\n \u001b[90m 241 |\u001b[39m         \u001b[36mawait\u001b[39m test\u001b[33m.\u001b[39mstep(\u001b[32m`Assert real-time generation`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m () \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 242 |\u001b[39m           \u001b[36mawait\u001b[39m expect(\u001b[36mfalse\u001b[39m)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 243 |\u001b[39m         })\u001b[33m;\u001b[39m\n \u001b[90m 244 |\u001b[39m       }\n \u001b[90m 245 |\u001b[39m     )\u001b[33m;\u001b[39m\u001b[0m",
+                "line": 242,
+                "column": 31,
+                "file": "/__w/demo-data/demo-data/tests/web-app/reports.spec.ts"
+              }
+            },
+            "wallClockStartedAt": "2026-03-27T16:23:18.399Z",
+            "wallClockDuration": 1644,
+            "videoTimestamp": null
+          },
+          {
+            "_d": true,
+            "attemptId": "SMgDZL0UpUPIJh8S-3",
+            "state": "failed",
+            "rawStatus": "failed",
+            "workerIndex": 8,
+            "parallelIndex": 0,
+            "error": {
+              "name": null,
+              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+              "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:242:31\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:241:20",
+              "value": null,
+              "codeFrame": {
+                "frame": "\u001b[0m \u001b[90m 240 |\u001b[39m\n \u001b[90m 241 |\u001b[39m         \u001b[36mawait\u001b[39m test\u001b[33m.\u001b[39mstep(\u001b[32m`Assert real-time generation`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m () \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 242 |\u001b[39m           \u001b[36mawait\u001b[39m expect(\u001b[36mfalse\u001b[39m)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 243 |\u001b[39m         })\u001b[33m;\u001b[39m\n \u001b[90m 244 |\u001b[39m       }\n \u001b[90m 245 |\u001b[39m     )\u001b[33m;\u001b[39m\u001b[0m",
+                "line": 242,
+                "column": 31,
+                "file": "/__w/demo-data/demo-data/tests/web-app/reports.spec.ts"
+              }
+            },
+            "wallClockStartedAt": "2026-03-27T16:23:20.727Z",
+            "wallClockDuration": 1725,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+        "duration": 8845,
+        "endTime": "2026-03-27T16:23:22.452Z",
+        "isFlaky": false,
+        "recordId": "SMgDZL0UpUPIJh8S",
+        "startTime": "2026-03-27T16:23:13.607Z",
+        "state": "failed"
+      },
+      "d2ea609703bae19dcdce-208c6d470aa45d378413": {
+        "_d": true,
+        "attempts": [
+          {
+            "_d": true,
+            "attemptId": "UyYI4xOm64Y66HzN-0",
+            "state": "failed",
+            "rawStatus": "failed",
+            "workerIndex": 9,
+            "parallelIndex": 0,
+            "error": {
+              "name": null,
+              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+              "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:261:43\n    at /__w/demo-data/demo-data/tests/web-app/reports.spec.ts:260:18",
+              "value": null,
+              "codeFrame": {
+                "frame": "\u001b[0m \u001b[90m 259 |\u001b[39m\n \u001b[90m 260 |\u001b[39m       \u001b[36mawait\u001b[39m test\u001b[33m.\u001b[39mstep(\u001b[32m`Assert collaboration features`\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m () \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 261 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\u001b[33mMath\u001b[39m\u001b[33m.\u001b[39mrandom() \u001b[33m>\u001b[39m \u001b[35m0.1\u001b[39m)\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 262 |\u001b[39m       })\u001b[33m;\u001b[39m\n \u001b[90m 263 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 264 |\u001b[39m   }\u001b[0m",
+                "line": 261,
+                "column": 43,
+                "file": "/__w/demo-data/demo-data/tests/web-app/reports.spec.ts"
+              }
+            },
+            "wallClockStartedAt": "2026-03-27T16:23:23.156Z",
+            "wallClockDuration": 1635,
+            "videoTimestamp": null
+          },
+          {
+            "_d": true,
+            "attemptId": "UyYI4xOm64Y66HzN-1",
+            "state": "passed",
+            "rawStatus": "passed",
+            "workerIndex": 10,
+            "parallelIndex": 0,
+            "error": null,
+            "wallClockStartedAt": "2026-03-27T16:23:25.493Z",
+            "wallClockDuration": 1640,
+            "videoTimestamp": null
+          }
+        ],
+        "displayError": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+        "duration": 3977,
+        "endTime": "2026-03-27T16:23:27.133Z",
+        "isFlaky": true,
+        "recordId": "UyYI4xOm64Y66HzN",
+        "startTime": "2026-03-27T16:23:23.156Z",
+        "state": "passed"
+      }
+    },
+    "claimList": [
+      {
+        "machineId": "vK67TERL9EUv",
+        "t": 1774628575129
+      }
+    ],
+    "claimedAt": "2026-03-27T16:22:55.129Z",
+    "id": null
+  }
+}

@@ -3,6 +3,7 @@ import { AuthManager } from "./auth.js";
 import type { RunFeedItem } from "./api/types.js";
 import { RunsWebviewProvider } from "./views/runsWebviewProvider.js";
 import { RunDetailPanelProvider } from "./views/runDetailPanel.js";
+import { SettingsWebviewProvider } from "./views/settingsWebviewProvider.js";
 import { getCurrentBranch } from "./git.js";
 import { log } from "./log.js";
 
@@ -10,13 +11,14 @@ interface AppState {
   auth: AuthManager;
   runsProvider: RunsWebviewProvider;
   runDetailPanel: RunDetailPanelProvider;
+  settingsProvider: SettingsWebviewProvider;
   context: vscode.ExtensionContext;
 }
 
 export function registerCommands(
   state: AppState
 ): vscode.Disposable[] {
-  const { auth, runsProvider, runDetailPanel, context } = state;
+  const { auth, runsProvider, runDetailPanel, settingsProvider, context } = state;
 
   return [
     vscode.commands.registerCommand("currents.setApiKey", async () => {
@@ -29,6 +31,7 @@ export function registerCommands(
         );
         runsProvider.setClient(auth.client);
         runDetailPanel.setClient(auth.client);
+        settingsProvider.setHasApiKey(true);
         await vscode.commands.executeCommand("currents.selectProject");
       }
     }),
@@ -49,6 +52,8 @@ export function registerCommands(
         );
         runsProvider.setClient(undefined);
         runsProvider.setProjectId(undefined);
+        settingsProvider.setHasApiKey(false);
+        settingsProvider.setProjectName(undefined);
       }
     ),
 
@@ -90,6 +95,7 @@ export function registerCommands(
               true
             );
             runsProvider.setProjectId(project.projectId);
+            settingsProvider.setProjectName(project.name);
             await autoSetBranchFilter(runsProvider);
             vscode.window.showInformationMessage(
               `Currents: Selected project "${project.name}"`
@@ -121,6 +127,7 @@ export function registerCommands(
               true
             );
             runsProvider.setProjectId(pick.projectId);
+            settingsProvider.setProjectName(pick.label);
             await autoSetBranchFilter(runsProvider);
             vscode.window.showInformationMessage(
               `Currents: Selected project "${pick.label}"`
@@ -212,6 +219,7 @@ export function registerCommands(
         }
       }
     ),
+
   ];
 }
 

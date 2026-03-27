@@ -127,6 +127,16 @@ export interface Instance {
     flaky: number;
     tests: InstanceTest[];
   } | null;
+  testResults?: Record<string, InstanceTestResult>;
+}
+
+export interface InstanceTestResult {
+  state: string;
+  isFlaky: boolean;
+  displayError: string | null;
+  duration: number;
+  attempts: TestAttempt[];
+  [key: string]: unknown;
 }
 
 export interface InstanceTest {

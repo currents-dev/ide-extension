@@ -18,7 +18,7 @@
         {
           "id": "currents",
           "title": "Currents",
-          "icon": "resources/currents-icon.svg"
+          "icon": "resources/logo.svg"
         }
       ]
     },
@@ -28,16 +28,31 @@
           "id": "currents-runs",
           "name": "Runs",
           "type": "webview"
+        },
+        {
+          "id": "currents-settings",
+          "name": "Settings",
+          "type": "webview",
+          "visibility": "collapsed"
         }
       ]
+    },
+    "configuration": {
+      "title": "Currents",
+      "properties": {
+        "currents.notifyOnRunComplete": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a notification when a run finishes."
+        }
+      }
     },
     "viewsWelcome": [],
     "commands": [
       {
         "command": "currents.setApiKey",
         "title": "Set API Key",
-        "category": "Currents",
-        "icon": "$(key)"
+        "category": "Currents"
       },
       {
         "command": "currents.removeApiKey",
@@ -121,13 +136,8 @@
         },
         {
           "command": "currents.selectProject",
-          "when": "view == currents-runs && currents.authenticated",
+          "when": "false",
           "group": "navigation@5"
-        },
-        {
-          "command": "currents.setApiKey",
-          "when": "view == currents-runs",
-          "group": "overflow"
         }
       ],
       "view/item/context": []

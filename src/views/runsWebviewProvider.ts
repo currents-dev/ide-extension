@@ -13,6 +13,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private lastCursor: string | undefined;
   private filters: RunFilters = {};
   private loading = false;
+  private activeRunId: string | undefined;
   private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
@@ -55,6 +56,16 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 
   clearFilters(): void {
     this.setFilters({});
+  }
+
+  setActiveRunId(runId: string | undefined): void {
+    this.activeRunId = runId;
+    if (this.view) {
+      this.view.webview.postMessage({
+        type: "activeRun",
+        runId: runId,
+      });
+    }
   }
 
   async loadMore(): Promise<void> {
@@ -107,6 +118,9 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           }
           break;
         }
+        case "clearFilters":
+          this.clearFilters();
+          break;
       }
     });
   }
@@ -158,6 +172,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       hasMore: this.hasMore,
       loading: this.loading,
       filters: this.filters,
+      activeRunId: this.activeRunId,
     });
   }
 
@@ -216,7 +231,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     cursor: pointer;
     transition: border-color 0.15s;
   }
-  .run-card:hover {
+  .run-card:hover,
+  .run-card.active {
     border-color: var(--vscode-focusBorder);
   }
 
@@ -290,7 +306,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   .stat-passed { color: var(--vscode-testing-iconPassed); }
   .stat-failed { color: var(--vscode-testing-iconFailed); }
   .stat-skipped { color: var(--vscode-descriptionForeground); }
-  .stat-flaky { color: var(--vscode-editorWarning-foreground); }
+  .stat-flaky { color: #e57ab0; }
 
   .run-actions {
     display: flex;
@@ -380,15 +396,24 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   <script>
     const vscode = acquireVsCodeApi();
 
-    let currentState = { runs: [], hasMore: false, loading: false, filters: {} };
+    let currentState = { runs: [], hasMore: false, loading: false, filters: {}, activeRunId: null };
 
     window.addEventListener('message', (event) => {
       const message = event.data;
       if (message.type === 'state') {
         currentState = message;
         render();
+      } else if (message.type === 'activeRun') {
+        currentState.activeRunId = message.runId || null;
+        applyActiveState();
       }
     });
+
+    function applyActiveState() {
+      document.querySelectorAll('.run-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.runId === currentState.activeRunId);
+      });
+    }
 
     function formatDuration(ms) {
       if (!ms) return '';
@@ -434,11 +459,12 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 
       // Filters
       const chips = [];
+      var filterIcon = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M6 12v-1h4v1H6zM4 8v-1h8v1H4zM2 4v-1h12v1H2z"/></svg> ';
       if (filters.branches && filters.branches.length) {
-        chips.push('<span class="filter-chip">\u2387 ' + escHtml(filters.branches[0]) + '</span>');
+        chips.push('<span class="filter-chip">' + filterIcon + escHtml(filters.branches[0]) + '</span>');
       }
       if (filters.authors && filters.authors.length) {
-        chips.push('<span class="filter-chip">\u263A ' + escHtml(filters.authors[0]) + '</span>');
+        chips.push('<span class="filter-chip">' + filterIcon + escHtml(filters.authors[0]) + '</span>');
       }
       filtersBar.innerHTML = chips.join('');
 
@@ -448,7 +474,18 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       }
 
       if (runs.length === 0) {
-        container.innerHTML = '<div class="empty-state">No runs found</div>';
+        const hasFilters = (filters.branches && filters.branches.length) || (filters.authors && filters.authors.length);
+        let emptyHtml = '<div class="empty-state">No runs found';
+        if (hasFilters) {
+          emptyHtml += '<br><button class="load-more" id="clear-filters-btn" style="margin-top:12px">Clear Filters</button>';
+        }
+        emptyHtml += '</div>';
+        container.innerHTML = emptyHtml;
+        if (hasFilters) {
+          document.getElementById('clear-filters-btn').addEventListener('click', () => {
+            vscode.postMessage({ type: 'clearFilters' });
+          });
+        }
         return;
       }
 
@@ -483,7 +520,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         html += '    <span class="stat stat-failed">\u2716 ' + stats.failures + '</span>';
         html += '    <span class="stat stat-skipped">\u25CB ' + stats.skipped + '</span>';
         if (stats.flaky > 0) {
-          html += '    <span class="stat stat-flaky">\u26A1 ' + stats.flaky + '</span>';
+          html += '    <span class="stat stat-flaky">\u2744 ' + stats.flaky + '</span>';
         }
         html += '  </div>';
         html += '  <div class="run-actions">';
@@ -519,6 +556,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           vscode.postMessage({ type: 'loadMore' });
         });
       }
+
+      applyActiveState();
     }
 
     function isRunInProgress(completionState) {

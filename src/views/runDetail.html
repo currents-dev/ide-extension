@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-foreground);
+    background: var(--vscode-editor-background);
+    padding: 0;
+    line-height: 1.5;
+  }
+
+  .header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .status-passed {
+    background: color-mix(in srgb, var(--vscode-testing-iconPassed) 20%, transparent);
+    color: var(--vscode-testing-iconPassed);
+  }
+  .status-failed {
+    background: color-mix(in srgb, var(--vscode-testing-iconFailed) 20%, transparent);
+    color: var(--vscode-testing-iconFailed);
+  }
+  .status-running {
+    background: color-mix(in srgb, var(--vscode-testing-iconQueued) 20%, transparent);
+    color: var(--vscode-testing-iconQueued);
+  }
+  .status-cancelled, .status-timedout {
+    background: color-mix(in srgb, var(--vscode-disabledForeground) 20%, transparent);
+    color: var(--vscode-disabledForeground);
+  }
+
+  .commit-message {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .header-btn {
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--vscode-font-family);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .header-btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    margin-top: 8px;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .meta-icon { opacity: 0.8; }
+
+  .tags-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .tag {
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 16px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .stat-num { font-weight: 700; font-size: 15px; }
+  .stat-label { color: var(--vscode-descriptionForeground); }
+  .c-total { color: var(--vscode-foreground); }
+  .c-pass { color: var(--vscode-testing-iconPassed); }
+  .c-fail { color: var(--vscode-testing-iconFailed); }
+  .c-skip { color: var(--vscode-descriptionForeground); }
+  .c-flaky { color: #e57ab0; }
+
+  .progress-bar-container {
+    padding: 12px 24px;
+    display: none;
+  }
+  .progress-bar-container.visible { display: block; }
+  .progress-bar-label {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 4px;
+  }
+  .progress-bar-track {
+    height: 4px;
+    background: var(--vscode-progressBar-background, var(--vscode-widget-border));
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0.2;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--vscode-progressBar-background, var(--vscode-testing-iconQueued));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+    opacity: 1;
+  }
+
+  .content {
+    padding: 16px 24px;
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--vscode-descriptionForeground);
+  }
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--vscode-descriptionForeground);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--vscode-errorForeground);
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 12px;
+  }
+
+  .spec-group {
+    margin-bottom: 16px;
+    border: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .spec-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--vscode-sideBar-background, var(--vscode-editor-background)) 50%, transparent);
+    cursor: pointer;
+    user-select: none;
+    gap: 8px;
+  }
+  .spec-header:hover {
+    background: var(--vscode-list-hoverBackground);
+  }
+
+  .spec-chevron {
+    transition: transform 0.15s;
+    font-size: 10px;
+    color: var(--vscode-descriptionForeground);
+    flex-shrink: 0;
+  }
+  .spec-chevron.open { transform: rotate(90deg); }
+
+  .spec-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-failed { background: var(--vscode-testing-iconFailed); }
+  .dot-passed { background: var(--vscode-testing-iconPassed); }
+  .dot-flaky { background: #e57ab0; }
+  .dot-pending {
+    background: var(--vscode-testing-iconQueued, var(--vscode-descriptionForeground));
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .spec-name {
+    font-weight: 500;
+    font-size: 13px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .spec-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    flex-shrink: 0;
+  }
+
+  .spec-body {
+    border-top: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
+  }
+  .spec-body.collapsed { display: none; }
+
+  .error-item {
+    padding: 12px 14px 12px 30px;
+    border-bottom: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
+  }
+  .error-item:last-child { border-bottom: none; }
+
+  .error-title-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .error-icon {
+    color: var(--vscode-testing-iconFailed);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .error-test-name {
+    font-weight: 500;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .error-message {
+    background: var(--vscode-textCodeBlock-background, color-mix(in srgb, var(--vscode-foreground) 8%, transparent));
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: var(--vscode-editor-font-family, monospace);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 8px;
+    color: var(--vscode-errorForeground, var(--vscode-foreground));
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--vscode-font-family);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn:hover {
+    background: var(--vscode-button-secondaryHoverBackground);
+  }
+  .btn-primary {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+  }
+  .btn-primary:hover {
+    background: var(--vscode-button-hoverBackground);
+  }
+
+  .flaky-icon {
+    color: #e57ab0;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .flaky-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: color-mix(in srgb, #e57ab0 18%, transparent);
+    color: #e57ab0;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .empty-errors {
+    text-align: center;
+    padding: 24px;
+    color: var(--vscode-descriptionForeground);
+  }
+
+  .success-state {
+    text-align: center;
+    padding: 48px 24px;
+  }
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--vscode-testing-iconPassed) 15%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .success-icon svg {
+    width: 36px;
+    height: 36px;
+    color: var(--vscode-testing-iconPassed);
+  }
+  .success-text {
+    font-size: 14px;
+    color: var(--vscode-descriptionForeground);
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-top">
+      <span class="status-badge" id="status-badge"></span>
+      <span class="commit-message" id="commit-message"></span>
+      <div class="header-actions">
+        <button class="header-btn" id="btn-dashboard">↗ Dashboard</button>
+      </div>
+    </div>
+    <div class="meta-row" id="meta-row"></div>
+    <div class="tags-row" id="tags-row"></div>
+  </div>
+
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <div class="progress-bar-container" id="progress-container">
+    <div class="progress-bar-label" id="progress-label">Receiving results…</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div></div>
+  </div>
+
+  <div class="content" id="content">
+    <div class="loading-state" id="loading">
+      <div class="spinner"></div>
+      <div>Loading spec details…</div>
+    </div>
+  </div>
+
+  <script>
+    const vscode = acquireVsCodeApi();
+    const __INIT_DATA__ = /**__INIT_DATA__**/null;
+
+    function init(data) {
+      var statusBadge = document.getElementById('status-badge');
+      statusBadge.className = 'status-badge status-' + data.status;
+      statusBadge.textContent = data.status;
+
+      document.getElementById('commit-message').textContent = data.commitMsg;
+
+      var metaHtml = '';
+      if (data.sha) metaHtml += '<span class="meta-item"><span class="meta-icon">⊙</span> ' + escHtml(data.sha) + '</span>';
+      if (data.branch) metaHtml += '<span class="meta-item"><span class="meta-icon">⑂</span> ' + escHtml(data.branch) + '</span>';
+      if (data.author) metaHtml += '<span class="meta-item"><span class="meta-icon">☺</span> ' + escHtml(data.author) + '</span>';
+      if (data.duration) metaHtml += '<span class="meta-item"><span class="meta-icon">◷</span> ' + escHtml(data.duration) + '</span>';
+      metaHtml += '<span class="meta-item"><span class="meta-icon">◷</span> ' + escHtml(data.createdAt) + '</span>';
+      if (data.framework) metaHtml += '<span class="meta-item"><span class="meta-icon">⬡</span> ' + escHtml(data.framework) + '</span>';
+      document.getElementById('meta-row').innerHTML = metaHtml;
+
+      if (data.tags && data.tags.length > 0) {
+        document.getElementById('tags-row').innerHTML = data.tags.map(function(t) {
+          return '<span class="tag">' + escHtml(t) + '</span>';
+        }).join('');
+      }
+
+      renderStatsBar(data.stats);
+
+      if (data.isInProgress) {
+        document.getElementById('progress-container').classList.add('visible');
+      }
+    }
+
+    function renderStatsBar(stats) {
+      var statsBar = document.getElementById('stats-bar');
+      var html = '<span class="stat-item c-total"><span class="stat-num">' + stats.totalTests + '</span> <span class="stat-label">tests</span></span>';
+      html += '<span class="stat-item c-pass"><span class="stat-num">' + stats.totalPasses + '</span> <span class="stat-label">passed</span></span>';
+      html += '<span class="stat-item c-fail"><span class="stat-num">' + stats.totalFailures + '</span> <span class="stat-label">failed</span></span>';
+      html += '<span class="stat-item c-skip"><span class="stat-num">' + (stats.totalSkipped + stats.totalPending) + '</span> <span class="stat-label">skipped</span></span>';
+      if (stats.totalFlaky > 0) {
+        html += '<span class="stat-item c-flaky"><span class="stat-num">' + stats.totalFlaky + '</span> <span class="stat-label">flaky</span></span>';
+      }
+      statsBar.innerHTML = html;
+    }
+
+    document.getElementById('btn-dashboard').addEventListener('click', function() {
+      vscode.postMessage({ type: 'openInDashboard' });
+    });
+
+    window.addEventListener('message', function(event) {
+      var msg = event.data;
+      if (msg.type === 'runData') {
+        lastAllSpecs = msg.allSpecs || [];
+        renderSpecs(msg.specs);
+        updateLiveState(msg);
+      } else if (msg.type === 'error') {
+        document.getElementById('content').innerHTML =
+          '<div class="error-state">Failed to load: ' + escHtml(msg.message) + '</div>';
+      }
+    });
+
+    function isInProgress(completionState) {
+      var v = (completionState || '').toLowerCase();
+      return v === 'incomplete' || v === 'in_progress';
+    }
+
+    function updateLiveState(msg) {
+      var live = isInProgress(msg.completionState);
+      var statusBadge = document.getElementById('status-badge');
+      var progressContainer = document.getElementById('progress-container');
+      var progressFill = document.getElementById('progress-fill');
+      var progressLabel = document.getElementById('progress-label');
+
+      if (statusBadge && msg.status) {
+        var statusLower = msg.status.toLowerCase();
+        statusBadge.className = 'status-badge status-' + statusLower;
+        statusBadge.textContent = statusLower;
+      }
+
+      if (msg.stats) {
+        renderStatsBar(msg.stats);
+      }
+
+      if (progressContainer && msg.allSpecs) {
+        var total = msg.allSpecs.length;
+        var completed = msg.allSpecs.filter(function(s) { return s.completed; }).length;
+        if (live && total > 0) {
+          progressContainer.classList.add('visible');
+          var pct = Math.round((completed / total) * 100);
+          progressFill.style.width = pct + '%';
+          progressLabel.textContent = completed + ' / ' + total + ' specs completed';
+        } else {
+          progressContainer.classList.remove('visible');
+        }
+      }
+    }
+
+    function renderSpecGroup(spec, kind) {
+      var isFlakyGroup = kind === 'flaky';
+      var dotClass = isFlakyGroup ? 'dot-flaky' : 'dot-failed';
+      var specKey = kind + ':' + spec.spec;
+      var html = '';
+
+      html += '<div class="spec-group">';
+      html += '  <div class="spec-header" data-spec="' + escAttr(specKey) + '">';
+      html += '    <span class="spec-chevron' + (isFlakyGroup ? '' : ' open') + '">\u25B6</span>';
+      html += '    <span class="spec-status-dot ' + dotClass + '"></span>';
+      html += '    <span class="spec-name">' + escHtml(spec.spec) + '</span>';
+      html += '    <span class="spec-meta">';
+      if (isFlakyGroup) {
+        html += '      <span style="color:#e57ab0">' + spec.flakyCount + ' flaky</span>';
+      } else {
+        html += '      <span style="color:var(--vscode-testing-iconFailed)">' + spec.failedCount + ' failed</span>';
+      }
+      html += '      <span>' + spec.testCount + ' tests</span>';
+      if (spec.duration) {
+        html += '      <span>' + formatDuration(spec.duration) + '</span>';
+      }
+      html += '    </span>';
+      html += '  </div>';
+      html += '  <div class="spec-body' + (isFlakyGroup ? ' collapsed' : '') + '" data-body="' + escAttr(specKey) + '">';
+
+      for (var j = 0; j < spec.errors.length; j++) {
+        var err = spec.errors[j];
+        var title = err.title.join(' > ');
+        var lastTitle = err.title[err.title.length - 1] || '';
+        var errorText = err.displayError || 'Unknown error';
+
+        html += '<div class="error-item">';
+        html += '  <div class="error-title-row">';
+        if (isFlakyGroup) {
+          html += '    <span class="flaky-icon">\u2744</span>';
+          html += '    <span class="error-test-name">' + escHtml(title) + '<span class="flaky-badge">flaky</span></span>';
+        } else {
+          html += '    <span class="error-icon">\u2715</span>';
+          html += '    <span class="error-test-name">' + escHtml(title) + '</span>';
+        }
+        html += '  </div>';
+        if (errorText) {
+          html += '  <div class="error-message">' + escHtml(errorText.slice(0, 2000)) + '</div>';
+        }
+        html += '  <div class="error-actions">';
+        html += '    <button class="btn btn-primary" data-action="goToFile" data-spec="' + escAttr(spec.spec) + '" data-title="' + escAttr(lastTitle) + '">\u2197 Go to file</button>';
+        html += '    <button class="btn btn-primary" data-action="fixWithAgent" data-spec="' + escAttr(spec.spec) + '" data-title="' + escAttr(title) + '" data-error="' + escAttr(errorText.slice(0, 2000)) + '">\u2726 Fix with Agent</button>';
+        html += '  </div>';
+        html += '</div>';
+      }
+
+      html += '  </div>';
+      html += '</div>';
+      return html;
+    }
+
+    var lastAllSpecs = [];
+    function renderSpecs(specs) {
+      var content = document.getElementById('content');
+
+      var failedSpecs = [];
+      var flakySpecs = [];
+      for (var i = 0; i < specs.length; i++) {
+        var s = specs[i];
+        var failedErrors = s.errors.filter(function(e) { return !e.isFlaky; });
+        var flakyErrors = s.errors.filter(function(e) { return e.isFlaky; });
+        if (failedErrors.length > 0) {
+          failedSpecs.push({ spec: s.spec, testCount: s.testCount, failedCount: s.failedCount, duration: s.duration, errors: failedErrors });
+        }
+        if (flakyErrors.length > 0) {
+          flakySpecs.push({ spec: s.spec, testCount: s.testCount, flakyCount: flakyErrors.length, duration: s.duration, errors: flakyErrors });
+        }
+      }
+
+      var hasNoErrors = failedSpecs.length === 0 && flakySpecs.length === 0;
+      var allDone = lastAllSpecs.filter(function(s) { return !s.completed; }).length === 0;
+
+      if (hasNoErrors && allDone) {
+        content.innerHTML = '<div class="success-state">'
+          + '<div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
+          + '<div class="success-text">No errors found in this run.</div>'
+          + '</div>';
+        return;
+      }
+
+      var html = '';
+
+      // Failed specs
+      if (failedSpecs.length > 0) {
+        html += '<div class="section-title">Errors by spec file (' + failedSpecs.length + ' files)</div>';
+      }
+      for (var i = 0; i < failedSpecs.length; i++) {
+        var spec = failedSpecs[i];
+        html += renderSpecGroup(spec, 'failed');
+      }
+
+      // Flaky specs
+      if (flakySpecs.length > 0) {
+        html += '<div class="section-title" style="margin-top:20px">Flaky tests (' + flakySpecs.length + ' files)</div>';
+      }
+      for (var fi = 0; fi < flakySpecs.length; fi++) {
+        var fSpec = flakySpecs[fi];
+        html += renderSpecGroup(fSpec, 'flaky');
+      }
+
+      var pendingSpecs = lastAllSpecs.filter(function(s) { return !s.completed; });
+      if (pendingSpecs.length > 0) {
+        html += '<div class="section-title" style="margin-top: 20px">In Progress (' + pendingSpecs.length + ' specs)</div>';
+        for (var k = 0; k < pendingSpecs.length; k++) {
+          var ps = pendingSpecs[k];
+          html += '<div class="spec-group">';
+          html += '  <div class="spec-header">';
+          html += '    <span class="spec-status-dot dot-pending"></span>';
+          html += '    <span class="spec-name">' + escHtml(ps.spec) + '</span>';
+          html += '    <span class="spec-meta"><span>waiting for results\u2026</span></span>';
+          html += '  </div>';
+          html += '</div>';
+        }
+      }
+
+      if (hasNoErrors && pendingSpecs.length > 0) {
+        html += '<div class="empty-errors" style="margin-top: 12px">No errors so far.</div>';
+      }
+
+      content.innerHTML = html;
+
+      document.querySelectorAll('.spec-header').forEach(function(header) {
+        header.addEventListener('click', function() {
+          var specName = header.dataset.spec;
+          var body = document.querySelector('[data-body="' + specName + '"]');
+          var chevron = header.querySelector('.spec-chevron');
+          if (body.classList.contains('collapsed')) {
+            body.classList.remove('collapsed');
+            chevron.classList.add('open');
+          } else {
+            body.classList.add('collapsed');
+            chevron.classList.remove('open');
+          }
+        });
+      });
+
+      document.querySelectorAll('[data-action="goToFile"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          vscode.postMessage({
+            type: 'goToFile',
+            spec: btn.dataset.spec,
+            testTitle: btn.dataset.title
+          });
+        });
+      });
+
+      document.querySelectorAll('[data-action="fixWithAgent"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          vscode.postMessage({
+            type: 'fixWithAgent',
+            spec: btn.dataset.spec,
+            testTitle: btn.dataset.title,
+            displayError: btn.dataset.error
+          });
+        });
+      });
+    }
+
+    function formatDuration(ms) {
+      if (!ms) return '';
+      var s = Math.floor(ms / 1000);
+      if (s < 60) return s + 's';
+      var m = Math.floor(s / 60);
+      var rs = s % 60;
+      if (m < 60) return m + 'm ' + rs + 's';
+      var h = Math.floor(m / 60);
+      var rm = m % 60;
+      return h + 'h ' + rm + 'm';
+    }
+
+    function escHtml(s) {
+      var d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    function escAttr(s) {
+      return (s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    if (__INIT_DATA__) {
+      init(__INIT_DATA__);
+    }
+    vscode.postMessage({ type: 'ready' });
+  </script>
+</body>
+</html>
