@@ -71,7 +71,7 @@ export interface RunMeta {
     remoteOrigin: string;
   };
   framework: {
-    name: string;
+    type: string;
     version: string;
   };
 }

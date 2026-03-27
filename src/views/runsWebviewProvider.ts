@@ -1,6 +1,49 @@
 import * as vscode from "vscode";
+import { exec } from "child_process";
 import type { CurrentsApiClient } from "../api/client.js";
 import type { RunFeedItem, RunFilters } from "../api/types.js";
+import { SettingsWebviewProvider } from "./settingsWebviewProvider.js";
+import { log } from "../log.js";
+
+function powershellToast(exe: string, title: string, body: string): string {
+  const t = title.replace(/"/g, '\\"');
+  const b = body.replace(/"/g, '\\"');
+  return `${exe} -NoProfile -Command 'Add-Type -AssemblyName System.Windows.Forms; $n=New-Object System.Windows.Forms.NotifyIcon; $n.Icon=[System.Drawing.SystemIcons]::Information; $n.Visible=$true; $n.ShowBalloonTip(5000,"${t}","${b}","Info"); Start-Sleep -Milliseconds 200; $n.Dispose()'`;
+}
+
+function sendOsNotification(title: string, body: string): void {
+  let cmd: string;
+  const isWsl = Boolean(process.env.WSL_DISTRO_NAME);
+
+  switch (process.platform) {
+    case "darwin": {
+      const t = title.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      const b = body.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      cmd = `osascript -e 'display notification "${b}" with title "${t}"'`;
+      break;
+    }
+    case "win32":
+      cmd = powershellToast("powershell", title, body);
+      break;
+    default:
+      cmd = isWsl
+        ? powershellToast("powershell.exe", title, body)
+        : `notify-send '${title.replace(/'/g, "'\\''")}' '${body.replace(/'/g, "'\\''")}'`;
+      break;
+  }
+
+  log(`[notify] sending OS notification (wsl=${isWsl}, platform=${process.platform})`);
+  exec(cmd, (err) => {
+    if (err) {
+      log("[notify] OS notification failed:", err.message);
+    }
+  });
+}
+
+function isRunInProgress(completionState: string): boolean {
+  const v = completionState.toLowerCase();
+  return v === "incomplete" || v === "in_progress";
+}
 
 export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "currents-runs";
@@ -15,8 +58,12 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private loading = false;
   private activeRunId: string | undefined;
   private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
+  private autoRefreshEnabled = true;
+  private inProgressRunIds = new Set<string>();
 
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(private readonly extensionUri: vscode.Uri) {
+    this.setAutoRefreshContext(true);
+  }
 
   setClient(client: CurrentsApiClient | undefined): void {
     this.client = client;
@@ -30,7 +77,9 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     this.lastCursor = undefined;
     if (projectId) {
       this.fetchRuns();
-      this.startAutoRefresh();
+      if (this.autoRefreshEnabled) {
+        this.startAutoRefresh();
+      }
     } else {
       this.stopAutoRefresh();
       this.sendState();
@@ -142,12 +191,16 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           ...this.filters,
         }
       );
+      if (!startingAfter) {
+        this.detectCompletedRuns(response.data);
+      }
       this.runs.push(...response.data);
       this.hasMore = response.has_more;
       if (response.data.length > 0) {
         this.lastCursor =
           response.data[response.data.length - 1].cursor;
       }
+      this.trackInProgressRuns(response.data);
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Unknown error";
@@ -158,6 +211,73 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       this.loading = false;
       this.sendState();
     }
+  }
+
+  private detectCompletedRuns(freshRuns: RunFeedItem[]): void {
+    log(
+      `[notify] detectCompletedRuns: tracking ${this.inProgressRunIds.size} in-progress run(s)`,
+      [...this.inProgressRunIds]
+    );
+    if (this.inProgressRunIds.size === 0) {
+      return;
+    }
+    for (const run of freshRuns) {
+      const wasInProgress = this.inProgressRunIds.has(run.runId);
+      const stillInProgress = isRunInProgress(run.completionState);
+      if (wasInProgress && !stillInProgress) {
+        log(
+          `[notify] run ${run.runId} transitioned to "${run.completionState}" (status: ${run.status})`
+        );
+        this.inProgressRunIds.delete(run.runId);
+        this.notifyRunCompleted(run);
+      }
+    }
+  }
+
+  private trackInProgressRuns(runs: RunFeedItem[]): void {
+    for (const run of runs) {
+      if (isRunInProgress(run.completionState)) {
+        this.inProgressRunIds.add(run.runId);
+      } else {
+        this.inProgressRunIds.delete(run.runId);
+      }
+    }
+    log(
+      `[notify] trackInProgressRuns: now tracking ${this.inProgressRunIds.size} in-progress run(s)`,
+      [...this.inProgressRunIds]
+    );
+  }
+
+  private notifyRunCompleted(run: RunFeedItem): void {
+    const enabled = SettingsWebviewProvider.getNotificationsEnabled();
+    log(
+      `[notify] notifyRunCompleted: run=${run.runId} status=${run.status} notificationsEnabled=${enabled}`
+    );
+    if (!enabled) {
+      return;
+    }
+    const commitMsg =
+      run.meta.commit?.message?.split("\n")[0]?.slice(0, 60) || "Run";
+    const status = run.status.toLowerCase();
+    const label =
+      status === "passed"
+        ? `\u2714 Run passed: ${commitMsg}`
+        : status === "failed"
+          ? `\u2716 Run failed: ${commitMsg}`
+          : `Run ${status}: ${commitMsg}`;
+
+    const showFn =
+      status === "failed"
+        ? vscode.window.showWarningMessage
+        : vscode.window.showInformationMessage;
+
+    sendOsNotification("Currents", label);
+
+    showFn(label, "View Details").then((action) => {
+      if (action === "View Details") {
+        vscode.commands.executeCommand("currents.openRun", run);
+      }
+    });
   }
 
   private sendState(): void {
@@ -185,6 +305,24 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       parts.push(`author: ${this.filters.authors.join(", ")}`);
     }
     return parts.join(" | ");
+  }
+
+  setAutoRefreshEnabled(enabled: boolean): void {
+    this.autoRefreshEnabled = enabled;
+    this.setAutoRefreshContext(enabled);
+    if (enabled && this.projectId) {
+      this.startAutoRefresh();
+    } else {
+      this.stopAutoRefresh();
+    }
+  }
+
+  private setAutoRefreshContext(enabled: boolean): void {
+    vscode.commands.executeCommand(
+      "setContext",
+      "currents.autoRefreshEnabled",
+      enabled
+    );
   }
 
   private startAutoRefresh(): void {

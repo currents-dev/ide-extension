@@ -149,6 +149,14 @@ export function registerCommands(
       );
     }),
 
+    vscode.commands.registerCommand("currents.enableAutoRefresh", () => {
+      runsProvider.setAutoRefreshEnabled(true);
+    }),
+
+    vscode.commands.registerCommand("currents.disableAutoRefresh", () => {
+      runsProvider.setAutoRefreshEnabled(false);
+    }),
+
     vscode.commands.registerCommand("currents.loadMoreRuns", () => {
       runsProvider.loadMore();
     }),

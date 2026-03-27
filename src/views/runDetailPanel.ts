@@ -37,7 +37,9 @@ export class RunDetailPanelProvider {
   private runIdByPanel = new Map<vscode.WebviewPanel, string>();
   private pollTimers = new Map<string, ReturnType<typeof setInterval>>();
   private client: CurrentsApiClient | undefined;
-  private _onActiveRunChanged: ((runId: string | undefined) => void) | undefined;
+  private _onActiveRunChanged:
+    | ((runId: string | undefined) => void)
+    | undefined;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
 
@@ -56,8 +58,7 @@ export class RunDetailPanelProvider {
       return;
     }
 
-    const commitMsg =
-      run.meta.commit?.message?.split("\n")[0] || "Run";
+    const commitMsg = run.meta.commit?.message?.split("\n")[0] || "Run";
     const panel = vscode.window.createWebviewPanel(
       "currents-run-detail",
       `${commitMsg.slice(0, 50)}`,
@@ -66,7 +67,7 @@ export class RunDetailPanelProvider {
         enableScripts: true,
         retainContextWhenHidden: true,
         localResourceRoots: [this.extensionUri],
-      }
+      },
     );
 
     panel.iconPath = new vscode.ThemeIcon("beaker");
@@ -96,9 +97,7 @@ export class RunDetailPanelProvider {
           break;
         case "openInDashboard":
           vscode.env.openExternal(
-            vscode.Uri.parse(
-              `https://app.currents.dev/run/${run.runId}`
-            )
+            vscode.Uri.parse(`https://app.currents.dev/run/${run.runId}`),
           );
           break;
         case "ready":
@@ -122,7 +121,7 @@ export class RunDetailPanelProvider {
 
   private async loadRunData(
     panel: vscode.WebviewPanel,
-    run: RunFeedItem
+    run: RunFeedItem,
   ): Promise<void> {
     if (!this.client) {
       return;
@@ -137,7 +136,7 @@ export class RunDetailPanelProvider {
       const specsWithIssues = fullRun.specs.filter(
         (s: RunSpec) =>
           s.results &&
-          (s.results.stats.failures > 0 || s.results.stats.flaky > 0)
+          (s.results.stats.failures > 0 || s.results.stats.flaky > 0),
       );
 
       log("RunDetailPanel: specsWithIssues:", specsWithIssues.length);
@@ -147,8 +146,8 @@ export class RunDetailPanelProvider {
           this.client!.getInstance(s.instanceId).then((res) => ({
             spec: s,
             instance: res.data,
-          }))
-        )
+          })),
+        ),
       );
 
       const specErrors: SerializedSpec[] = instances.map(
@@ -156,15 +155,13 @@ export class RunDetailPanelProvider {
           const tr = instance.testResults ?? {};
 
           const failedTests =
-            instance.results?.tests.filter(
-              (t) => t._s === "failed"
-            ) ?? [];
+            instance.results?.tests.filter((t) => t._s === "failed") ?? [];
 
           const flakyTests =
             instance.results?.tests.filter(
               (t) =>
                 t._s === "passed" &&
-                (t._f === true || tr[t.testId]?.isFlaky === true)
+                (t._f === true || tr[t.testId]?.isFlaky === true),
             ) ?? [];
 
           const allIssueTests = [
@@ -182,12 +179,12 @@ export class RunDetailPanelProvider {
             duration: spec.results?.stats.wallClockDuration ?? 0,
             errors: allIssueTests,
           };
-        }
+        },
       );
 
       log(
         "RunDetailPanel: sending data, specs with errors:",
-        specErrors.filter((s) => s.errors.length > 0).length
+        specErrors.filter((s) => s.errors.length > 0).length,
       );
 
       let totalPasses = 0,
@@ -210,7 +207,14 @@ export class RunDetailPanelProvider {
         specs: specErrors,
         completionState: fullRun.completionState,
         status: fullRun.status,
-        stats: { totalTests, totalPasses, totalFailures, totalSkipped, totalPending, totalFlaky },
+        stats: {
+          totalTests,
+          totalPasses,
+          totalFailures,
+          totalSkipped,
+          totalPending,
+          totalFlaky,
+        },
         allSpecs: fullRun.specs.map((s: RunSpec) => ({
           spec: s.spec,
           instanceId: s.instanceId,
@@ -231,17 +235,13 @@ export class RunDetailPanelProvider {
         this.stopPolling(run.runId);
       }
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Unknown error";
+      const msg = err instanceof Error ? err.message : "Unknown error";
       log("RunDetailPanel: error fetching run data:", msg);
       panel.webview.postMessage({ type: "error", message: msg });
     }
   }
 
-  private startPolling(
-    panel: vscode.WebviewPanel,
-    run: RunFeedItem
-  ): void {
+  private startPolling(panel: vscode.WebviewPanel, run: RunFeedItem): void {
     if (this.pollTimers.has(run.runId)) {
       return;
     }
@@ -268,31 +268,27 @@ export class RunDetailPanelProvider {
   }): Promise<void> {
     const prompt = `Please fix this failing test.\n\nFile: ${msg.spec}\nTest: ${msg.testTitle}\n\nError:\n${msg.displayError}`;
     try {
-      await vscode.commands.executeCommand(
-        "workbench.action.chat.open",
-        { query: prompt }
-      );
+      await vscode.commands.executeCommand("workbench.action.chat.open", {
+        query: prompt,
+      });
     } catch {
       await vscode.env.clipboard.writeText(prompt);
       vscode.window.showInformationMessage(
-        "Currents: Prompt copied to clipboard. Paste it in the AI chat."
+        "Currents: Prompt copied to clipboard. Paste it in the AI chat.",
       );
     }
   }
 
-  private async handleGoToFile(
-    spec: string,
-    testTitle: string
-  ): Promise<void> {
+  private async handleGoToFile(spec: string, testTitle: string): Promise<void> {
     const files = await vscode.workspace.findFiles(
       `**/${spec}`,
       "**/node_modules/**",
-      1
+      1,
     );
 
     if (files.length === 0) {
       vscode.window.showWarningMessage(
-        `Currents: Could not find file "${spec}" in workspace.`
+        `Currents: Could not find file "${spec}" in workspace.`,
       );
       return;
     }
@@ -314,7 +310,7 @@ export class RunDetailPanelProvider {
     });
     editor.revealRange(
       new vscode.Range(line, 0, line, 0),
-      vscode.TextEditorRevealType.InCenter
+      vscode.TextEditorRevealType.InCenter,
     );
   }
 
@@ -323,13 +319,12 @@ export class RunDetailPanelProvider {
       this.extensionUri.fsPath,
       "src",
       "views",
-      "runDetail.html"
+      "runDetail.html",
     );
     let html = fs.readFileSync(htmlPath, "utf-8");
 
     const commit = run.meta.commit;
-    const commitMsg =
-      commit?.message?.split("\n")[0] || "No title";
+    const commitMsg = commit?.message?.split("\n")[0] || "No title";
 
     let totalPasses = 0,
       totalFailures = 0,
@@ -355,7 +350,7 @@ export class RunDetailPanelProvider {
       duration: formatDuration(run.durationMs),
       createdAt: formatDate(run.createdAt),
       framework: run.meta.framework
-        ? `${run.meta.framework.name} ${run.meta.framework.version}`
+        ? `${run.meta.framework.type} ${run.meta.framework.version}`
         : "",
       tags: run.tags || [],
       isInProgress: isRunInProgress(run.completionState),
@@ -369,10 +364,7 @@ export class RunDetailPanelProvider {
       },
     };
 
-    html = html.replace(
-      "/**__INIT_DATA__**/null",
-      JSON.stringify(initData)
-    );
+    html = html.replace("/**__INIT_DATA__**/null", JSON.stringify(initData));
 
     return html;
   }
@@ -386,14 +378,14 @@ function stripAnsi(str: string): string {
 function serializeTest(
   t: InstanceTest,
   isFlaky: boolean,
-  detail?: InstanceTestResult
+  detail?: InstanceTestResult,
 ): SerializedError {
   const errorText = stripAnsi(
     detail?.displayError ||
-    t.displayError ||
-    detail?.attempts?.find((a) => a.error)?.error?.message ||
-    t.attempts?.find((a) => a.error)?.error?.message ||
-    ""
+      t.displayError ||
+      detail?.attempts?.find((a) => a.error)?.error?.message ||
+      t.attempts?.find((a) => a.error)?.error?.message ||
+      "",
   );
   const attempts = detail?.attempts ?? t.attempts ?? [];
   return {

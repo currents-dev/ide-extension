@@ -10,7 +10,7 @@
   "categories": [
     "Testing"
   ],
-  "activationEvents": [],
+  "activationEvents": ["onStartupFinished"],
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -72,6 +72,18 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "currents.enableAutoRefresh",
+        "title": "Enable Auto Refresh",
+        "category": "Currents",
+        "icon": "$(sync-ignored)"
+      },
+      {
+        "command": "currents.disableAutoRefresh",
+        "title": "Disable Auto Refresh",
+        "category": "Currents",
+        "icon": "$(sync)"
+      },
+      {
         "command": "currents.filterByBranch",
         "title": "Filter by Branch",
         "category": "Currents",
@@ -120,24 +132,34 @@
           "group": "navigation@1"
         },
         {
-          "command": "currents.filterByBranch",
-          "when": "view == currents-runs && currents.projectSelected",
+          "command": "currents.enableAutoRefresh",
+          "when": "view == currents-runs && currents.projectSelected && !currents.autoRefreshEnabled",
           "group": "navigation@2"
         },
         {
-          "command": "currents.filterByAuthor",
+          "command": "currents.disableAutoRefresh",
+          "when": "view == currents-runs && currents.projectSelected && currents.autoRefreshEnabled",
+          "group": "navigation@2"
+        },
+        {
+          "command": "currents.filterByBranch",
           "when": "view == currents-runs && currents.projectSelected",
           "group": "navigation@3"
         },
         {
+          "command": "currents.filterByAuthor",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@4"
+        },
+        {
           "command": "currents.clearFilters",
           "when": "view == currents-runs && currents.hasFilters",
-          "group": "navigation@4"
+          "group": "navigation@5"
         },
         {
           "command": "currents.selectProject",
           "when": "false",
-          "group": "navigation@5"
+          "group": "navigation@6"
         }
       ],
       "view/item/context": []
