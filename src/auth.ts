@@ -48,7 +48,7 @@ export class AuthManager {
 
     const tempClient = new CurrentsApiClient(key, AuthManager.getBaseUrl());
     try {
-      await tempClient.getProjects(1);
+      await tempClient.getProjects({ limit: 1 });
     } catch {
       vscode.window.showErrorMessage(
         "Invalid API key. Please check your key and try again."

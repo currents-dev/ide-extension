@@ -1,4 +1,5 @@
 import type {
+  AiContextPayload,
   ApiListResponse,
   ApiResponse,
   Instance,
@@ -39,14 +40,30 @@ export class CurrentsApiClient {
   }
 
   async getProjects(
-    limit = 20
+    opts: { limit?: number; fetchAll?: boolean } = {},
   ): Promise<ApiListResponse<Project>> {
-    return this.request(`/projects?limit=${limit}`);
+    const limit = opts.limit ?? 50;
+    if (!opts.fetchAll) {
+      return this.request(`/projects?limit=${limit}`);
+    }
+    const all: Project[] = [];
+    let cursor: string | undefined;
+    for (;;) {
+      const params = new URLSearchParams({ limit: String(limit) });
+      if (cursor) params.set("starting_after", cursor);
+      const page = await this.request<ApiListResponse<Project>>(
+        `/projects?${params}`,
+      );
+      all.push(...page.data);
+      if (!page.has_more || page.data.length === 0) break;
+      cursor = page.data[page.data.length - 1].cursor;
+    }
+    return { status: "OK", has_more: false, data: all };
   }
 
   async getProjectRuns(
     projectId: string,
-    opts: ListRunsOptions = {}
+    opts: ListRunsOptions = {},
   ): Promise<ApiListResponse<RunFeedItem>> {
     const params = new URLSearchParams();
     if (opts.limit) {
@@ -66,24 +83,20 @@ export class CurrentsApiClient {
       }
     }
     const qs = params.toString();
-    return this.request(
-      `/projects/${projectId}/runs${qs ? `?${qs}` : ""}`
-    );
+    return this.request(`/projects/${projectId}/runs${qs ? `?${qs}` : ""}`);
   }
 
   async getRun(runId: string): Promise<ApiResponse<Run>> {
     return this.request(`/runs/${runId}`);
   }
 
-  async getInstance(
-    instanceId: string
-  ): Promise<ApiResponse<Instance>> {
+  async getInstance(instanceId: string): Promise<ApiResponse<Instance>> {
     return this.request(`/instances/${instanceId}`);
   }
 
   async getTestsExplorer(
     projectId: string,
-    opts: TestExplorerOptions
+    opts: TestExplorerOptions,
   ): Promise<TestExplorerResponse> {
     const params = new URLSearchParams();
     params.set("date_start", opts.date_start);
@@ -123,5 +136,29 @@ export class CurrentsApiClient {
     }
     const qs = params.toString();
     return this.request(`/tests/${projectId}?${qs}`);
+  }
+
+  async getAiContext(
+    instanceId: string,
+    testId: string,
+    attempt?: number,
+  ): Promise<AiContextPayload> {
+    const params = new URLSearchParams({
+      instance_id: instanceId,
+      test_id: testId,
+      format: "json",
+    });
+    if (attempt !== undefined) {
+      params.set("attempt", String(attempt));
+    }
+    return this.request(`/ai-context?${params}`);
+  }
+
+  async fetchUrl(url: string): Promise<string> {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Fetch failed ${res.status}: ${url}`);
+    }
+    return res.text();
   }
 }
