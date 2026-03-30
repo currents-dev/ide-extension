@@ -28,11 +28,14 @@ export class TestExplorerWebviewProvider
   private page = 0;
   private total = 0;
   private hasMore = false;
+  private authenticated = false;
 
   constructor(private readonly extensionUri: vscode.Uri) {}
 
   setClient(client: CurrentsApiClient | undefined): void {
     this.client = client;
+    this.authenticated = client !== undefined;
+    this.sendState();
   }
 
   setProjectId(projectId: string | undefined): void {
@@ -92,6 +95,9 @@ export class TestExplorerWebviewProvider
           break;
         case "fixWithAI":
           await this.handleFixWithAI(message);
+          break;
+        case "setApiKey":
+          vscode.commands.executeCommand("currents.setApiKey");
           break;
       }
     });
@@ -154,6 +160,7 @@ export class TestExplorerWebviewProvider
       sortMode: this.sortMode,
       total: this.total,
       hasMore: this.hasMore,
+      authenticated: this.authenticated,
     });
   }
 
@@ -477,9 +484,24 @@ export class TestExplorerWebviewProvider
     function render() {
       var container = document.getElementById('tests-container');
       var summary = document.getElementById('summary');
+      var toolbar = document.querySelector('.toolbar');
       var tests = currentState.tests;
       var sortMode = currentState.sortMode;
       var dateRange = currentState.dateRange;
+
+      if (currentState.authenticated === false) {
+        toolbar.style.display = 'none';
+        summary.textContent = '';
+        container.innerHTML = '<div style="text-align:center;padding:32px 12px;color:var(--vscode-descriptionForeground);font-size:12px">'
+          + '<div style="margin-bottom:8px">Connect your Currents.dev account to explore tests.</div>'
+          + '<button class="load-more" id="set-api-key-btn">Set API Key</button>'
+          + '</div>';
+        document.getElementById('set-api-key-btn').addEventListener('click', function() {
+          vscode.postMessage({ type: 'setApiKey' });
+        });
+        return;
+      }
+      toolbar.style.display = '';
 
       document.querySelectorAll('.tab-btn').forEach(function(btn) {
         btn.classList.toggle('active', btn.dataset.mode === sortMode);

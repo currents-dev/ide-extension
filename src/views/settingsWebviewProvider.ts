@@ -254,6 +254,33 @@ export class SettingsWebviewProvider
     color: var(--vscode-descriptionForeground);
     margin-top: 4px;
   }
+
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+  }
+  .collapsible-header:hover {
+    color: var(--vscode-textLink-foreground);
+  }
+  .collapsible-chevron {
+    font-size: 10px;
+    transition: transform 0.15s;
+    color: var(--vscode-descriptionForeground);
+  }
+  .collapsible-chevron.open {
+    transform: rotate(90deg);
+  }
+  .collapsible-body {
+    display: none;
+    padding-top: 10px;
+  }
+  .collapsible-body.open {
+    display: block;
+  }
 </style>
 </head>
 <body>
@@ -297,10 +324,16 @@ export class SettingsWebviewProvider
   </div>
 
   <div class="section">
-    <div class="section-title">API Base URL</div>
-    <div class="section-content">
-      <input type="text" class="text-input" id="api-base-url" placeholder="https://api.currents.dev/v1">
-      <div class="input-desc">Change this only if you use a custom Currents API endpoint.</div>
+    <div class="collapsible-header" id="advanced-toggle">
+      <span class="collapsible-chevron" id="advanced-chevron">\u25B6</span>
+      <span class="section-title" style="margin-bottom:0">Advanced Settings</span>
+    </div>
+    <div class="collapsible-body" id="advanced-body">
+      <div class="section-content">
+        <label style="font-size:12px;margin-bottom:4px;display:block">API Base URL</label>
+        <input type="text" class="text-input" id="api-base-url" placeholder="https://api.currents.dev/v1">
+        <div class="input-desc">Change this only if you use a custom Currents API endpoint.</div>
+      </div>
     </div>
   </div>
 
@@ -374,6 +407,13 @@ export class SettingsWebviewProvider
 
     notifyToggle.addEventListener('change', () => {
       vscode.postMessage({ type: 'toggleNotifications', enabled: notifyToggle.checked });
+    });
+
+    document.getElementById('advanced-toggle').addEventListener('click', () => {
+      var body = document.getElementById('advanced-body');
+      var chevron = document.getElementById('advanced-chevron');
+      body.classList.toggle('open');
+      chevron.classList.toggle('open');
     });
 
     var baseUrlTimeout;

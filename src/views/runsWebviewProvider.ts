@@ -57,6 +57,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private filters: RunFilters = {};
   private loading = false;
   private activeRunId: string | undefined;
+  private authenticated = false;
   private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
   private autoRefreshEnabled = true;
   private inProgressRunIds = new Set<string>();
@@ -67,6 +68,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 
   setClient(client: CurrentsApiClient | undefined): void {
     this.client = client;
+    this.authenticated = client !== undefined;
     this.sendState();
   }
 
@@ -169,6 +171,9 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         }
         case "clearFilters":
           this.clearFilters();
+          break;
+        case "setApiKey":
+          vscode.commands.executeCommand("currents.setApiKey");
           break;
       }
     });
@@ -293,6 +298,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       loading: this.loading,
       filters: this.filters,
       activeRunId: this.activeRunId,
+      authenticated: this.authenticated,
     });
   }
 
@@ -594,6 +600,18 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       const container = document.getElementById('runs-container');
       const filtersBar = document.getElementById('filters-bar');
       const { runs, hasMore, loading, filters } = currentState;
+
+      if (currentState.authenticated === false) {
+        filtersBar.innerHTML = '';
+        container.innerHTML = '<div class="empty-state" style="padding:32px 12px">'
+          + '<div style="margin-bottom:8px">Connect your Currents.dev account to see test runs.</div>'
+          + '<button class="load-more" id="set-api-key-btn">Set API Key</button>'
+          + '</div>';
+        document.getElementById('set-api-key-btn').addEventListener('click', function() {
+          vscode.postMessage({ type: 'setApiKey' });
+        });
+        return;
+      }
 
       // Filters
       const chips = [];

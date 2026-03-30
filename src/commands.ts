@@ -99,10 +99,10 @@ export function registerCommands(
               "currents.projectSelected",
               true
             );
-            runsProvider.setProjectId(project.projectId);
-            testExplorerProvider.setProjectId(project.projectId);
             settingsProvider.setProjectName(project.name);
             await autoSetBranchFilter(runsProvider);
+            runsProvider.setProjectId(project.projectId);
+            testExplorerProvider.setProjectId(project.projectId);
             vscode.window.showInformationMessage(
               `Currents: Selected project "${project.name}"`
             );
@@ -132,10 +132,10 @@ export function registerCommands(
               "currents.projectSelected",
               true
             );
-            runsProvider.setProjectId(pick.projectId);
-            testExplorerProvider.setProjectId(pick.projectId);
             settingsProvider.setProjectName(pick.label);
             await autoSetBranchFilter(runsProvider);
+            runsProvider.setProjectId(pick.projectId);
+            testExplorerProvider.setProjectId(pick.projectId);
             vscode.window.showInformationMessage(
               `Currents: Selected project "${pick.label}"`
             );
