@@ -18,10 +18,16 @@ export class AuthManager {
     return this._client;
   }
 
+  private static getBaseUrl(): string | undefined {
+    return vscode.workspace
+      .getConfiguration("currents")
+      .get<string>("apiBaseUrl") || undefined;
+  }
+
   async initialize(): Promise<boolean> {
     const key = await this.secrets.get(SECRET_KEY);
     if (key) {
-      this._client = new CurrentsApiClient(key);
+      this._client = new CurrentsApiClient(key, AuthManager.getBaseUrl());
       return true;
     }
     return false;
@@ -40,7 +46,7 @@ export class AuthManager {
       return false;
     }
 
-    const tempClient = new CurrentsApiClient(key);
+    const tempClient = new CurrentsApiClient(key, AuthManager.getBaseUrl());
     try {
       await tempClient.getProjects(1);
     } catch {

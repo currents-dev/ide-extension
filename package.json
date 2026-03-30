@@ -49,6 +49,11 @@
           "type": "boolean",
           "default": false,
           "description": "Show a notification when a run finishes."
+        },
+        "currents.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.currents.dev/v1",
+          "description": "Base URL for the Currents API."
         }
       }
     },

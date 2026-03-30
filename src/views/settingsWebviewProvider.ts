@@ -52,6 +52,9 @@ export class SettingsWebviewProvider
         case "selectProject":
           vscode.commands.executeCommand("currents.selectProject");
           break;
+        case "setApiBaseUrl":
+          this.setApiBaseUrl(message.url);
+          break;
       }
     });
   }
@@ -65,6 +68,7 @@ export class SettingsWebviewProvider
       hasApiKey: this.hasApiKey,
       projectName: this.projectName,
       notificationsEnabled: SettingsWebviewProvider.getNotificationsEnabled(),
+      apiBaseUrl: SettingsWebviewProvider.getApiBaseUrl(),
     });
   }
 
@@ -78,6 +82,23 @@ export class SettingsWebviewProvider
     return vscode.workspace
       .getConfiguration("currents")
       .get<boolean>("notifyOnRunComplete", false);
+  }
+
+  static getApiBaseUrl(): string {
+    return vscode.workspace
+      .getConfiguration("currents")
+      .get<string>("apiBaseUrl", "https://api.currents.dev/v1");
+  }
+
+  private async setApiBaseUrl(url: string): Promise<void> {
+    const config = vscode.workspace.getConfiguration("currents");
+    const trimmed = url.trim();
+    if (trimmed && trimmed !== "https://api.currents.dev/v1") {
+      await config.update("apiBaseUrl", trimmed, true);
+    } else {
+      await config.update("apiBaseUrl", undefined, true);
+    }
+    this.sendState();
   }
 
   private getHtml(): string {
@@ -213,6 +234,26 @@ export class SettingsWebviewProvider
     transform: translateX(16px);
     background: var(--vscode-button-foreground);
   }
+
+  .text-input {
+    width: 100%;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: var(--vscode-font-family);
+    color: var(--vscode-input-foreground);
+    background: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border, var(--vscode-widget-border));
+    border-radius: 4px;
+    outline: none;
+  }
+  .text-input:focus {
+    border-color: var(--vscode-focusBorder);
+  }
+  .input-desc {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -255,6 +296,14 @@ export class SettingsWebviewProvider
     </div>
   </div>
 
+  <div class="section">
+    <div class="section-title">API Base URL</div>
+    <div class="section-content">
+      <input type="text" class="text-input" id="api-base-url" placeholder="https://api.currents.dev/v1">
+      <div class="input-desc">Change this only if you use a custom Currents API endpoint.</div>
+    </div>
+  </div>
+
   <script>
     const vscode = acquireVsCodeApi();
 
@@ -267,6 +316,7 @@ export class SettingsWebviewProvider
     const projectLabel = document.getElementById('project-label');
     const selectProjectBtn = document.getElementById('select-project-btn');
     const notifyToggle = document.getElementById('notify-toggle');
+    const apiBaseUrlInput = document.getElementById('api-base-url');
 
     window.addEventListener('message', (event) => {
       const msg = event.data;
@@ -304,6 +354,10 @@ export class SettingsWebviewProvider
       }
 
       notifyToggle.checked = !!state.notificationsEnabled;
+
+      if (document.activeElement !== apiBaseUrlInput) {
+        apiBaseUrlInput.value = state.apiBaseUrl || '';
+      }
     }
 
     setKeyBtn.addEventListener('click', () => {
@@ -320,6 +374,14 @@ export class SettingsWebviewProvider
 
     notifyToggle.addEventListener('change', () => {
       vscode.postMessage({ type: 'toggleNotifications', enabled: notifyToggle.checked });
+    });
+
+    var baseUrlTimeout;
+    apiBaseUrlInput.addEventListener('input', () => {
+      clearTimeout(baseUrlTimeout);
+      baseUrlTimeout = setTimeout(() => {
+        vscode.postMessage({ type: 'setApiBaseUrl', url: apiBaseUrlInput.value });
+      }, 600);
     });
 
     vscode.postMessage({ type: 'ready' });

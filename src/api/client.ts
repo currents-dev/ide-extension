@@ -10,17 +10,19 @@ import type {
   TestExplorerResponse,
 } from "./types.js";
 
-const BASE_URL = "https://api.currents.dev/v1";
+const DEFAULT_BASE_URL = "https://api.currents.dev/v1";
 
 export class CurrentsApiClient {
   private apiKey: string;
+  private baseUrl: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, baseUrl?: string) {
     this.apiKey = apiKey;
+    this.baseUrl = (baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, "");
   }
 
   private async request<T>(path: string): Promise<T> {
-    const url = `${BASE_URL}${path}`;
+    const url = `${this.baseUrl}${path}`;
     const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
