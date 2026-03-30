@@ -4,6 +4,7 @@ import type { RunFeedItem } from "./api/types.js";
 import { RunsWebviewProvider } from "./views/runsWebviewProvider.js";
 import { RunDetailPanelProvider } from "./views/runDetailPanel.js";
 import { SettingsWebviewProvider } from "./views/settingsWebviewProvider.js";
+import type { TestExplorerWebviewProvider } from "./views/testExplorerWebviewProvider.js";
 import { getCurrentBranch } from "./git.js";
 import { log } from "./log.js";
 
@@ -12,13 +13,14 @@ interface AppState {
   runsProvider: RunsWebviewProvider;
   runDetailPanel: RunDetailPanelProvider;
   settingsProvider: SettingsWebviewProvider;
+  testExplorerProvider: TestExplorerWebviewProvider;
   context: vscode.ExtensionContext;
 }
 
 export function registerCommands(
   state: AppState
 ): vscode.Disposable[] {
-  const { auth, runsProvider, runDetailPanel, settingsProvider, context } = state;
+  const { auth, runsProvider, runDetailPanel, settingsProvider, testExplorerProvider, context } = state;
 
   return [
     vscode.commands.registerCommand("currents.setApiKey", async () => {
@@ -31,6 +33,7 @@ export function registerCommands(
         );
         runsProvider.setClient(auth.client);
         runDetailPanel.setClient(auth.client);
+        testExplorerProvider.setClient(auth.client);
         settingsProvider.setHasApiKey(true);
         await vscode.commands.executeCommand("currents.selectProject");
       }
@@ -52,6 +55,8 @@ export function registerCommands(
         );
         runsProvider.setClient(undefined);
         runsProvider.setProjectId(undefined);
+        testExplorerProvider.setClient(undefined);
+        testExplorerProvider.setProjectId(undefined);
         settingsProvider.setHasApiKey(false);
         settingsProvider.setProjectName(undefined);
       }
@@ -95,6 +100,7 @@ export function registerCommands(
               true
             );
             runsProvider.setProjectId(project.projectId);
+            testExplorerProvider.setProjectId(project.projectId);
             settingsProvider.setProjectName(project.name);
             await autoSetBranchFilter(runsProvider);
             vscode.window.showInformationMessage(
@@ -127,6 +133,7 @@ export function registerCommands(
               true
             );
             runsProvider.setProjectId(pick.projectId);
+            testExplorerProvider.setProjectId(pick.projectId);
             settingsProvider.setProjectName(pick.label);
             await autoSetBranchFilter(runsProvider);
             vscode.window.showInformationMessage(
@@ -227,6 +234,21 @@ export function registerCommands(
         }
       }
     ),
+
+    vscode.commands.registerCommand("currents.refreshTestExplorer", () => {
+      testExplorerProvider.setProjectId(
+        context.workspaceState.get("currents.projectId")
+      );
+    }),
+
+    vscode.commands.registerCommand("currents.openTestExplorerInDashboard", () => {
+      const projectId = context.workspaceState.get<string>("currents.projectId");
+      if (projectId) {
+        vscode.env.openExternal(
+          vscode.Uri.parse(`https://app.currents.dev/projects/${projectId}/insights/tests`)
+        );
+      }
+    }),
 
   ];
 }

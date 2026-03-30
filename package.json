@@ -30,6 +30,11 @@
           "type": "webview"
         },
         {
+          "id": "currents-test-explorer",
+          "name": "Test Explorer",
+          "type": "webview"
+        },
+        {
           "id": "currents-settings",
           "name": "Settings",
           "type": "webview",
@@ -122,6 +127,18 @@
         "title": "Open in Dashboard",
         "category": "Currents",
         "icon": "$(link-external)"
+      },
+      {
+        "command": "currents.refreshTestExplorer",
+        "title": "Refresh Test Explorer",
+        "category": "Currents",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "currents.openTestExplorerInDashboard",
+        "title": "Open in Dashboard",
+        "category": "Currents",
+        "icon": "$(link-external)"
       }
     ],
     "menus": {
@@ -160,6 +177,16 @@
           "command": "currents.selectProject",
           "when": "false",
           "group": "navigation@6"
+        },
+        {
+          "command": "currents.refreshTestExplorer",
+          "when": "view == currents-test-explorer && currents.projectSelected",
+          "group": "navigation@1"
+        },
+        {
+          "command": "currents.openTestExplorerInDashboard",
+          "when": "view == currents-test-explorer && currents.projectSelected",
+          "group": "navigation@2"
         }
       ],
       "view/item/context": []

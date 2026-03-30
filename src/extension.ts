@@ -3,6 +3,7 @@ import { AuthManager } from "./auth.js";
 import { RunsWebviewProvider } from "./views/runsWebviewProvider.js";
 import { RunDetailPanelProvider } from "./views/runDetailPanel.js";
 import { SettingsWebviewProvider } from "./views/settingsWebviewProvider.js";
+import { TestExplorerWebviewProvider } from "./views/testExplorerWebviewProvider.js";
 import { registerCommands } from "./commands.js";
 import { getCurrentBranch } from "./git.js";
 import { initLog, log } from "./log.js";
@@ -21,11 +22,16 @@ export async function activate(
     runsProvider.setActiveRunId(runId);
   };
   const settingsProvider = new SettingsWebviewProvider(context.extensionUri);
+  const testExplorerProvider = new TestExplorerWebviewProvider(context.extensionUri);
 
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       RunsWebviewProvider.viewType,
       runsProvider
+    ),
+    vscode.window.registerWebviewViewProvider(
+      TestExplorerWebviewProvider.viewType,
+      testExplorerProvider
     ),
     vscode.window.registerWebviewViewProvider(
       SettingsWebviewProvider.viewType,
@@ -40,6 +46,7 @@ export async function activate(
     runsProvider,
     runDetailPanel,
     settingsProvider,
+    testExplorerProvider,
     context,
   });
   context.subscriptions.push(...commands);
@@ -56,6 +63,7 @@ export async function activate(
   if (authenticated) {
     runsProvider.setClient(auth.client);
     runDetailPanel.setClient(auth.client);
+    testExplorerProvider.setClient(auth.client);
 
     const savedProjectId = context.workspaceState.get<string>(
       "currents.projectId"
@@ -77,6 +85,7 @@ export async function activate(
         runsProvider.setFilters({ branches: [branch] });
       }
       runsProvider.setProjectId(savedProjectId);
+      testExplorerProvider.setProjectId(savedProjectId);
     } else {
       await vscode.commands.executeCommand(
         "setContext",

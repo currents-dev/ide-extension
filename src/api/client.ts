@@ -6,6 +6,8 @@ import type {
   Project,
   Run,
   RunFeedItem,
+  TestExplorerOptions,
+  TestExplorerResponse,
 } from "./types.js";
 
 const BASE_URL = "https://api.currents.dev/v1";
@@ -75,5 +77,49 @@ export class CurrentsApiClient {
     instanceId: string
   ): Promise<ApiResponse<Instance>> {
     return this.request(`/instances/${instanceId}`);
+  }
+
+  async getTestsExplorer(
+    projectId: string,
+    opts: TestExplorerOptions
+  ): Promise<TestExplorerResponse> {
+    const params = new URLSearchParams();
+    params.set("date_start", opts.date_start);
+    params.set("date_end", opts.date_end);
+    if (opts.page !== undefined) {
+      params.set("page", String(opts.page));
+    }
+    if (opts.limit) {
+      params.set("limit", String(opts.limit));
+    }
+    if (opts.order) {
+      params.set("order", opts.order);
+    }
+    if (opts.dir) {
+      params.set("dir", opts.dir);
+    }
+    if (opts.branches?.length) {
+      for (const b of opts.branches) {
+        params.append("branches[]", b);
+      }
+    }
+    if (opts.tags?.length) {
+      for (const t of opts.tags) {
+        params.append("tags[]", t);
+      }
+    }
+    if (opts.authors?.length) {
+      for (const a of opts.authors) {
+        params.append("authors[]", a);
+      }
+    }
+    if (opts.spec) {
+      params.set("spec", opts.spec);
+    }
+    if (opts.title) {
+      params.set("title", opts.title);
+    }
+    const qs = params.toString();
+    return this.request(`/tests/${projectId}?${qs}`);
   }
 }

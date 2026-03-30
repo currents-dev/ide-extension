@@ -167,6 +167,53 @@ export interface TestAttempt {
   } | null;
 }
 
+// --- Tests Explorer ---
+
+export interface TestExplorerItem {
+  title: string;
+  signature: string;
+  spec: string;
+  metrics: {
+    executions: number;
+    failures: number;
+    ignored: number;
+    passes: number;
+    flaky: number;
+    flakinessRate: number;
+    failureRate: number;
+    avgDurationMs: number;
+    flakinessVolume: number;
+    failureVolume: number;
+    durationVolume: number;
+  };
+  latestTag: string[] | null;
+  lastSeen: string | null;
+}
+
+export interface TestExplorerResponse {
+  status: "OK";
+  data: {
+    list: TestExplorerItem[];
+    count: number;
+    total: number;
+    nextPage: number | false;
+  };
+}
+
+export interface TestExplorerOptions {
+  date_start: string;
+  date_end: string;
+  page?: number;
+  limit?: number;
+  order?: string;
+  dir?: "asc" | "desc";
+  branches?: string[];
+  tags?: string[];
+  authors?: string[];
+  spec?: string;
+  title?: string;
+}
+
 // --- Filters ---
 
 export interface RunFilters {
