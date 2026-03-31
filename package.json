@@ -140,6 +140,12 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "currents.changeDateRange",
+        "title": "Change Date Range",
+        "category": "Currents",
+        "icon": "$(calendar)"
+      },
+      {
         "command": "currents.openTestExplorerInDashboard",
         "title": "Open in Dashboard",
         "category": "Currents",
@@ -189,9 +195,14 @@
           "group": "navigation@1"
         },
         {
-          "command": "currents.openTestExplorerInDashboard",
+          "command": "currents.changeDateRange",
           "when": "view == currents-test-explorer && currents.projectSelected",
           "group": "navigation@2"
+        },
+        {
+          "command": "currents.openTestExplorerInDashboard",
+          "when": "view == currents-test-explorer && currents.projectSelected",
+          "group": "navigation@3"
         }
       ],
       "view/item/context": []

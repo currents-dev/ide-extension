@@ -241,6 +241,27 @@ export function registerCommands(
       );
     }),
 
+    vscode.commands.registerCommand("currents.changeDateRange", async () => {
+      const current = testExplorerProvider.getDateRange();
+      const options = [
+        { label: "14 days", value: "14d" as const },
+        { label: "30 days", value: "30d" as const },
+        { label: "60 days", value: "60d" as const },
+        { label: "90 days", value: "90d" as const },
+      ];
+      const pick = await vscode.window.showQuickPick(
+        options.map((o) => ({
+          label: o.label,
+          description: o.value === current ? "$(check) Current" : undefined,
+          value: o.value,
+        })),
+        { title: "Select Date Range" }
+      );
+      if (pick) {
+        testExplorerProvider.setDateRange(pick.value);
+      }
+    }),
+
     vscode.commands.registerCommand("currents.openTestExplorerInDashboard", () => {
       const projectId = context.workspaceState.get<string>("currents.projectId");
       if (projectId) {

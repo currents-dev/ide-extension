@@ -38,6 +38,18 @@ export class TestExplorerWebviewProvider
     this.sendState();
   }
 
+  getDateRange(): DateRange {
+    return this.dateRange;
+  }
+
+  setDateRange(range: DateRange): void {
+    this.dateRange = range;
+    this.tests = [];
+    this.page = 0;
+    this.hasMore = false;
+    this.fetchTests();
+  }
+
   setProjectId(projectId: string | undefined): void {
     this.projectId = projectId;
     this.tests = [];
@@ -69,13 +81,6 @@ export class TestExplorerWebviewProvider
       switch (message.type) {
         case "ready":
           this.sendState();
-          break;
-        case "changeDateRange":
-          this.dateRange = message.range as DateRange;
-          this.tests = [];
-          this.page = 0;
-          this.hasMore = false;
-          this.fetchTests();
           break;
         case "changeSortMode":
           this.sortMode = message.mode as SortMode;
@@ -274,31 +279,6 @@ export class TestExplorerWebviewProvider
     border-color: var(--vscode-button-background);
   }
 
-  .date-bar {
-    display: flex;
-    gap: 4px;
-  }
-  .date-btn {
-    flex: 1;
-    padding: 4px 6px;
-    font-size: 11px;
-    font-family: var(--vscode-font-family);
-    border: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
-    border-radius: 4px;
-    cursor: pointer;
-    background: transparent;
-    color: var(--vscode-descriptionForeground);
-    transition: all 0.15s;
-  }
-  .date-btn:hover {
-    background: var(--vscode-toolbar-hoverBackground);
-  }
-  .date-btn.active {
-    background: var(--vscode-badge-background);
-    color: var(--vscode-badge-foreground);
-    border-color: var(--vscode-badge-background);
-  }
-
   .summary {
     font-size: 11px;
     color: var(--vscode-descriptionForeground);
@@ -437,12 +417,6 @@ export class TestExplorerWebviewProvider
       <button class="tab-btn active" data-mode="flakiest">\u2744 Flakiest</button>
       <button class="tab-btn" data-mode="slowest">\u23F1 Slowest</button>
     </div>
-    <div class="date-bar">
-      <button class="date-btn active" data-range="14d">14 days</button>
-      <button class="date-btn" data-range="30d">30 days</button>
-      <button class="date-btn" data-range="60d">60 days</button>
-      <button class="date-btn" data-range="90d">90 days</button>
-    </div>
   </div>
   <div class="summary" id="summary"></div>
   <div id="tests-container"></div>
@@ -462,12 +436,6 @@ export class TestExplorerWebviewProvider
     document.querySelectorAll('.tab-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         vscode.postMessage({ type: 'changeSortMode', mode: btn.dataset.mode });
-      });
-    });
-
-    document.querySelectorAll('.date-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        vscode.postMessage({ type: 'changeDateRange', range: btn.dataset.range });
       });
     });
 
@@ -506,10 +474,6 @@ export class TestExplorerWebviewProvider
       document.querySelectorAll('.tab-btn').forEach(function(btn) {
         btn.classList.toggle('active', btn.dataset.mode === sortMode);
       });
-      document.querySelectorAll('.date-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.dataset.range === dateRange);
-      });
-
       if (currentState.loading && tests.length === 0) {
         summary.textContent = '';
         container.innerHTML = '<div class="loading">Loading tests\u2026</div>';
