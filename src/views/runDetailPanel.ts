@@ -9,6 +9,11 @@ import type {
   RunSpec,
 } from "../api/types.js";
 import { log } from "../log.js";
+import {
+  buildBasicPrompt,
+  buildPromptMarkdown,
+  writeContextFiles,
+} from "../aiContext.js";
 
 interface SerializedError {
   testId: string;
@@ -265,18 +270,66 @@ export class RunDetailPanelProvider {
     spec: string;
     testTitle: string;
     displayError: string;
+    instanceId?: string;
+    testId?: string;
   }): Promise<void> {
-    const prompt = `Please fix this failing test.\n\nFile: ${msg.spec}\nTest: ${msg.testTitle}\n\nError:\n${msg.displayError}`;
-    try {
-      await vscode.commands.executeCommand("workbench.action.chat.open", {
-        query: prompt,
-      });
-    } catch {
-      await vscode.env.clipboard.writeText(prompt);
-      vscode.window.showInformationMessage(
-        "Currents: Prompt copied to clipboard. Paste it in the AI chat.",
-      );
-    }
+    log("handleFixWithAgent called with:", {
+      spec: msg.spec,
+      testTitle: msg.testTitle,
+      instanceId: msg.instanceId,
+      testId: msg.testId,
+      hasClient: !!this.client,
+    });
+
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: "Currents: Loading test context...",
+        cancellable: false,
+      },
+      async () => {
+        let prompt: string;
+        let attachFiles: vscode.Uri[] = [];
+
+        if (this.client && msg.instanceId && msg.testId) {
+          try {
+            log("Fetching AI context for", msg.instanceId, msg.testId);
+            const payload = await this.client.getAiContext(
+              msg.instanceId,
+              msg.testId,
+            );
+            log("AI context fetched successfully");
+            prompt = buildPromptMarkdown(payload);
+            attachFiles = await writeContextFiles(this.client, payload);
+            log("Context files written:", attachFiles.map((u) => u.fsPath));
+          } catch (err) {
+            log("AI context fetch failed, using basic prompt:", err);
+            prompt = buildBasicPrompt(msg);
+          }
+        } else {
+          log(
+            "Using basic prompt - missing:",
+            !this.client ? "client" : "",
+            !msg.instanceId ? "instanceId" : "",
+            !msg.testId ? "testId" : "",
+          );
+          prompt = buildBasicPrompt(msg);
+        }
+
+        try {
+          log("Opening chat with prompt length:", prompt.length, "attachFiles:", attachFiles.length);
+          await vscode.commands.executeCommand("workbench.action.chat.open", {
+            query: prompt,
+            ...(attachFiles.length > 0 ? { attachFiles } : {}),
+          });
+        } catch {
+          await vscode.env.clipboard.writeText(prompt);
+          vscode.window.showInformationMessage(
+            "Currents: Prompt copied to clipboard. Paste it in the AI chat.",
+          );
+        }
+      },
+    );
   }
 
   private async handleGoToFile(spec: string, testTitle: string): Promise<void> {

@@ -73,7 +73,7 @@ export function registerCommands(
         }
 
         try {
-          const { data: allProjects } = await auth.client.getProjects();
+          const { data: allProjects } = await auth.client.getProjects({ fetchAll: true });
           const projects = allProjects.filter(
             (p) => !p.name.toLowerCase().includes("[archived]")
           );
