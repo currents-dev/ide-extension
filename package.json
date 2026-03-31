@@ -54,9 +54,21 @@
           "type": "string",
           "default": "https://api.currents.dev/v1",
           "description": "Base URL for the Currents API."
+        },
+        "currents.registerMcpServer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically register the Currents MCP server. Disable if you already have @currents/mcp configured manually.",
+          "order": 100
         }
       }
     },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "currentsProvider",
+        "label": "Currents"
+      }
+    ],
     "viewsWelcome": [],
     "commands": [
       {

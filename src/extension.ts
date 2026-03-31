@@ -7,6 +7,7 @@ import { TestExplorerWebviewProvider } from "./views/testExplorerWebviewProvider
 import { registerCommands } from "./commands.js";
 import { getCurrentBranch } from "./git.js";
 import { initLog, log } from "./log.js";
+import { initMcpServer } from "./mcp.js";
 
 export async function activate(
   context: vscode.ExtensionContext
@@ -59,6 +60,7 @@ export async function activate(
   );
 
   settingsProvider.setHasApiKey(authenticated);
+  context.subscriptions.push(initMcpServer(auth, context.secrets));
 
   if (authenticated) {
     runsProvider.setClient(auth.client);
