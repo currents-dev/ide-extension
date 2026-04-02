@@ -10,7 +10,9 @@
   "categories": [
     "Testing"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {
@@ -54,6 +56,22 @@
           "type": "string",
           "default": "https://api.currents.dev/v1",
           "description": "Base URL for the Currents API."
+        },
+        "currents.filterByCurrentBranch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically filter runs by the current git branch when a project is selected."
+        },
+        "currents.analyzeTestDisplay": {
+          "type": "string",
+          "default": "always",
+          "enum": ["always", "quickfix"],
+          "enumDescriptions": [
+            "Always show \"Analyze with Currents\" above every test definition",
+            "Only available via Quick Fix shortcut on a test line"
+          ],
+          "description": "Controls how the AI-powered \"Analyze with Currents\" action appears on test definitions. The Quick Fix shortcut is always available regardless of this setting.",
+          "order": 50
         },
         "currents.registerMcpServer": {
           "type": "boolean",
@@ -162,9 +180,73 @@
         "title": "Open in Dashboard",
         "category": "Currents",
         "icon": "$(link-external)"
+      },
+      {
+        "command": "currents.analyzeTest",
+        "title": "Analyze Test with AI",
+        "category": "Currents",
+        "icon": "$(sparkle)"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "currents.refreshRuns",
+          "when": "false"
+        },
+        {
+          "command": "currents.enableAutoRefresh",
+          "when": "false"
+        },
+        {
+          "command": "currents.disableAutoRefresh",
+          "when": "false"
+        },
+        {
+          "command": "currents.filterByBranch",
+          "when": "false"
+        },
+        {
+          "command": "currents.filterByAuthor",
+          "when": "false"
+        },
+        {
+          "command": "currents.clearFilters",
+          "when": "false"
+        },
+        {
+          "command": "currents.loadMoreRuns",
+          "when": "false"
+        },
+        {
+          "command": "currents.openRun",
+          "when": "false"
+        },
+        {
+          "command": "currents.fixWithAgent",
+          "when": "false"
+        },
+        {
+          "command": "currents.openInDashboard",
+          "when": "false"
+        },
+        {
+          "command": "currents.refreshTestExplorer",
+          "when": "false"
+        },
+        {
+          "command": "currents.changeDateRange",
+          "when": "false"
+        },
+        {
+          "command": "currents.openTestExplorerInDashboard",
+          "when": "false"
+        },
+        {
+          "command": "currents.analyzeTest",
+          "when": "false"
+        }
+      ],
       "view/title": [
         {
           "command": "currents.refreshRuns",
@@ -236,5 +318,8 @@
     "esbuild": "^0.25.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.45"
   }
 }

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import type { AuthManager } from "./auth.js";
-import { log } from "./log.js";
+import { log } from "./lib/log.js";
 
 const SERVER_NAME = "currents";
 const SECRET_KEY = "currents.apiKey";

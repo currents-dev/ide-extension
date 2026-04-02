@@ -107,6 +107,14 @@ export interface RunSpec {
 
 // --- Instances ---
 
+export interface InstanceTrace {
+  testId: string;
+  traceId: string;
+  testAttemptIndex: number;
+  name: string;
+  traceURL: string;
+}
+
 export interface Instance {
   instanceId: string;
   runId: string;
@@ -126,6 +134,7 @@ export interface Instance {
     exception: string | null;
     flaky: number;
     tests: InstanceTest[];
+    playwrightTraces?: InstanceTrace[];
   } | null;
   testResults?: Record<string, InstanceTestResult>;
 }

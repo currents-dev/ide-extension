@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <style>
+      /**__CODICON_CSS__**/
       * {
         box-sizing: border-box;
         margin: 0;
@@ -392,6 +393,7 @@
         border: none;
         padding: 4px 10px;
         border-radius: 4px;
+        text-decoration: none;
         cursor: pointer;
         font-size: 12px;
         font-family: var(--vscode-font-family);
@@ -401,6 +403,8 @@
       }
       .btn:hover {
         background: var(--vscode-button-secondaryHoverBackground);
+        color: var(--vscode-button-secondaryForeground);
+        text-decoration: none;
       }
       .btn-primary {
         background: var(--vscode-button-background);
@@ -410,11 +414,6 @@
         background: var(--vscode-button-hoverBackground);
       }
 
-      .flaky-icon {
-        color: #e57ab0;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
       .flaky-badge {
         display: inline-block;
         font-size: 10px;
@@ -427,6 +426,25 @@
         color: #e57ab0;
         margin-left: 8px;
         vertical-align: middle;
+      }
+
+      .attempt-indicators {
+        display: inline-flex;
+        gap: 3px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      .attempt-square {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        display: inline-block;
+      }
+      .attempt-pass {
+        background: var(--vscode-testing-iconPassed);
+      }
+      .attempt-fail {
+        background: var(--vscode-testing-iconFailed);
       }
 
       .empty-errors {
@@ -470,8 +488,11 @@
         <span class="status-badge" id="status-badge"></span>
         <span class="commit-message" id="commit-message"></span>
         <div class="header-actions">
+          <button class="header-btn" id="btn-fix-all" style="display: none">
+            <i class="codicon codicon-chat-sparkle"></i> Fix with Agent
+          </button>
           <button class="header-btn" id="btn-dashboard">
-            ↗ Open in Dashboard
+            <i class="codicon codicon-forward"></i> Dashboard
           </button>
         </div>
       </div>
@@ -594,12 +615,24 @@
           vscode.postMessage({ type: "openInDashboard" });
         });
 
+      document
+        .getElementById("btn-fix-all")
+        .addEventListener("click", function () {
+          vscode.postMessage({ type: "fixAllWithAgent" });
+        });
+
       window.addEventListener("message", function (event) {
         var msg = event.data;
         if (msg.type === "runData") {
           lastAllSpecs = msg.allSpecs || [];
           renderSpecs(msg.specs);
           updateLiveState(msg);
+          var hasFailures = msg.specs.some(function (s) {
+            return s.errors && s.errors.length > 0;
+          });
+          document.getElementById("btn-fix-all").style.display = hasFailures
+            ? ""
+            : "none";
         } else if (msg.type === "error") {
           document.getElementById("content").innerHTML =
             '<div class="error-state">Failed to load: ' +
@@ -647,6 +680,17 @@
         }
       }
 
+      function renderAttemptDots(attempts) {
+        if (!attempts || attempts.length <= 1) return "";
+        var html = '<span class="attempt-indicators">';
+        for (var i = 0; i < attempts.length; i++) {
+          var cls = attempts[i].error ? "attempt-fail" : "attempt-pass";
+          html += '<span class="attempt-square ' + cls + '"></span>';
+        }
+        html += "</span>";
+        return html;
+      }
+
       function renderSpecGroup(spec, kind) {
         var isFlakyGroup = kind === "flaky";
         var dotClass = isFlakyGroup ? "dot-flaky" : "dot-failed";
@@ -657,9 +701,7 @@
         html +=
           '  <div class="spec-header" data-spec="' + escAttr(specKey) + '">';
         html +=
-          '    <span class="spec-chevron' +
-          (isFlakyGroup ? "" : " open") +
-          '">\u25B6</span>';
+          '    <span class="spec-chevron open">\u25B6</span>';
         html += '    <span class="spec-status-dot ' + dotClass + '"></span>';
         html += '    <span class="spec-name">' + escHtml(spec.spec) + "</span>";
         html += '    <span class="spec-meta">';
@@ -679,11 +721,13 @@
           html += "      <span>" + formatDuration(spec.duration) + "</span>";
         }
         html += "    </span>";
+        html +=
+          '    <button class="btn" data-action="openInstanceDashboard" data-instance-id="' +
+          escAttr(spec.instanceId || "") +
+          '"><i class=\"codicon codicon-forward\"></i> Dashboard</button>';
         html += "  </div>";
         html +=
-          '  <div class="spec-body' +
-          (isFlakyGroup ? " collapsed" : "") +
-          '" data-body="' +
+          '  <div class="spec-body" data-body="' +
           escAttr(specKey) +
           '">';
 
@@ -696,15 +740,19 @@
           html += '<div class="error-item">';
           html += '  <div class="error-title-row">';
           if (isFlakyGroup) {
-            html += '    <span class="flaky-icon">\u2744</span>';
+            html += '    <span class="error-icon" style="color:#e57ab0">\u2715</span>';
             html +=
               '    <span class="error-test-name">' +
               escHtml(title) +
-              '<span class="flaky-badge">flaky</span></span>';
+              '<span class="flaky-badge">flaky</span>' +
+              renderAttemptDots(err.attempts) +
+              "</span>";
           } else {
             html += '    <span class="error-icon">\u2715</span>';
             html +=
-              '    <span class="error-test-name">' + escHtml(title) + "</span>";
+              '    <span class="error-test-name">' + escHtml(title) +
+              renderAttemptDots(err.attempts) +
+              "</span>";
           }
           html += "  </div>";
           if (errorText) {
@@ -715,13 +763,7 @@
           }
           html += '  <div class="error-actions">';
           html +=
-            '    <button class="btn btn-primary" data-action="goToFile" data-spec="' +
-            escAttr(spec.spec) +
-            '" data-title="' +
-            escAttr(lastTitle) +
-            '">\u2197 Go to file</button>';
-          html +=
-            '    <button class="btn btn-primary" data-action="fixWithAgent" data-spec="' +
+            '    <button class="btn" data-action="fixWithAgent" data-spec="' +
             escAttr(spec.spec) +
             '" data-title="' +
             escAttr(title) +
@@ -731,7 +773,25 @@
             escAttr(spec.instanceId || "") +
             '" data-test-id="' +
             escAttr(err.testId || "") +
-            '">\u2726 Fix with Agent</button>';
+            '"><i class=\"codicon codicon-chat-sparkle\"></i> Fix with agent</button>';
+          html +=
+            '    <button class="btn" data-action="goToFile" data-spec="' +
+            escAttr(spec.spec) +
+            '" data-title="' +
+            escAttr(lastTitle) +
+            '"><i class=\"codicon codicon-go-to-file\"></i> Go to file</button>';
+          if (err.traceUrl) {
+            html +=
+              '    <a class="btn" href="https://trace.playwright.dev/?trace=' +
+              encodeURIComponent(err.traceUrl) +
+              '"><i class=\"codicon codicon-bug\"></i> Trace Viewer</a>';
+          }
+          html +=
+            '    <button class="btn" data-action="openTestDashboard" data-instance-id="' +
+            escAttr(spec.instanceId || "") +
+            '" data-test-id="' +
+            escAttr(err.testId || "") +
+            '"><i class=\"codicon codicon-forward\"></i> Dashboard</button>';
           html += "  </div>";
           html += "</div>";
         }
@@ -885,6 +945,31 @@
                 spec: btn.dataset.spec,
                 testTitle: btn.dataset.title,
                 displayError: btn.dataset.error,
+                instanceId: btn.dataset.instanceId,
+                testId: btn.dataset.testId,
+              });
+            });
+          });
+
+        document
+          .querySelectorAll('[data-action="openInstanceDashboard"]')
+          .forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              vscode.postMessage({
+                type: "openInstanceDashboard",
+                instanceId: btn.dataset.instanceId,
+              });
+            });
+          });
+
+        document
+          .querySelectorAll('[data-action="openTestDashboard"]')
+          .forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              vscode.postMessage({
+                type: "openTestDashboard",
                 instanceId: btn.dataset.instanceId,
                 testId: btn.dataset.testId,
               });

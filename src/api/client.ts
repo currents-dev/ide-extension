@@ -154,6 +154,18 @@ export class CurrentsApiClient {
     return this.request(`/ai-context?${params}`);
   }
 
+  async getAiContextBySignature(
+    projectId: string,
+    signature: string,
+  ): Promise<AiContextPayload> {
+    const params = new URLSearchParams({
+      project_id: projectId,
+      signature,
+      format: "json",
+    });
+    return this.request(`/ai-context?${params}`);
+  }
+
   async fetchUrl(url: string): Promise<string> {
     const res = await fetch(url);
     if (!res.ok) {

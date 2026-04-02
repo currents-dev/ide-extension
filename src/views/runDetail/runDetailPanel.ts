@@ -1,19 +1,21 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import type { CurrentsApiClient } from "../api/client.js";
+import type { CurrentsApiClient } from "../../api/client.js";
+import { getCodiconCss } from "../codiconCss.js";
 import type {
   InstanceTest,
   InstanceTestResult,
+  InstanceTrace,
   RunFeedItem,
   RunSpec,
-} from "../api/types.js";
-import { log } from "../log.js";
+} from "../../api/types.js";
+import { log } from "../../lib/log.js";
 import {
   buildBasicPrompt,
   buildPromptMarkdown,
   writeContextFiles,
-} from "../aiContext.js";
+} from "../../aiContext.js";
 
 interface SerializedError {
   testId: string;
@@ -21,6 +23,7 @@ interface SerializedError {
   spec: string;
   displayError: string;
   isFlaky: boolean;
+  traceUrl: string;
   attempts: Array<{
     error?: { message: string; stack: string } | null;
   }>;
@@ -41,6 +44,8 @@ export class RunDetailPanelProvider {
   private panels = new Map<string, vscode.WebviewPanel>();
   private runIdByPanel = new Map<vscode.WebviewPanel, string>();
   private pollTimers = new Map<string, ReturnType<typeof setInterval>>();
+  private lastSpecErrors = new Map<string, SerializedSpec[]>();
+  private runProjectIds = new Map<string, string>();
   private client: CurrentsApiClient | undefined;
   private _onActiveRunChanged:
     | ((runId: string | undefined) => void)
@@ -78,10 +83,13 @@ export class RunDetailPanelProvider {
     panel.iconPath = new vscode.ThemeIcon("beaker");
     this.panels.set(run.runId, panel);
     this.runIdByPanel.set(panel, run.runId);
+    this.runProjectIds.set(run.runId, run.projectId);
 
     panel.onDidDispose(() => {
       this.panels.delete(run.runId);
       this.runIdByPanel.delete(panel);
+      this.lastSpecErrors.delete(run.runId);
+      this.runProjectIds.delete(run.runId);
       this.stopPolling(run.runId);
       this.notifyActiveRun();
     });
@@ -105,13 +113,30 @@ export class RunDetailPanelProvider {
             vscode.Uri.parse(`https://app.currents.dev/run/${run.runId}`),
           );
           break;
+        case "openInstanceDashboard":
+          vscode.env.openExternal(
+            vscode.Uri.parse(
+              `https://app.currents.dev/instance/${msg.instanceId}`,
+            ),
+          );
+          break;
+        case "openTestDashboard":
+          vscode.env.openExternal(
+            vscode.Uri.parse(
+              `https://app.currents.dev/instance/${msg.instanceId}/test/${msg.testId}`,
+            ),
+          );
+          break;
+        case "fixAllWithAgent":
+          await this.handleFixAllWithAgent(run.runId);
+          break;
         case "ready":
           await this.loadRunData(panel, run);
           break;
       }
     });
 
-    panel.webview.html = this.getHtml(run);
+    panel.webview.html = this.getHtml(panel.webview, run);
   }
 
   private notifyActiveRun(): void {
@@ -169,9 +194,14 @@ export class RunDetailPanelProvider {
                 (t._f === true || tr[t.testId]?.isFlaky === true),
             ) ?? [];
 
+          const traces = instance.results?.playwrightTraces ?? [];
           const allIssueTests = [
-            ...failedTests.map((t) => serializeTest(t, false, tr[t.testId])),
-            ...flakyTests.map((t) => serializeTest(t, true, tr[t.testId])),
+            ...failedTests.map((t) =>
+              serializeTest(t, false, tr[t.testId], traces),
+            ),
+            ...flakyTests.map((t) =>
+              serializeTest(t, true, tr[t.testId], traces),
+            ),
           ];
 
           return {
@@ -206,6 +236,8 @@ export class RunDetailPanelProvider {
         totalFlaky += g.tests.flaky;
         totalTests += g.tests.overall;
       }
+
+      this.lastSpecErrors.set(run.runId, specErrors);
 
       panel.webview.postMessage({
         type: "runData",
@@ -301,7 +333,10 @@ export class RunDetailPanelProvider {
             log("AI context fetched successfully");
             prompt = buildPromptMarkdown(payload);
             attachFiles = await writeContextFiles(this.client, payload);
-            log("Context files written:", attachFiles.map((u) => u.fsPath));
+            log(
+              "Context files written:",
+              attachFiles.map((u) => u.fsPath),
+            );
           } catch (err) {
             log("AI context fetch failed, using basic prompt:", err);
             prompt = buildBasicPrompt(msg);
@@ -317,7 +352,12 @@ export class RunDetailPanelProvider {
         }
 
         try {
-          log("Opening chat with prompt length:", prompt.length, "attachFiles:", attachFiles.length);
+          log(
+            "Opening chat with prompt length:",
+            prompt.length,
+            "attachFiles:",
+            attachFiles.length,
+          );
           await vscode.commands.executeCommand("workbench.action.chat.open", {
             query: prompt,
             ...(attachFiles.length > 0 ? { attachFiles } : {}),
@@ -330,6 +370,90 @@ export class RunDetailPanelProvider {
         }
       },
     );
+  }
+
+  private async handleFixAllWithAgent(runId: string): Promise<void> {
+    const specErrors = this.lastSpecErrors.get(runId);
+    if (!specErrors || specErrors.length === 0) {
+      vscode.window.showInformationMessage(
+        "Currents: No failures found in this run.",
+      );
+      return;
+    }
+
+    const projectId = this.runProjectIds.get(runId);
+
+    const failedTests: Array<{
+      spec: string;
+      instanceId: string;
+      title: string;
+      testId: string;
+      errorPreview: string;
+    }> = [];
+
+    for (const spec of specErrors) {
+      for (const err of spec.errors) {
+        if (err.isFlaky) continue;
+        failedTests.push({
+          spec: spec.spec,
+          instanceId: spec.instanceId,
+          title: err.title.join(" > "),
+          testId: err.testId,
+          errorPreview: (err.displayError || "").split("\n")[0].slice(0, 120),
+        });
+      }
+    }
+
+    if (failedTests.length === 0) {
+      vscode.window.showInformationMessage(
+        "Currents: No non-flaky failures found in this run.",
+      );
+      return;
+    }
+
+    const lines: string[] = [];
+    lines.push(
+      `This CI run has **${failedTests.length} failing test(s)** across ${specErrors.filter((s) => s.errors.some((e) => !e.isFlaky)).length} spec file(s).`,
+    );
+    lines.push("");
+    lines.push("Please:");
+    lines.push("1. For each failing test below, use `currents-get-spec-instance` with the instance ID to get full failure details and stack traces");
+    lines.push("2. Open each spec file, locate the failing test, and analyze the root cause");
+    lines.push("3. Build a plan to fix all failures, then implement the fixes");
+    lines.push("");
+    lines.push("## Run metadata (for MCP queries)");
+    lines.push("");
+    if (projectId) lines.push(`- **Project ID:** \`${projectId}\``);
+    lines.push(`- **Run ID:** \`${runId}\``);
+    lines.push("");
+    lines.push("## Failing tests");
+    lines.push("");
+
+    for (const t of failedTests) {
+      lines.push(`### ${t.title}`);
+      lines.push(`- **Spec:** \`${t.spec}\``);
+      lines.push(`- **Instance ID:** \`${t.instanceId}\``);
+      lines.push(`- **Test ID:** \`${t.testId}\``);
+      if (t.errorPreview) lines.push(`- **Error:** \`${t.errorPreview}\``);
+      lines.push("");
+    }
+
+    lines.push(
+      "Use the Currents MCP tools (`currents-get-spec-instance`, `currents-get-test-results`, `currents-get-run-details`) with the identifiers above to retrieve full context before fixing.",
+    );
+
+    const prompt = lines.join("\n");
+
+    try {
+      await vscode.commands.executeCommand("workbench.action.chat.open", {
+        query: prompt,
+      });
+    } catch {
+      await vscode.env.clipboard.writeText(prompt);
+      vscode.window.showInformationMessage(
+        "Currents: Prompt copied to clipboard. Paste it in the AI chat.",
+      );
+    }
   }
 
   private async handleGoToFile(spec: string, testTitle: string): Promise<void> {
@@ -367,14 +491,19 @@ export class RunDetailPanelProvider {
     );
   }
 
-  private getHtml(run: RunFeedItem): string {
+  private getHtml(webview: vscode.Webview, run: RunFeedItem): string {
     const htmlPath = path.join(
       this.extensionUri.fsPath,
       "src",
       "views",
+      "runDetail",
       "runDetail.html",
     );
     let html = fs.readFileSync(htmlPath, "utf-8");
+    html = html.replace(
+      "/**__CODICON_CSS__**/",
+      getCodiconCss(webview, this.extensionUri),
+    );
 
     const commit = run.meta.commit;
     const commitMsg = commit?.message?.split("\n")[0] || "No title";
@@ -417,7 +546,7 @@ export class RunDetailPanelProvider {
       },
     };
 
-    html = html.replace("/**__INIT_DATA__**/null", JSON.stringify(initData));
+    html = html.replace("/**__INIT_DATA__**/ null", JSON.stringify(initData));
 
     return html;
   }
@@ -432,6 +561,7 @@ function serializeTest(
   t: InstanceTest,
   isFlaky: boolean,
   detail?: InstanceTestResult,
+  traces?: InstanceTrace[],
 ): SerializedError {
   const errorText = stripAnsi(
     detail?.displayError ||
@@ -441,12 +571,19 @@ function serializeTest(
       "",
   );
   const attempts = detail?.attempts ?? t.attempts ?? [];
+
+  const matchingTraces = (traces ?? []).filter((tr) => tr.testId === t.testId);
+  const bestTrace = matchingTraces.sort(
+    (a, b) => b.testAttemptIndex - a.testAttemptIndex,
+  )[0];
+
   return {
     testId: t.testId,
     title: t.title,
     spec: t.spec,
     displayError: errorText,
     isFlaky,
+    traceUrl: bestTrace?.traceURL ?? "",
     attempts: attempts.map((a) => ({
       error: a.error ?? null,
     })),
