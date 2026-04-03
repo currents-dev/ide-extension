@@ -269,21 +269,22 @@ export interface AiContextAttachment {
 }
 
 export interface AiContextConsoleEntry {
+  time: number;
   messageType: string;
   text: string;
   location: { url: string; lineNumber: number; columnNumber: number } | null;
 }
 
 export interface AiContextNetworkRequest {
+  time: number;
   url: string;
-  status: number | null;
-  method: string | null;
-  resourceType: string | null;
+  status: number;
+  method: string;
 }
 
-export interface AiContextTraceSummary {
-  consoleErrorsWarnings: AiContextConsoleEntry[];
-  failedNetworkRequests: AiContextNetworkRequest[];
+export interface AiContextTraceErrorAnalysis {
+  consoleEntries: AiContextConsoleEntry[];
+  networkRequests: AiContextNetworkRequest[];
 }
 
 export interface AiContextFailureContext {
@@ -317,7 +318,7 @@ export interface AiContextPayload {
   error: AiContextError | null;
   otherAttempts: AiContextOtherAttempt[];
   errorContext: AiContextAsset | null;
-  traceAnalyzerSummary: AiContextTraceSummary | null;
+  traceErrorAnalysis: AiContextTraceErrorAnalysis | null;
   failureContext: AiContextFailureContext | null;
   steps: AiContextStep[];
   stdout: string[];

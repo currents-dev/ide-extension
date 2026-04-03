@@ -12,6 +12,38 @@ import type {
 
 const CONTEXT_DIR = "currents-ai-context";
 
+function longestBacktickRunLength(content: string): number {
+  let max = 0;
+  let current = 0;
+  for (const ch of content) {
+    if (ch === "`") {
+      current += 1;
+      max = Math.max(max, current);
+    } else {
+      current = 0;
+    }
+  }
+  return max;
+}
+
+/** Fenced block; fence length beats any run of backticks in `content`. */
+function pushMarkdownCodeBlock(
+  lines: string[],
+  content: string | undefined | null,
+  info?: string,
+): void {
+  if (content == null || content === "") {
+    return;
+  }
+  const runLen = longestBacktickRunLength(content);
+  const fenceLen = Math.max(3, runLen + 1);
+  const fence = "`".repeat(fenceLen);
+  const opening = info != null && info !== "" ? `${fence}${info}` : fence;
+  lines.push(opening);
+  lines.push(content);
+  lines.push(fence);
+}
+
 function formatErrorMarkdown(
   error: AiContextError,
   opts: { includeSnippet?: boolean; includeStack?: boolean } = {},
@@ -22,9 +54,7 @@ function formatErrorMarkdown(
 
   if (!hasStack && error.message) {
     lines.push("**Error:**");
-    lines.push("```");
-    lines.push(error.message);
-    lines.push("```");
+    pushMarkdownCodeBlock(lines, error.message);
   }
 
   if (error.location) {
@@ -36,17 +66,13 @@ function formatErrorMarkdown(
 
   if (includeSnippet && error.snippet) {
     lines.push("**Code:**");
-    lines.push("```");
-    lines.push(error.snippet);
-    lines.push("```");
+    pushMarkdownCodeBlock(lines, error.snippet);
     lines.push("");
   }
 
   if (hasStack) {
     lines.push("**Stack:**");
-    lines.push("```");
-    lines.push(error.stack!);
-    lines.push("```");
+    pushMarkdownCodeBlock(lines, error.stack!);
     lines.push("");
   }
 
@@ -62,12 +88,14 @@ function formatFailureContextMarkdown(fc: AiContextFailureContext): string[] {
     `The test failed at step ${failedStepNum}. Here is the context around the failure:`,
   );
 
+  const stepLines: string[] = [];
+
   if (fc.stepBefore) {
     const beforeStepNum = fc.failedStepIndex;
     const category = fc.stepBefore.category
       ? ` [${fc.stepBefore.category}]`
       : "";
-    lines.push(
+    stepLines.push(
       `    ${beforeStepNum}. ${fc.stepBefore.title}${category} (${fc.stepBefore.duration}ms)`,
     );
   }
@@ -75,20 +103,24 @@ function formatFailureContextMarkdown(fc: AiContextFailureContext): string[] {
   const failedCategory = fc.failedStep.category
     ? ` [${fc.failedStep.category}]`
     : "";
-  lines.push(
+  stepLines.push(
     `>>> ${failedStepNum}. ${fc.failedStep.title}${failedCategory} (${fc.failedStep.duration}ms) <<< FAILED`,
   );
   if (fc.failedStep.error?.message) {
-    lines.push(`        Error: ${fc.failedStep.error.message.split("\n")[0]}`);
+    stepLines.push(
+      `        Error: ${fc.failedStep.error.message.split("\n")[0]}`,
+    );
   }
 
   if (fc.stepAfter) {
     const afterStepNum = fc.failedStepIndex + 2;
     const category = fc.stepAfter.category ? ` [${fc.stepAfter.category}]` : "";
-    lines.push(
+    stepLines.push(
       `    ${afterStepNum}. ${fc.stepAfter.title}${category} (${fc.stepAfter.duration}ms)`,
     );
   }
+
+  pushMarkdownCodeBlock(lines, stepLines.join("\n"), "text");
   lines.push("");
 
   return lines;
@@ -117,6 +149,23 @@ function flattenSteps(steps: AiContextStep[], indent = 0): FlattenedStep[] {
     }
   }
   return result;
+}
+
+function formatAllStepsMarkdown(steps: AiContextStep[]): string[] {
+  const lines: string[] = [];
+  lines.push("## All Steps");
+  lines.push("");
+  const flatSteps = flattenSteps(steps);
+  const stepLines = flatSteps.map((step, index) => {
+    const nestIndent = "  ".repeat(step.indent);
+    const category = step.category ? ` [${step.category}]` : "";
+    const marker = step.hasError ? ">>> " : "    ";
+    const suffix = step.hasError ? " <<< FAILED" : "";
+    return `${nestIndent}${marker}${index + 1}. ${step.title}${category} (${step.duration}ms)${suffix}`;
+  });
+  pushMarkdownCodeBlock(lines, stepLines.join("\n"), "text");
+  lines.push("");
+  return lines;
 }
 
 export function buildPromptMarkdown(payload: AiContextPayload): string {
@@ -148,36 +197,20 @@ export function buildPromptMarkdown(payload: AiContextPayload): string {
   }
 
   if (payload.steps.length > 0) {
-    lines.push("## All Steps");
-    lines.push("");
-    const flatSteps = flattenSteps(payload.steps);
-    flatSteps.forEach((step, index) => {
-      const nestIndent = "  ".repeat(step.indent);
-      const category = step.category ? ` [${step.category}]` : "";
-      const marker = step.hasError ? ">>> " : "    ";
-      const suffix = step.hasError ? " <<< FAILED" : "";
-      lines.push(
-        `${nestIndent}${marker}${index + 1}. ${step.title}${category} (${step.duration}ms)${suffix}`,
-      );
-    });
-    lines.push("");
+    lines.push(...formatAllStepsMarkdown(payload.steps));
   }
 
   if (payload.stdout.length > 0) {
     lines.push("## Stdout");
     lines.push("");
-    lines.push("```");
-    lines.push(payload.stdout.join("\n"));
-    lines.push("```");
+    pushMarkdownCodeBlock(lines, payload.stdout.join("\n"));
     lines.push("");
   }
 
   if (payload.stderr.length > 0) {
     lines.push("## Stderr");
     lines.push("");
-    lines.push("```");
-    lines.push(payload.stderr.join("\n"));
-    lines.push("```");
+    pushMarkdownCodeBlock(lines, payload.stderr.join("\n"));
     lines.push("");
   }
 
@@ -276,41 +309,43 @@ export async function writeContextFiles(
     }
   }
 
-  if (payload.traceAnalyzerSummary) {
-    const summary = payload.traceAnalyzerSummary;
+  if (payload.traceErrorAnalysis) {
+    const analysis = payload.traceErrorAnalysis;
     const hasContent =
-      summary.consoleErrorsWarnings.length > 0 ||
-      summary.failedNetworkRequests.length > 0;
+      analysis.consoleEntries.length > 0 || analysis.networkRequests.length > 0;
 
     if (hasContent) {
       const lines: string[] = [];
-      lines.push("# Trace Analyzer Summary");
+      lines.push("# Trace Error Analysis");
       lines.push("");
 
-      if (summary.consoleErrorsWarnings.length > 0) {
-        lines.push("## Browser Console Errors/Warnings");
+      if (analysis.consoleEntries.length > 0) {
+        lines.push("## Browser Console (Error Timeframe)");
         lines.push("");
-        for (const entry of summary.consoleErrorsWarnings) {
+        for (const entry of analysis.consoleEntries) {
+          const timeMs = Math.round(entry.time);
           const location = entry.location
             ? ` (${entry.location.url}:${entry.location.lineNumber}:${entry.location.columnNumber})`
             : "";
-          lines.push(`- **[${entry.messageType}]** ${entry.text}${location}`);
+          lines.push(
+            `- **[@${timeMs}ms] [${entry.messageType}]** ${entry.text}${location}`
+          );
         }
         lines.push("");
       }
 
-      if (summary.failedNetworkRequests.length > 0) {
-        lines.push("## Failed Network Requests");
+      if (analysis.networkRequests.length > 0) {
+        lines.push("## Network Requests (Error Timeframe)");
         lines.push("");
-        for (const req of summary.failedNetworkRequests) {
-          const method = req.method || "GET";
+        for (const req of analysis.networkRequests) {
+          const timeMs = Math.round(req.time);
           const status = req.status ? ` (${req.status})` : "";
-          lines.push(`- ${method} ${req.url}${status}`);
+          lines.push(`- **[@${timeMs}ms]** ${req.method} ${req.url}${status}`);
         }
         lines.push("");
       }
 
-      const filePath = path.join(dir, "trace-summary.md");
+      const filePath = path.join(dir, "trace-error-analysis.md");
       fs.writeFileSync(filePath, lines.join("\n"), "utf8");
       uris.push(vscode.Uri.file(filePath));
     }
