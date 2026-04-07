@@ -314,6 +314,20 @@
           <div class="input-desc">
             Change this only if you use a custom Currents API endpoint.
           </div>
+
+          <div class="toggle-row" style="margin-top: 16px">
+            <div>
+              <div class="toggle-label">Experimental: AI context fetch</div>
+              <div class="toggle-desc">
+                Load rich context from the Currents API for Fix with AI (run
+                detail &amp; test explorer). Unstable; may change.
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="experimental-ai-context-toggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -335,6 +349,9 @@
       const notifyToggle = document.getElementById("notify-toggle");
       const apiBaseUrlInput = document.getElementById("api-base-url");
       const analyzeTestSelect = document.getElementById("analyze-test-display");
+      const experimentalAiContextToggle = document.getElementById(
+        "experimental-ai-context-toggle",
+      );
 
       window.addEventListener("message", (event) => {
         const msg = event.data;
@@ -382,6 +399,9 @@
           analyzeTestSelect.value = state.analyzeTestDisplay;
         }
 
+        experimentalAiContextToggle.checked =
+          !!state.experimentalAiContextFetch;
+
         if (state.quickFixKeybinding) {
           document.getElementById("quickfix-option").textContent =
             "Quick Fix (" + state.quickFixKeybinding + ")";
@@ -418,6 +438,13 @@
         vscode.postMessage({
           type: "setAnalyzeTestDisplay",
           value: analyzeTestSelect.value,
+        });
+      });
+
+      experimentalAiContextToggle.addEventListener("change", () => {
+        vscode.postMessage({
+          type: "toggleExperimentalAiContextFetch",
+          enabled: experimentalAiContextToggle.checked,
         });
       });
 

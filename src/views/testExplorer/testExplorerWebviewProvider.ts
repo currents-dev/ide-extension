@@ -5,6 +5,7 @@ import type { CurrentsApiClient } from "../../api/client.js";
 import type { TestExplorerItem } from "../../api/types.js";
 import { getCodiconCss } from "../codiconCss.js";
 import { buildPromptMarkdown, writeContextFiles } from "../../aiContext.js";
+import { isAiContextFetchEnabled } from "../../featureFlags.js";
 import { log } from "../../lib/log.js";
 
 type DateRange = "14d" | "30d" | "60d" | "90d";
@@ -223,7 +224,12 @@ export class TestExplorerWebviewProvider implements vscode.WebviewViewProvider {
         let prompt: string;
         let attachFiles: vscode.Uri[] = [];
 
-        if (this.client && this.projectId && msg.signature) {
+        if (
+          isAiContextFetchEnabled() &&
+          this.client &&
+          this.projectId &&
+          msg.signature
+        ) {
           try {
             const payload = await this.client.getAiContextBySignature(
               this.projectId,

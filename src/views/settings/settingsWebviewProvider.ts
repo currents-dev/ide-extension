@@ -2,9 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
 
-export class SettingsWebviewProvider
-  implements vscode.WebviewViewProvider
-{
+export class SettingsWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "currents-settings";
 
   private view?: vscode.WebviewView;
@@ -26,7 +24,7 @@ export class SettingsWebviewProvider
   resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    _token: vscode.CancellationToken,
   ): void {
     this.view = webviewView;
 
@@ -63,6 +61,9 @@ export class SettingsWebviewProvider
         case "setAnalyzeTestDisplay":
           this.setAnalyzeTestDisplay(message.value);
           break;
+        case "toggleExperimentalAiContextFetch":
+          this.setExperimentalAiContextFetch(message.enabled);
+          break;
       }
     });
   }
@@ -79,6 +80,8 @@ export class SettingsWebviewProvider
       notificationsEnabled: SettingsWebviewProvider.getNotificationsEnabled(),
       apiBaseUrl: SettingsWebviewProvider.getApiBaseUrl(),
       analyzeTestDisplay: SettingsWebviewProvider.getAnalyzeTestDisplay(),
+      experimentalAiContextFetch:
+        SettingsWebviewProvider.getExperimentalAiContextFetch(),
       quickFixKeybinding: process.platform === "darwin" ? "⌘." : "Ctrl+.",
     });
   }
@@ -122,6 +125,18 @@ export class SettingsWebviewProvider
   private async setAnalyzeTestDisplay(value: string): Promise<void> {
     const config = vscode.workspace.getConfiguration("currents");
     await config.update("analyzeTestDisplay", value, true);
+    this.sendState();
+  }
+
+  static getExperimentalAiContextFetch(): boolean {
+    return vscode.workspace
+      .getConfiguration("currents")
+      .get<boolean>("experimental.aiContextFetch", false);
+  }
+
+  private async setExperimentalAiContextFetch(enabled: boolean): Promise<void> {
+    const config = vscode.workspace.getConfiguration("currents");
+    await config.update("experimental.aiContextFetch", enabled, true);
     this.sendState();
   }
 
