@@ -1,0 +1,46 @@
+name: Publish Extension
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Publish target"
+        required: true
+        default: "both"
+        type: choice
+        options:
+          - marketplace
+          - openvsx
+          - both
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - name: Publish to VS Code Marketplace
+        if: >-
+          github.event_name == 'release' ||
+          inputs.target == 'marketplace' ||
+          inputs.target == 'both'
+        run: npx @vscode/vsce publish --no-update-package-json
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX (Cursor / others)
+        if: >-
+          github.event_name == 'release' ||
+          inputs.target == 'openvsx' ||
+          inputs.target == 'both'
+        run: npx ovsx publish --no-update-package-json
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}

@@ -8,12 +8,32 @@
     "type": "git",
     "url": "https://github.com/currents-dev/ide-extension"
   },
+  "icon": "resources/icon.png",
+  "license": "Apache-2.0",
+  "homepage": "https://currents.dev",
+  "bugs": {
+    "url": "https://github.com/currents-dev/ide-extension/issues"
+  },
+  "keywords": [
+    "testing",
+    "test runner",
+    "cypress",
+    "playwright",
+    "flaky tests",
+    "test reporting",
+    "CI",
+    "currents"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
     "Testing"
   ],
+  "galleryBanner": {
+    "color": "#1a1a2e",
+    "theme": "dark"
+  },
   "activationEvents": [
     "onStartupFinished"
   ],
