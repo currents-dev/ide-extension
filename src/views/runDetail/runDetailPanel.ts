@@ -25,6 +25,9 @@ interface SerializedError {
   isFlaky: boolean;
   traceUrl: string;
   attempts: Array<{
+    state?: string;
+    wallClockStartedAt?: string;
+    wallClockDuration?: number;
     error?: { message: string; stack: string } | null;
   }>;
 }
@@ -304,6 +307,7 @@ export class RunDetailPanelProvider {
     displayError: string;
     instanceId?: string;
     testId?: string;
+    attempt?: number;
   }): Promise<void> {
     log("handleFixWithAgent called with:", {
       spec: msg.spec,
@@ -325,10 +329,11 @@ export class RunDetailPanelProvider {
 
         if (this.client && msg.instanceId && msg.testId) {
           try {
-            log("Fetching AI context for", msg.instanceId, msg.testId);
+            log("Fetching AI context for", msg.instanceId, msg.testId, "attempt:", msg.attempt);
             const payload = await this.client.getAiContext(
               msg.instanceId,
               msg.testId,
+              msg.attempt,
             );
             log("AI context fetched successfully");
             prompt = buildPromptMarkdown(payload);
@@ -418,8 +423,9 @@ export class RunDetailPanelProvider {
     lines.push("");
     lines.push("Please:");
     lines.push("1. For each failing test below, use `currents-get-spec-instance` with the instance ID to get full failure details and stack traces");
-    lines.push("2. Open each spec file, locate the failing test, and analyze the root cause");
-    lines.push("3. Build a plan to fix all failures, then implement the fixes");
+    lines.push("2. Use `currents-get-tests-signatures` with the project ID, spec file path, and test title to get test signatures, then use `currents-get-test-results` to retrieve historical results and check for flakiness patterns");
+    lines.push("3. Open each spec file, locate the failing test, and analyze the root cause");
+    lines.push("4. Build a plan to fix all failures, then implement the fixes");
     lines.push("");
     lines.push("## Run metadata (for MCP queries)");
     lines.push("");
@@ -439,7 +445,7 @@ export class RunDetailPanelProvider {
     }
 
     lines.push(
-      "Use the Currents MCP tools (`currents-get-spec-instance`, `currents-get-test-results`, `currents-get-run-details`) with the identifiers above to retrieve full context before fixing.",
+      "Use the Currents MCP tools (`currents-get-spec-instance`, `currents-get-tests-signatures`, `currents-get-test-results`, `currents-get-run-details`) with the identifiers above to retrieve full context before fixing.",
     );
 
     const prompt = lines.join("\n");
@@ -585,6 +591,9 @@ function serializeTest(
     isFlaky,
     traceUrl: bestTrace?.traceURL ?? "",
     attempts: attempts.map((a) => ({
+      state: a.state,
+      wallClockStartedAt: a.wallClockStartedAt,
+      wallClockDuration: a.wallClockDuration,
       error: a.error ?? null,
     })),
   };

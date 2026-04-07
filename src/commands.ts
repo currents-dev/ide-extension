@@ -273,7 +273,7 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
           `Use the Currents MCP tools to analyze the test **"${testName}"** defined in \`${relativePath}\`.`,
           "",
           "Please:",
-          "1. Search for this test using `currents-get-test-results` or `currents-list-tests` to find recent run data",
+          "1. Use `currents-get-tests-signatures` with the spec file path and test title to get the test signature, then use `currents-get-test-results` to find recent run data",
           "2. Check if there were any failures in recent runs",
           "3. Determine if the test is flaky (intermittent pass/fail pattern)",
           "4. Check if the test is slow compared to the suite average",

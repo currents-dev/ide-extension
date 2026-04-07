@@ -19,7 +19,7 @@
       "activitybar": [
         {
           "id": "currents",
-          "title": "Currents",
+          "title": "Currents (Beta)",
           "icon": "resources/logo.svg"
         }
       ]
@@ -65,7 +65,10 @@
         "currents.analyzeTestDisplay": {
           "type": "string",
           "default": "always",
-          "enum": ["always", "quickfix"],
+          "enum": [
+            "always",
+            "quickfix"
+          ],
           "enumDescriptions": [
             "Always show \"Analyze with Currents\" above every test definition",
             "Only available via Quick Fix shortcut on a test line"

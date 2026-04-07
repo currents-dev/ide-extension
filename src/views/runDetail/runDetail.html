@@ -353,11 +353,6 @@
         gap: 8px;
         margin-bottom: 6px;
       }
-      .error-icon {
-        color: var(--vscode-testing-iconFailed);
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
       .error-test-name {
         font-weight: 500;
         font-size: 13px;
@@ -439,12 +434,30 @@
         height: 10px;
         border-radius: 2px;
         display: inline-block;
+        cursor: pointer;
+      }
+      .attempt-square.active {
+        outline: 2px solid var(--vscode-focusBorder, #007fd4);
+        outline-offset: 1px;
       }
       .attempt-pass {
         background: var(--vscode-testing-iconPassed);
       }
       .attempt-fail {
         background: var(--vscode-testing-iconFailed);
+      }
+
+      .attempt-meta {
+        display: flex;
+        gap: 12px;
+        font-size: 11px;
+        color: var(--vscode-descriptionForeground);
+        margin-bottom: 6px;
+      }
+      .attempt-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
       }
 
       .empty-errors {
@@ -489,7 +502,7 @@
         <span class="commit-message" id="commit-message"></span>
         <div class="header-actions">
           <button class="header-btn" id="btn-fix-all" style="display: none">
-            <i class="codicon codicon-chat-sparkle"></i> Fix with Agent
+            <i class="codicon codicon-chat-sparkle"></i> Fix all failures
           </button>
           <button class="header-btn" id="btn-dashboard">
             <i class="codicon codicon-forward"></i> Dashboard
@@ -680,15 +693,89 @@
         }
       }
 
-      function renderAttemptDots(attempts) {
+      var errorItemCounter = 0;
+      var attemptDataMap = {};
+
+      function renderAttemptDots(attempts, errorItemId, isFlaky) {
         if (!attempts || attempts.length <= 1) return "";
-        var html = '<span class="attempt-indicators">';
+        attemptDataMap[errorItemId] = attempts;
+        var defaultIdx = attempts.length - 1;
+        if (isFlaky) {
+          for (var k = attempts.length - 1; k >= 0; k--) {
+            if (attempts[k].error) {
+              defaultIdx = k;
+              break;
+            }
+          }
+        }
+        var html =
+          '<span class="attempt-indicators" data-error-item="' +
+          errorItemId +
+          '">';
         for (var i = 0; i < attempts.length; i++) {
           var cls = attempts[i].error ? "attempt-fail" : "attempt-pass";
-          html += '<span class="attempt-square ' + cls + '"></span>';
+          var active = i === defaultIdx ? " active" : "";
+          html +=
+            '<span class="attempt-square ' +
+            cls +
+            active +
+            '" data-attempt-idx="' +
+            i +
+            '" title="Attempt ' +
+            (i + 1) +
+            '"></span>';
         }
         html += "</span>";
         return html;
+      }
+
+      function renderAttemptMeta(attempt, idx, total) {
+        if (!attempt) return "";
+        var html = '<div class="attempt-meta">';
+        html +=
+          '<span class="attempt-meta-item"><strong>Attempt ' +
+          (idx + 1) +
+          " of " +
+          total +
+          "</strong></span>";
+        if (attempt.state) {
+          html += '<span class="attempt-meta-item">';
+          if (attempt.state === "passed") {
+            html +=
+              '<span style="color:var(--vscode-testing-iconPassed)">\u2713 passed</span>';
+          } else if (attempt.state === "failed") {
+            html +=
+              '<span style="color:var(--vscode-testing-iconFailed)">\u2715 failed</span>';
+          } else {
+            html += escHtml(attempt.state);
+          }
+          html += "</span>";
+        }
+        if (attempt.wallClockStartedAt) {
+          var d = new Date(attempt.wallClockStartedAt);
+          html +=
+            '<span class="attempt-meta-item">\u25F7 started ' +
+            formatTime(d) +
+            "</span>";
+        }
+        if (attempt.wallClockDuration != null) {
+          html +=
+            '<span class="attempt-meta-item">\u25F7 duration ' +
+            formatDuration(attempt.wallClockDuration) +
+            "</span>";
+        }
+        html += "</div>";
+        return html;
+      }
+
+      function getDefaultAttemptIdx(attempts, isFlaky) {
+        if (!attempts || attempts.length <= 1) return -1;
+        if (isFlaky) {
+          for (var k = attempts.length - 1; k >= 0; k--) {
+            if (attempts[k].error) return k;
+          }
+        }
+        return attempts.length - 1;
       }
 
       function renderSpecGroup(spec, kind) {
@@ -700,8 +787,7 @@
         html += '<div class="spec-group">';
         html +=
           '  <div class="spec-header" data-spec="' + escAttr(specKey) + '">';
-        html +=
-          '    <span class="spec-chevron open">\u25B6</span>';
+        html += '    <span class="spec-chevron open">\u25B6</span>';
         html += '    <span class="spec-status-dot ' + dotClass + '"></span>';
         html += '    <span class="spec-name">' + escHtml(spec.spec) + "</span>";
         html += '    <span class="spec-meta">';
@@ -727,34 +813,49 @@
           '"><i class=\"codicon codicon-forward\"></i> Dashboard</button>';
         html += "  </div>";
         html +=
-          '  <div class="spec-body" data-body="' +
-          escAttr(specKey) +
-          '">';
+          '  <div class="spec-body" data-body="' + escAttr(specKey) + '">';
 
         for (var j = 0; j < spec.errors.length; j++) {
           var err = spec.errors[j];
           var title = err.title.join(" > ");
           var lastTitle = err.title[err.title.length - 1] || "";
           var errorText = err.displayError || "Unknown error";
+          var eid = "err-" + errorItemCounter++;
 
-          html += '<div class="error-item">';
+          if (isFlakyGroup && err.attempts && err.attempts.length > 1) {
+            for (var ai = err.attempts.length - 1; ai >= 0; ai--) {
+              if (err.attempts[ai].error) {
+                errorText = attemptErrorText(err.attempts[ai]) || errorText;
+                break;
+              }
+            }
+          }
+
+          html += '<div class="error-item" id="' + eid + '">';
           html += '  <div class="error-title-row">';
           if (isFlakyGroup) {
-            html += '    <span class="error-icon" style="color:#e57ab0">\u2715</span>';
             html +=
               '    <span class="error-test-name">' +
               escHtml(title) +
               '<span class="flaky-badge">flaky</span>' +
-              renderAttemptDots(err.attempts) +
+              renderAttemptDots(err.attempts, eid, true) +
               "</span>";
           } else {
-            html += '    <span class="error-icon">\u2715</span>';
             html +=
-              '    <span class="error-test-name">' + escHtml(title) +
-              renderAttemptDots(err.attempts) +
+              '    <span class="error-test-name">' +
+              escHtml(title) +
+              renderAttemptDots(err.attempts, eid, false) +
               "</span>";
           }
           html += "  </div>";
+          var defIdx = getDefaultAttemptIdx(err.attempts, isFlakyGroup);
+          if (defIdx >= 0) {
+            html += renderAttemptMeta(
+              err.attempts[defIdx],
+              defIdx,
+              err.attempts.length,
+            );
+          }
           if (errorText) {
             html +=
               '  <div class="error-message">' +
@@ -773,6 +874,8 @@
             escAttr(spec.instanceId || "") +
             '" data-test-id="' +
             escAttr(err.testId || "") +
+            '" data-attempt="' +
+            (defIdx >= 0 ? defIdx : "") +
             '"><i class=\"codicon codicon-chat-sparkle\"></i> Fix with agent</button>';
           html +=
             '    <button class="btn" data-action="goToFile" data-spec="' +
@@ -804,6 +907,8 @@
       var lastAllSpecs = [];
       function renderSpecs(specs) {
         var content = document.getElementById("content");
+        errorItemCounter = 0;
+        attemptDataMap = {};
 
         var failedSpecs = [];
         var flakySpecs = [];
@@ -940,14 +1045,19 @@
           .forEach(function (btn) {
             btn.addEventListener("click", function (e) {
               e.stopPropagation();
-              vscode.postMessage({
+              var attemptVal = btn.dataset.attempt;
+              var msgPayload = {
                 type: "fixWithAgent",
                 spec: btn.dataset.spec,
                 testTitle: btn.dataset.title,
                 displayError: btn.dataset.error,
                 instanceId: btn.dataset.instanceId,
                 testId: btn.dataset.testId,
-              });
+              };
+              if (attemptVal !== undefined && attemptVal !== "") {
+                msgPayload.attempt = parseInt(attemptVal, 10);
+              }
+              vscode.postMessage(msgPayload);
             });
           });
 
@@ -978,7 +1088,8 @@
       }
 
       function formatDuration(ms) {
-        if (!ms) return "";
+        if (ms == null) return "";
+        if (ms < 1000) return ms + "ms";
         var s = Math.floor(ms / 1000);
         if (s < 60) return s + "s";
         var m = Math.floor(s / 60);
@@ -987,6 +1098,26 @@
         var h = Math.floor(m / 60);
         var rm = m % 60;
         return h + "h " + rm + "m";
+      }
+
+      function formatTime(d) {
+        var hh = String(d.getHours()).padStart(2, "0");
+        var mm = String(d.getMinutes()).padStart(2, "0");
+        var ss = String(d.getSeconds()).padStart(2, "0");
+        return hh + ":" + mm + ":" + ss;
+      }
+
+      function stripAnsi(s) {
+        return (s || "").replace(/\u001b\[[0-9;]*m/g, "");
+      }
+
+      function attemptErrorText(attempt) {
+        if (!attempt || !attempt.error) return "";
+        var raw =
+          typeof attempt.error === "string"
+            ? attempt.error
+            : attempt.error.message || attempt.error.stack || "";
+        return stripAnsi(raw);
       }
 
       function escHtml(s) {
@@ -1002,6 +1133,49 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
       }
+
+      document
+        .getElementById("content")
+        .addEventListener("click", function (e) {
+          var sq = e.target.closest(".attempt-square[data-attempt-idx]");
+          if (!sq) return;
+          e.stopPropagation();
+          var container = sq.closest(".attempt-indicators");
+          var errorItemId = container.dataset.errorItem;
+          var idx = parseInt(sq.dataset.attemptIdx, 10);
+          var attempts = attemptDataMap[errorItemId];
+          if (!attempts) return;
+
+          container.querySelectorAll(".attempt-square").forEach(function (s) {
+            s.classList.remove("active");
+          });
+          sq.classList.add("active");
+
+          var errorItem = document.getElementById(errorItemId);
+          if (!errorItem) return;
+
+          var metaEl = errorItem.querySelector(".attempt-meta");
+          if (metaEl) {
+            metaEl.outerHTML = renderAttemptMeta(
+              attempts[idx],
+              idx,
+              attempts.length,
+            );
+          }
+
+          var msgEl = errorItem.querySelector(".error-message");
+          var attempt = attempts[idx];
+          var text = attemptErrorText(attempt) || "No error for this attempt";
+          if (msgEl) {
+            msgEl.textContent = text.slice(0, 2000);
+          }
+
+          var fixBtn = errorItem.querySelector('[data-action="fixWithAgent"]');
+          if (fixBtn) {
+            fixBtn.dataset.error = text.slice(0, 2000);
+            fixBtn.dataset.attempt = String(idx);
+          }
+        });
 
       if (__INIT_DATA__) {
         init(__INIT_DATA__);
