@@ -3,7 +3,7 @@
   "displayName": "Currents",
   "description": "Currents.dev test reporting for VS Code — view runs, errors, and fix tests with AI",
   "version": "0.0.1",
-  "publisher": "currents-dev",
+  "publisher": "currents",
   "repository": {
     "type": "git",
     "url": "https://github.com/currents-dev/ide-extension"
