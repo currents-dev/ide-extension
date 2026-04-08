@@ -1,0 +1,358 @@
+{
+  "name": "currents",
+  "displayName": "Currents",
+  "description": "Currents.dev test reporting for VS Code — view runs, errors, and fix tests with AI",
+  "version": "0.0.1",
+  "publisher": "currents-dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/currents-dev/ide-extension"
+  },
+  "icon": "resources/icon.png",
+  "license": "Apache-2.0",
+  "homepage": "https://currents.dev",
+  "bugs": {
+    "url": "https://github.com/currents-dev/ide-extension/issues"
+  },
+  "keywords": [
+    "testing",
+    "test runner",
+    "cypress",
+    "playwright",
+    "flaky tests",
+    "test reporting",
+    "CI",
+    "currents"
+  ],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "galleryBanner": {
+    "color": "#1a1a2e",
+    "theme": "dark"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "currents",
+          "title": "Currents (Beta)",
+          "icon": "resources/logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "currents": [
+        {
+          "id": "currents-runs",
+          "name": "Runs",
+          "type": "webview"
+        },
+        {
+          "id": "currents-test-explorer",
+          "name": "Test Explorer",
+          "type": "webview"
+        },
+        {
+          "id": "currents-settings",
+          "name": "Settings",
+          "type": "webview",
+          "visibility": "collapsed"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Currents",
+      "properties": {
+        "currents.notifyOnRunComplete": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show a notification when a run finishes."
+        },
+        "currents.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.currents.dev/v1",
+          "description": "Base URL for the Currents API."
+        },
+        "currents.filterByCurrentBranch": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically filter runs by the current git branch when a project is selected."
+        },
+        "currents.analyzeTestDisplay": {
+          "type": "string",
+          "default": "always",
+          "enum": [
+            "always",
+            "quickfix"
+          ],
+          "enumDescriptions": [
+            "Always show \"Analyze with Currents\" above every test definition",
+            "Only available via Quick Fix shortcut on a test line"
+          ],
+          "description": "Controls how the AI-powered \"Analyze with Currents\" action appears on test definitions. The Quick Fix shortcut is always available regardless of this setting.",
+          "order": 50
+        },
+        "currents.registerMcpServer": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically register the Currents MCP server. Disable if you already have @currents/mcp configured manually.",
+          "order": 100
+        },
+        "currents.experimental.aiContextFetch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Experimental: fetch rich AI context from the Currents API for Fix with AI (run detail and test explorer). Subject to change or removal.",
+          "order": 150
+        }
+      }
+    },
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "currentsProvider",
+        "label": "Currents"
+      }
+    ],
+    "viewsWelcome": [],
+    "commands": [
+      {
+        "command": "currents.setApiKey",
+        "title": "Set API Key",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.removeApiKey",
+        "title": "Remove API Key",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.selectProject",
+        "title": "Select Project",
+        "category": "Currents",
+        "icon": "$(project)"
+      },
+      {
+        "command": "currents.refreshRuns",
+        "title": "Refresh Runs",
+        "category": "Currents",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "currents.enableAutoRefresh",
+        "title": "Enable Auto Refresh",
+        "category": "Currents",
+        "icon": "$(sync-ignored)"
+      },
+      {
+        "command": "currents.disableAutoRefresh",
+        "title": "Disable Auto Refresh",
+        "category": "Currents",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "currents.filterByBranch",
+        "title": "Filter by Branch",
+        "category": "Currents",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "currents.filterByAuthor",
+        "title": "Filter by Author",
+        "category": "Currents",
+        "icon": "$(person)"
+      },
+      {
+        "command": "currents.clearFilters",
+        "title": "Clear Filters",
+        "category": "Currents",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "currents.loadMoreRuns",
+        "title": "Load More Runs",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.openRun",
+        "title": "View Run Details",
+        "category": "Currents"
+      },
+      {
+        "command": "currents.fixWithAgent",
+        "title": "Fix with Agent",
+        "category": "Currents",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "currents.openInDashboard",
+        "title": "Open in Dashboard",
+        "category": "Currents",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "currents.refreshTestExplorer",
+        "title": "Refresh Test Explorer",
+        "category": "Currents",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "currents.changeDateRange",
+        "title": "Change Date Range",
+        "category": "Currents",
+        "icon": "$(calendar)"
+      },
+      {
+        "command": "currents.openTestExplorerInDashboard",
+        "title": "Open in Dashboard",
+        "category": "Currents",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "currents.analyzeTest",
+        "title": "Analyze Test with AI",
+        "category": "Currents",
+        "icon": "$(sparkle)"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "currents.refreshRuns",
+          "when": "false"
+        },
+        {
+          "command": "currents.enableAutoRefresh",
+          "when": "false"
+        },
+        {
+          "command": "currents.disableAutoRefresh",
+          "when": "false"
+        },
+        {
+          "command": "currents.filterByBranch",
+          "when": "false"
+        },
+        {
+          "command": "currents.filterByAuthor",
+          "when": "false"
+        },
+        {
+          "command": "currents.clearFilters",
+          "when": "false"
+        },
+        {
+          "command": "currents.loadMoreRuns",
+          "when": "false"
+        },
+        {
+          "command": "currents.openRun",
+          "when": "false"
+        },
+        {
+          "command": "currents.fixWithAgent",
+          "when": "false"
+        },
+        {
+          "command": "currents.openInDashboard",
+          "when": "false"
+        },
+        {
+          "command": "currents.refreshTestExplorer",
+          "when": "false"
+        },
+        {
+          "command": "currents.changeDateRange",
+          "when": "false"
+        },
+        {
+          "command": "currents.openTestExplorerInDashboard",
+          "when": "false"
+        },
+        {
+          "command": "currents.analyzeTest",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "currents.refreshRuns",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@1"
+        },
+        {
+          "command": "currents.enableAutoRefresh",
+          "when": "view == currents-runs && currents.projectSelected && !currents.autoRefreshEnabled",
+          "group": "navigation@2"
+        },
+        {
+          "command": "currents.disableAutoRefresh",
+          "when": "view == currents-runs && currents.projectSelected && currents.autoRefreshEnabled",
+          "group": "navigation@2"
+        },
+        {
+          "command": "currents.filterByBranch",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@3"
+        },
+        {
+          "command": "currents.filterByAuthor",
+          "when": "view == currents-runs && currents.projectSelected",
+          "group": "navigation@4"
+        },
+        {
+          "command": "currents.clearFilters",
+          "when": "view == currents-runs && currents.hasFilters",
+          "group": "navigation@5"
+        },
+        {
+          "command": "currents.selectProject",
+          "when": "false",
+          "group": "navigation@6"
+        },
+        {
+          "command": "currents.refreshTestExplorer",
+          "when": "view == currents-test-explorer && currents.projectSelected",
+          "group": "navigation@1"
+        },
+        {
+          "command": "currents.changeDateRange",
+          "when": "view == currents-test-explorer && currents.projectSelected",
+          "group": "navigation@2"
+        },
+        {
+          "command": "currents.openTestExplorerInDashboard",
+          "when": "view == currents-test-explorer && currents.projectSelected",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": []
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && node esbuild.js --production",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.25.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.45"
+  }
+}

@@ -1,0 +1,10 @@
+.vscode/**
+.vscode-test/**
+src/**
+!src/views/**/*.html
+node_modules/**
+!node_modules/@vscode/codicons/dist/**
+.gitignore
+tsconfig.json
+esbuild.js
+**/*.map

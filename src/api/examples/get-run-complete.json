@@ -1,0 +1,159 @@
+{
+  "status": "OK",
+  "data": {
+    "runId": "88daf1f3dca30e40",
+    "projectId": "GtO78i",
+    "createdAt": "2026-03-27T15:58:11.146Z",
+    "durationMs": 59850,
+    "tags": ["web-app", "actions", "annotations", "attachments"],
+    "timeout": {
+      "isTimeout": false
+    },
+    "groups": [
+      {
+        "instances": {
+          "overall": 3,
+          "claimed": 3,
+          "complete": 3,
+          "passes": 1,
+          "failures": 2
+        },
+        "tests": {
+          "overall": 25,
+          "tests": 25,
+          "passes": 23,
+          "failures": 2,
+          "pending": 0,
+          "skipped": 0,
+          "flaky": 1,
+          "retries": 0
+        },
+        "groupId": "web-app",
+        "platform": {
+          "osName": "linux",
+          "osVersion": "Ubuntu - 22.04",
+          "browserName": "web-app",
+          "browserVersion": ""
+        },
+        "coverageEnabled": false,
+        "tags": ["annotations", "attachments", "actions", "web-app"],
+        "durationMs": 59850,
+        "specCount": 3
+      }
+    ],
+    "meta": {
+      "ciBuildId": "web-23655227654-1",
+      "commit": {
+        "branch": "main",
+        "remoteOrigin": "https://github.com/currents-dev/demo-data",
+        "authorEmail": "jane.smith@example.com",
+        "authorName": "Jane Smith",
+        "message": "docs: add troubleshooting guide",
+        "sha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+        "ghaEventData": {
+          "headRef": "main",
+          "headSha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+          "baseRef": "main",
+          "baseSha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+          "issueUrl": "https://api.github.com/repos/owner/repo/issues/590",
+          "htmlUrl": "https://github.com/owner/repo/pull/439",
+          "prTitle": "docs: add troubleshooting guide",
+          "senderAvatarUrl": "https://avatars.githubusercontent.com/u/8869",
+          "senderHtmlUrl": "https://github.com/JaneSmith"
+        },
+        "replacedCommitData": {
+          "sha": "f2897f1a705e412ff0b0ed58968d3b1f9265a422",
+          "branch": "main",
+          "message": "docs: add troubleshooting guide\n"
+        }
+      },
+      "framework": {
+        "type": "pw",
+        "version": "1.50.1",
+        "clientVersion": "1.9.4"
+      }
+    },
+    "specs": [
+      {
+        "instanceId": "c08e65107ca73ccb",
+        "spec": "web-app/onboarding.spec.ts",
+        "groupId": "web-app",
+        "claimedAt": "2026-03-27T15:58:10.210Z",
+        "completedAt": "2026-03-27T15:58:52.211Z",
+        "machineId": "3K86yOGDu7SI",
+        "tags": ["actions", "web-app"],
+        "inactivityTimeoutMs": null,
+        "results": {
+          "stats": {
+            "tests": 6,
+            "passes": 5,
+            "failures": 1,
+            "pending": 0,
+            "skipped": 0,
+            "flaky": 0,
+            "wallClockStartedAt": "2026-03-27T15:58:10.210Z",
+            "wallClockEndedAt": "2026-03-27T15:58:52.211Z",
+            "wallClockDuration": 42001,
+            "overall": 6
+          },
+          "flaky": 0,
+          "videoUrl": null
+        }
+      },
+      {
+        "instanceId": "8388c981fd278b85",
+        "spec": "web-app/payments.spec.ts",
+        "groupId": "web-app",
+        "claimedAt": "2026-03-27T15:58:10.266Z",
+        "completedAt": "2026-03-27T15:58:35.020Z",
+        "machineId": "3K86yOGDu7SI",
+        "tags": ["annotations", "web-app"],
+        "inactivityTimeoutMs": null,
+        "results": {
+          "stats": {
+            "tests": 9,
+            "passes": 9,
+            "failures": 0,
+            "pending": 0,
+            "skipped": 0,
+            "flaky": 0,
+            "wallClockStartedAt": "2026-03-27T15:58:10.266Z",
+            "wallClockEndedAt": "2026-03-27T15:58:35.020Z",
+            "wallClockDuration": 24754,
+            "overall": 9
+          },
+          "flaky": 0,
+          "videoUrl": null
+        }
+      },
+      {
+        "instanceId": "aa441e0b50d50c42",
+        "spec": "web-app/reports.spec.ts",
+        "groupId": "web-app",
+        "claimedAt": "2026-03-27T15:58:35.176Z",
+        "completedAt": "2026-03-27T15:59:10.060Z",
+        "machineId": "3K86yOGDu7SI",
+        "tags": ["annotations", "attachments", "web-app"],
+        "inactivityTimeoutMs": null,
+        "results": {
+          "stats": {
+            "tests": 10,
+            "passes": 9,
+            "failures": 1,
+            "pending": 0,
+            "skipped": 0,
+            "flaky": 1,
+            "wallClockStartedAt": "2026-03-27T15:58:35.176Z",
+            "wallClockEndedAt": "2026-03-27T15:59:10.060Z",
+            "wallClockDuration": 34884,
+            "overall": 10
+          },
+          "flaky": 1,
+          "videoUrl": null
+        }
+      }
+    ],
+    "completionState": "COMPLETE",
+    "status": "FAILED"
+  }
+}
