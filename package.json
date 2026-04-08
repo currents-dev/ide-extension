@@ -105,6 +105,12 @@
           "default": true,
           "description": "Automatically register the Currents MCP server. Disable if you already have @currents/mcp configured manually.",
           "order": 100
+        },
+        "currents.experimental.aiContextFetch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Experimental: fetch rich AI context from the Currents API for Fix with AI (run detail and test explorer). Subject to change or removal.",
+          "order": 150
         }
       }
     },

@@ -16,6 +16,7 @@ import {
   buildPromptMarkdown,
   writeContextFiles,
 } from "../../aiContext.js";
+import { isAiContextFetchEnabled } from "../../featureFlags.js";
 
 interface SerializedError {
   testId: string;
@@ -327,7 +328,12 @@ export class RunDetailPanelProvider {
         let prompt: string;
         let attachFiles: vscode.Uri[] = [];
 
-        if (this.client && msg.instanceId && msg.testId) {
+        if (
+          isAiContextFetchEnabled() &&
+          this.client &&
+          msg.instanceId &&
+          msg.testId
+        ) {
           try {
             log("Fetching AI context for", msg.instanceId, msg.testId, "attempt:", msg.attempt);
             const payload = await this.client.getAiContext(
