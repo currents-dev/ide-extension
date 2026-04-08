@@ -1,6 +1,7 @@
 # Currents for VS Code
 
 [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/currents.currents?label=Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=currents.currents)
+[![Open VSX](https://img.shields.io/open-vsx/v/currents/currents?label=Open%20VSX&logo=eclipse-ide)](https://open-vsx.org/extension/currents/currents)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 > Test reporting from [Currents.dev](https://currents.dev) — view runs, inspect errors, explore flaky tests, and fix them with AI, all without leaving your editor.
