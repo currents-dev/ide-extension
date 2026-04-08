@@ -1,6 +1,6 @@
 # Currents for VS Code
 
-[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/currents-dev.currents?label=Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=currents-dev.currents)
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/currents.currents?label=Marketplace&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=currents.currents)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 > Test reporting from [Currents.dev](https://currents.dev) — view runs, inspect errors, explore flaky tests, and fix them with AI, all without leaving your editor.
@@ -40,7 +40,7 @@ The extension automatically registers a [Currents MCP server](https://www.npmjs.
 
 ## Getting Started
 
-1. Install the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=currents-dev.currents) or search **"Currents"** in the Extensions panel.
+1. Install the extension from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=currents.currents) or search **"Currents"** in the Extensions panel.
 2. Open the **Currents** panel in the Activity Bar.
 3. Click **Set API Key** and paste your [Currents.dev](https://currents.dev) API key.
 4. Select a project — your runs will appear immediately.
