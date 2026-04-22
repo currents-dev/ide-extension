@@ -16,6 +16,7 @@ import {
 import {
   applySelectedProjectToWorkspace,
   fetchActiveProjects,
+  pickProjectManually,
 } from "./projectWorkspace.js";
 
 interface AppState {
@@ -103,28 +104,9 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
           return;
         }
 
-        if (projects.length === 1) {
-          await applySelectedProjectToWorkspace(deps, projects[0]);
-          return;
-        }
-
-        const pick = await vscode.window.showQuickPick(
-          projects.map((p) => ({
-            label: p.name,
-            description: p.projectId,
-            projectId: p.projectId,
-          })),
-          {
-            title: "Select a Currents Project",
-            placeHolder: "Choose a project",
-          },
-        );
-
-        if (pick) {
-          await applySelectedProjectToWorkspace(deps, {
-            projectId: pick.projectId,
-            name: pick.label,
-          });
+        const chosen = await pickProjectManually(projects);
+        if (chosen) {
+          await applySelectedProjectToWorkspace(deps, chosen);
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
