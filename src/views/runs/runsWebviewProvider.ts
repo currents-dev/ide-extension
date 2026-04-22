@@ -84,10 +84,20 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     this.setAutoRefreshContext(true);
   }
 
+  /** Runs once on first view resolve when extension registers a handler (no saved project at startup). */
+  private deferredDefaultProjectHandler: (() => Promise<void>) | undefined;
+  private deferredDefaultProjectAttempted = false;
+
   setClient(client: CurrentsApiClient | undefined): void {
     this.client = client;
     this.authenticated = client !== undefined;
     this.sendState();
+  }
+
+  setDeferredDefaultProjectHandler(
+    handler: (() => Promise<void>) | undefined,
+  ): void {
+    this.deferredDefaultProjectHandler = handler;
   }
 
   setProjectId(
@@ -223,6 +233,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this.getHtml(webviewView.webview);
 
+    void this.runDeferredDefaultProjectIfNeeded();
+
     webviewView.webview.onDidReceiveMessage((message) => {
       switch (message.type) {
         case "ready":
@@ -273,6 +285,18 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           break;
       }
     });
+  }
+
+  private async runDeferredDefaultProjectIfNeeded(): Promise<void> {
+    if (this.deferredDefaultProjectAttempted || !this.deferredDefaultProjectHandler) {
+      return;
+    }
+    this.deferredDefaultProjectAttempted = true;
+    try {
+      await this.deferredDefaultProjectHandler();
+    } catch (err) {
+      log("Currents: deferred default project selection failed:", err);
+    }
   }
 
   private applyRunsResponse(

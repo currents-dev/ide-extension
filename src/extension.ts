@@ -102,34 +102,47 @@ export async function activate(
       );
       testExplorerProvider.setProjectId(savedProjectId);
     } else {
+      await vscode.commands.executeCommand(
+        "setContext",
+        "currents.projectSelected",
+        false,
+      );
       const projectDeps = {
         context,
         runsProvider,
         testExplorerProvider,
         settingsProvider,
       };
-      try {
-        const projects = await fetchActiveProjects(auth.client!);
-        const chosen = await pickProjectWithLatestRun(auth.client!, projects);
-        if (chosen) {
-          await applySelectedProjectToWorkspace(projectDeps, chosen, {
-            showToast: false,
-          });
-        } else {
+      runsProvider.setDeferredDefaultProjectHandler(async () => {
+        if (context.workspaceState.get<string>("currents.projectId")) {
+          return;
+        }
+        if (!auth.client) {
+          return;
+        }
+        try {
+          const projects = await fetchActiveProjects(auth.client);
+          const chosen = await pickProjectWithLatestRun(auth.client, projects);
+          if (chosen) {
+            await applySelectedProjectToWorkspace(projectDeps, chosen, {
+              showToast: false,
+            });
+          } else {
+            await vscode.commands.executeCommand(
+              "setContext",
+              "currents.projectSelected",
+              false,
+            );
+          }
+        } catch (err) {
+          log("Currents: auto-select default project failed:", err);
           await vscode.commands.executeCommand(
             "setContext",
             "currents.projectSelected",
             false,
           );
         }
-      } catch (err) {
-        log("Currents: auto-select default project failed:", err);
-        await vscode.commands.executeCommand(
-          "setContext",
-          "currents.projectSelected",
-          false,
-        );
-      }
+      });
     }
   }
 }
