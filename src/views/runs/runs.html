@@ -373,10 +373,18 @@
       function setGroupExpandedState(groupKey, expanded) {
         const m = getGroupExpandedMap();
         m[groupKey] = expanded;
-        sessionStorage.setItem(
-          GROUP_EXPANDED_KEY,
-          JSON.stringify(m),
-        );
+        try {
+          sessionStorage.setItem(
+            GROUP_EXPANDED_KEY,
+            JSON.stringify(m),
+          );
+        } catch (e) {
+          console.warn(
+            "setGroupExpandedState: could not persist to sessionStorage",
+            GROUP_EXPANDED_KEY,
+            e,
+          );
+        }
       }
       function isGroupExpanded(groupKey) {
         const m = getGroupExpandedMap();
