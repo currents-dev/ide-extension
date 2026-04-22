@@ -95,7 +95,7 @@ async function autoSetBranchFilter(
   }
   const branch = await getCurrentBranch();
   if (branch) {
-    runsProvider.setFilters({
+    runsProvider.setFiltersSilently({
       ...runsProvider.getFilters(),
       branches: [branch],
     });

@@ -112,8 +112,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     return { ...this.filters };
   }
 
-  setFilters(filters: RunFilters): void {
-    this.filters = { ...filters };
+  private updateHasFiltersContext(filters: RunFilters): void {
     vscode.commands.executeCommand(
       "setContext",
       "currents.hasFilters",
@@ -124,6 +123,16 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           filters.status?.length,
       ),
     );
+  }
+
+  setFiltersSilently(filters: RunFilters): void {
+    this.filters = { ...filters };
+    this.updateHasFiltersContext(filters);
+  }
+
+  setFilters(filters: RunFilters): void {
+    this.filters = { ...filters };
+    this.updateHasFiltersContext(filters);
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
