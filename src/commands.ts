@@ -5,8 +5,14 @@ import { RunsWebviewProvider } from "./views/runs/runsWebviewProvider.js";
 import { RunDetailPanelProvider } from "./views/runDetail/runDetailPanel.js";
 import { SettingsWebviewProvider } from "./views/settings/settingsWebviewProvider.js";
 import type { TestExplorerWebviewProvider } from "./views/testExplorer/testExplorerWebviewProvider.js";
-import { getCurrentBranch } from "./lib/git.js";
 import { log } from "./lib/log.js";
+import {
+  promptFilterByAuthor,
+  promptFilterByBranch,
+  promptFilterByStatus,
+  promptFilterByTags,
+  showRunFiltersMenu,
+} from "./runFilterPrompts.js";
 import {
   applySelectedProjectToWorkspace,
   fetchActiveProjects,
@@ -130,41 +136,24 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
       runsProvider.loadMore();
     }),
 
+    vscode.commands.registerCommand("currents.filterRuns", async () => {
+      await showRunFiltersMenu(runsProvider);
+    }),
+
     vscode.commands.registerCommand("currents.filterByBranch", async () => {
-      const currentFilters = runsProvider.getFilters();
-      const currentBranch = await getCurrentBranch();
-      const input = await vscode.window.showInputBox({
-        title: "Filter by Branch",
-        prompt: "Enter branch name (leave empty to clear filter)",
-        value: currentFilters.branches?.[0] || currentBranch || "",
-      });
-
-      if (input === undefined) {
-        return;
-      }
-
-      runsProvider.setFilters({
-        ...currentFilters,
-        branches: input ? [input] : undefined,
-      });
+      await promptFilterByBranch(runsProvider);
     }),
 
     vscode.commands.registerCommand("currents.filterByAuthor", async () => {
-      const currentFilters = runsProvider.getFilters();
-      const input = await vscode.window.showInputBox({
-        title: "Filter by Author",
-        prompt: "Enter author name (leave empty to clear filter)",
-        value: currentFilters.authors?.[0] || "",
-      });
+      await promptFilterByAuthor(runsProvider);
+    }),
 
-      if (input === undefined) {
-        return;
-      }
+    vscode.commands.registerCommand("currents.filterByTags", async () => {
+      await promptFilterByTags(runsProvider);
+    }),
 
-      runsProvider.setFilters({
-        ...currentFilters,
-        authors: input ? [input] : undefined,
-      });
+    vscode.commands.registerCommand("currents.filterByStatus", async () => {
+      await promptFilterByStatus(runsProvider);
     }),
 
     vscode.commands.registerCommand("currents.clearFilters", () => {

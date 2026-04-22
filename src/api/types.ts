@@ -62,7 +62,9 @@ export interface RunGroup {
 
 export interface RunMeta {
   ciBuildId: string;
+  /** Stored run title (write-time); display still uses read-time resolution. */
   title?: string | null;
+  /** PR metadata; title/id used for display before commit-derived fields. */
   pr?: {
     id?: string | null;
     title?: string | null;
@@ -235,9 +237,20 @@ export interface TestExplorerOptions {
 
 // --- Filters ---
 
+/** Values for `status` query param on list project runs (API uppercase). */
+export type RunFeedApiStatus =
+  | "PASSED"
+  | "FAILED"
+  | "RUNNING"
+  | "FAILING";
+
 export interface RunFilters {
   branches?: string[];
   authors?: string[];
+  tags?: string[];
+  /** Used when multiple tags; API default AND. */
+  tagOperator?: "AND" | "OR";
+  status?: RunFeedApiStatus[];
 }
 
 export interface ListRunsOptions extends RunFilters {

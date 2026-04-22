@@ -163,6 +163,12 @@
         "icon": "$(sync)"
       },
       {
+        "command": "currents.filterRuns",
+        "title": "Filter Runs",
+        "category": "Currents",
+        "icon": "$(filter)"
+      },
+      {
         "command": "currents.filterByBranch",
         "title": "Filter by Branch",
         "category": "Currents",
@@ -173,6 +179,18 @@
         "title": "Filter by Author",
         "category": "Currents",
         "icon": "$(person)"
+      },
+      {
+        "command": "currents.filterByTags",
+        "title": "Filter by Tags",
+        "category": "Currents",
+        "icon": "$(tag)"
+      },
+      {
+        "command": "currents.filterByStatus",
+        "title": "Filter by Status",
+        "category": "Currents",
+        "icon": "$(run)"
       },
       {
         "command": "currents.clearFilters",
@@ -242,11 +260,23 @@
           "when": "false"
         },
         {
+          "command": "currents.filterRuns",
+          "when": "currents.authenticated && currents.projectSelected"
+        },
+        {
           "command": "currents.filterByBranch",
           "when": "false"
         },
         {
           "command": "currents.filterByAuthor",
+          "when": "false"
+        },
+        {
+          "command": "currents.filterByTags",
+          "when": "false"
+        },
+        {
+          "command": "currents.filterByStatus",
           "when": "false"
         },
         {
@@ -303,19 +333,14 @@
           "group": "navigation@2"
         },
         {
-          "command": "currents.filterByBranch",
+          "command": "currents.filterRuns",
           "when": "view == currents-runs && currents.projectSelected",
           "group": "navigation@3"
         },
         {
-          "command": "currents.filterByAuthor",
-          "when": "view == currents-runs && currents.projectSelected",
-          "group": "navigation@4"
-        },
-        {
           "command": "currents.clearFilters",
           "when": "view == currents-runs && currents.hasFilters",
-          "group": "navigation@5"
+          "group": "navigation@4"
         },
         {
           "command": "currents.selectProject",

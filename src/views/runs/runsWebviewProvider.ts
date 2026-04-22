@@ -3,7 +3,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { exec } from "child_process";
 import type { CurrentsApiClient } from "../../api/client.js";
-import type { RunFeedItem, RunFilters } from "../../api/types.js";
+import type {
+  RunFeedApiStatus,
+  RunFeedItem,
+  RunFilters,
+} from "../../api/types.js";
 import { SettingsWebviewProvider } from "../settings/settingsWebviewProvider.js";
 import { getCodiconCss } from "../codiconCss.js";
 import { log } from "../../lib/log.js";
@@ -69,6 +73,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
   private autoRefreshEnabled = true;
   private inProgressRunIds = new Set<string>();
+  /** Monotonic id so only the latest `fetchRuns` may apply results and clear loading. */
+  private fetchSeq = 0;
 
   constructor(private readonly extensionUri: vscode.Uri) {
     this.setAutoRefreshContext(true);
@@ -84,11 +90,17 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     projectId: string | undefined,
     projectDisplayName?: string | undefined,
   ): void {
+    const previousProjectId = this.projectId;
     this.projectId = projectId;
+    if (projectId !== previousProjectId) {
+      this.inProgressRunIds.clear();
+    }
     if (!projectId) {
       this.projectDisplayName = undefined;
     } else if (projectDisplayName !== undefined) {
       this.projectDisplayName = projectDisplayName;
+    } else if (projectId !== previousProjectId) {
+      this.projectDisplayName = undefined;
     }
     this.runs = [];
     this.hasMore = false;
@@ -99,6 +111,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         this.startAutoRefresh();
       }
     } else {
+      this.fetchSeq++;
       this.stopAutoRefresh();
       this.sendState();
     }
@@ -108,19 +121,35 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     return { ...this.filters };
   }
 
-  setFilters(
-    filters: RunFilters,
-    options?: { fetch?: boolean },
-  ): void {
-    this.filters = { ...filters };
+  private hasActiveFeedFilters(filters: RunFilters = this.filters): boolean {
+    return Boolean(
+      filters.branches?.length ||
+        filters.authors?.length ||
+        filters.tags?.length ||
+        filters.status?.length,
+    );
+  }
+
+  private hasActiveStatusFilter(filters: RunFilters = this.filters): boolean {
+    return Boolean(filters.status?.length);
+  }
+
+  private updateHasFiltersContext(filters: RunFilters): void {
     vscode.commands.executeCommand(
       "setContext",
       "currents.hasFilters",
-      Boolean(filters.branches?.length || filters.authors?.length),
+      this.hasActiveFeedFilters(filters),
     );
-    if (options?.fetch === false) {
-      return;
-    }
+  }
+
+  setFiltersSilently(filters: RunFilters): void {
+    this.filters = { ...filters };
+    this.updateHasFiltersContext(filters);
+  }
+
+  setFilters(filters: RunFilters): void {
+    this.filters = { ...filters };
+    this.updateHasFiltersContext(filters);
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
@@ -201,15 +230,19 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     response: ApiListResponse<RunFeedItem>,
     startingAfter: string | undefined,
   ): void {
-    if (!startingAfter) {
-      this.detectCompletedRuns(response.data);
+    if (this.hasActiveStatusFilter()) {
+      this.inProgressRunIds.clear();
+    } else {
+      if (!startingAfter) {
+        this.detectCompletedRuns(response.data);
+      }
+      this.trackInProgressRuns(response.data);
     }
     this.runs.push(...response.data);
     this.hasMore = response.has_more;
     if (response.data.length > 0) {
       this.lastCursor = response.data[response.data.length - 1].cursor;
     }
-    this.trackInProgressRuns(response.data);
   }
 
   private async fetchRuns(startingAfter?: string): Promise<void> {
@@ -217,6 +250,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
+    const mySeq = ++this.fetchSeq;
     this.loading = true;
     this.sendState();
 
@@ -226,13 +260,21 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         starting_after: startingAfter,
         ...this.filters,
       });
+      if (mySeq !== this.fetchSeq) {
+        return;
+      }
       this.applyRunsResponse(response, startingAfter);
     } catch (err) {
+      if (mySeq !== this.fetchSeq) {
+        return;
+      }
       const msg = err instanceof Error ? err.message : "Unknown error";
       vscode.window.showErrorMessage(`Currents: Failed to fetch runs. ${msg}`);
     } finally {
-      this.loading = false;
-      this.sendState();
+      if (mySeq === this.fetchSeq) {
+        this.loading = false;
+        this.sendState();
+      }
     }
   }
 
@@ -321,12 +363,30 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   describeFilters(): string {
+    const statusLabels: Record<RunFeedApiStatus, string> = {
+      PASSED: "Passed",
+      FAILED: "Failed",
+      RUNNING: "Running",
+      FAILING: "Failing",
+    };
     const parts: string[] = [];
     if (this.filters.branches?.length) {
       parts.push(`branch: ${this.filters.branches.join(", ")}`);
     }
     if (this.filters.authors?.length) {
       parts.push(`author: ${this.filters.authors.join(", ")}`);
+    }
+    if (this.filters.tags?.length) {
+      const op =
+        this.filters.tags.length > 1
+          ? ` (${this.filters.tagOperator ?? "AND"})`
+          : "";
+      parts.push(`tag${op}: ${this.filters.tags.join(", ")}`);
+    }
+    if (this.filters.status?.length) {
+      parts.push(
+        `status: ${this.filters.status.map((s) => statusLabels[s]).join(", ")}`,
+      );
     }
     return parts.join(" | ");
   }
