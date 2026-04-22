@@ -310,6 +310,16 @@
         return { passes, failures, skipped, pending, flaky };
       }
 
+      function statusApiLabel(s) {
+        var m = {
+          PASSED: "Passed",
+          FAILED: "Failed",
+          RUNNING: "Running",
+          FAILING: "Failing",
+        };
+        return m[s] || s;
+      }
+
       function render() {
         const container = document.getElementById("runs-container");
         const filtersBar = document.getElementById("filters-bar");
@@ -332,10 +342,25 @@
 
         // Filters
         const chips = [];
-        var filterIcon =
-          '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M6 12v-1h4v1H6zM4 8v-1h8v1H4zM2 4v-1h12v1H2z"/></svg> ';
+        var svgStrokeStart =
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px">';
+        var svgEnd = "</svg> ";
         var projectIcon =
           '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M2 3h4l1 1h7v9H2V3zm1 2v6h10V6H8.5L7.5 5H3z"/></svg> ';
+        var branchIcon =
+          svgStrokeStart +
+          '<line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>' +
+          svgEnd;
+        var authorIcon =
+          svgStrokeStart +
+          '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>' +
+          svgEnd;
+        var tagIcon =
+          svgStrokeStart +
+          '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>' +
+          svgEnd;
+        var statusIcon =
+          svgStrokeStart + "<polygon points=\"5 3 19 12 5 21 5 3\"/>" + svgEnd;
         if (currentState.projectName) {
           chips.push(
             '<span class="filter-chip project-scope-chip" title="Open Settings to change project">' +
@@ -348,7 +373,7 @@
         if (filters.branches && filters.branches.length) {
           chips.push(
             '<span class="filter-chip">' +
-              filterIcon +
+              branchIcon +
               escHtml(filters.branches[0]) +
               "</span>",
           );
@@ -356,8 +381,37 @@
         if (filters.authors && filters.authors.length) {
           chips.push(
             '<span class="filter-chip">' +
-              filterIcon +
+              authorIcon +
               escHtml(filters.authors[0]) +
+              "</span>",
+          );
+        }
+        if (filters.tags && filters.tags.length) {
+          var tagOp =
+            filters.tags.length > 1
+              ? " (" + (filters.tagOperator || "AND") + ") "
+              : " ";
+          var tagLabel =
+            filters.tags.length <= 2
+              ? filters.tags.map(escHtml).join(", ")
+              : escHtml(filters.tags[0]) + " +" + (filters.tags.length - 1);
+          chips.push(
+            '<span class="filter-chip" title="Tags' +
+              tagOp +
+              "— use Filter on Runs view title bar" +
+              '">' +
+              tagIcon +
+              tagLabel +
+              "</span>",
+          );
+        }
+        if (filters.status && filters.status.length) {
+          chips.push(
+            '<span class="filter-chip">' +
+              statusIcon +
+              escHtml(
+                filters.status.map(statusApiLabel).join(", "),
+              ) +
               "</span>",
           );
         }
@@ -378,7 +432,9 @@
         if (runs.length === 0) {
           const hasFilters =
             (filters.branches && filters.branches.length) ||
-            (filters.authors && filters.authors.length);
+            (filters.authors && filters.authors.length) ||
+            (filters.tags && filters.tags.length) ||
+            (filters.status && filters.status.length);
           let emptyHtml = '<div class="empty-state">No runs found';
           if (hasFilters) {
             emptyHtml +=

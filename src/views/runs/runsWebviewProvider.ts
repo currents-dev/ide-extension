@@ -3,7 +3,11 @@ import * as fs from "fs";
 import * as path from "path";
 import { exec } from "child_process";
 import type { CurrentsApiClient } from "../../api/client.js";
-import type { RunFeedItem, RunFilters } from "../../api/types.js";
+import type {
+  RunFeedApiStatus,
+  RunFeedItem,
+  RunFilters,
+} from "../../api/types.js";
 import { SettingsWebviewProvider } from "../settings/settingsWebviewProvider.js";
 import { getCodiconCss } from "../codiconCss.js";
 import { log } from "../../lib/log.js";
@@ -113,7 +117,12 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     vscode.commands.executeCommand(
       "setContext",
       "currents.hasFilters",
-      Boolean(filters.branches?.length || filters.authors?.length),
+      Boolean(
+        filters.branches?.length ||
+          filters.authors?.length ||
+          filters.tags?.length ||
+          filters.status?.length,
+      ),
     );
     this.runs = [];
     this.hasMore = false;
@@ -315,12 +324,30 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   describeFilters(): string {
+    const statusLabels: Record<RunFeedApiStatus, string> = {
+      PASSED: "Passed",
+      FAILED: "Failed",
+      RUNNING: "Running",
+      FAILING: "Failing",
+    };
     const parts: string[] = [];
     if (this.filters.branches?.length) {
       parts.push(`branch: ${this.filters.branches.join(", ")}`);
     }
     if (this.filters.authors?.length) {
       parts.push(`author: ${this.filters.authors.join(", ")}`);
+    }
+    if (this.filters.tags?.length) {
+      const op =
+        this.filters.tags.length > 1
+          ? ` (${this.filters.tagOperator ?? "AND"})`
+          : "";
+      parts.push(`tag${op}: ${this.filters.tags.join(", ")}`);
+    }
+    if (this.filters.status?.length) {
+      parts.push(
+        `status: ${this.filters.status.map((s) => statusLabels[s]).join(", ")}`,
+      );
     }
     return parts.join(" | ");
   }

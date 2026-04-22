@@ -82,6 +82,19 @@ export class CurrentsApiClient {
         params.append("authors[]", a);
       }
     }
+    if (opts.tags?.length) {
+      for (const t of opts.tags) {
+        params.append("tags[]", t);
+      }
+      if (opts.tags.length > 1) {
+        params.set("tag_operator", opts.tagOperator ?? "AND");
+      }
+    }
+    if (opts.status?.length) {
+      for (const s of opts.status) {
+        params.append("status", s);
+      }
+    }
     const qs = params.toString();
     return this.request(`/projects/${projectId}/runs${qs ? `?${qs}` : ""}`);
   }
