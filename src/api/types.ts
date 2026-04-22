@@ -68,7 +68,6 @@ export interface RunMeta {
   pr?: {
     id?: string | null;
     title?: string | null;
-    link?: string | null;
   } | null;
   commit: {
     sha: string;

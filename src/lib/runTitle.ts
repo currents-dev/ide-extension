@@ -8,7 +8,6 @@ export type RunTitleMeta = {
   pr?: {
     id?: string | null;
     title?: string | null;
-    link?: string | null;
   } | null;
   commit?: {
     message?: string | null;
@@ -97,40 +96,36 @@ export function resolveRunTitleFromFeedItem(run: RunFeedItem): string {
 }
 
 /**
- * Derives a stable PR identifier from the run metadata.
- * Tries (in order): canonical `meta.pr.id`, `meta.pr.link`,
- * then `meta.commit.ghaEventData.htmlUrl` — the list API may return
- * `meta.pr` without `id`, or omit `pr` entirely while keeping the
- * GitHub Actions event payload.
+ * Derives a canonical PR id (matching `meta.pr.id` format) from a GitHub
+ * Actions PR html URL such as `https://github.com/owner/repo/pull/123`.
+ * Returns `null` for non-GitHub or non-PR URLs.
  */
-function derivePrIdentifier(run: RunFeedItem): string | null {
-  const pr = run.meta.pr;
-  if (pr?.id && String(pr.id).trim() !== "") {
-    return String(pr.id);
+function prIdFromGithubHtmlUrl(url: string | null | undefined): string | null {
+  if (!url) {
+    return null;
   }
-  const linkCandidates = [pr?.link, run.meta.commit?.ghaEventData?.htmlUrl];
-  for (const link of linkCandidates) {
-    if (!link) {
-      continue;
-    }
-    const m = link.match(
-      /^https?:\/\/(?:www\.)?github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/i,
-    );
-    if (m) {
-      return `github:github.com/${m[1]}#${m[2]}`;
-    }
-  }
-  return null;
+  const m = url.match(
+    /^https?:\/\/(?:www\.)?github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/i,
+  );
+  return m ? `github:github.com/${m[1]}#${m[2]}` : null;
 }
 
-/** Stable key + header label for PR grouping. */
+/**
+ * Stable key + header label for PR grouping. Prefers canonical `meta.pr.id`,
+ * and falls back to `meta.commit.ghaEventData.htmlUrl` for GitHub Actions
+ * runs (the list endpoint currently strips `meta.pr`).
+ */
 export function getPrGroupKeyAndLabel(run: RunFeedItem): {
   key: string;
   label: string;
 } {
-  const id = derivePrIdentifier(run);
+  const pr = run.meta.pr;
+  const idFromPr =
+    pr?.id != null && String(pr.id).trim() !== "" ? String(pr.id) : null;
+  const id =
+    idFromPr ?? prIdFromGithubHtmlUrl(run.meta.commit?.ghaEventData?.htmlUrl);
   if (id) {
-    const fromTitle = run.meta.pr?.title?.trim();
+    const fromTitle = pr?.title?.trim();
     const fromGha = run.meta.commit?.ghaEventData?.prTitle?.trim();
     const fromId = getPRTitleFromCanonicalId(id);
     const fromResolve = resolveRunTitleFromFeedItem(run);
