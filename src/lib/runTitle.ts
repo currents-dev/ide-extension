@@ -8,11 +8,13 @@ export type RunTitleMeta = {
   pr?: {
     id?: string | null;
     title?: string | null;
+    link?: string | null;
   } | null;
   commit?: {
     message?: string | null;
     ghaEventData?: {
       prTitle?: string | null;
+      htmlUrl?: string | null;
     } | null;
   } | null;
   ciBuildId?: string | null;
@@ -94,18 +96,45 @@ export function resolveRunTitleFromFeedItem(run: RunFeedItem): string {
   });
 }
 
-/** Stable key + header label for PR grouping (uses canonical `meta.pr.id` only). */
+/**
+ * Derives a stable PR identifier from the run metadata.
+ * Tries (in order): canonical `meta.pr.id`, `meta.pr.link`,
+ * then `meta.commit.ghaEventData.htmlUrl` — the list API may return
+ * `meta.pr` without `id`, or omit `pr` entirely while keeping the
+ * GitHub Actions event payload.
+ */
+function derivePrIdentifier(run: RunFeedItem): string | null {
+  const pr = run.meta.pr;
+  if (pr?.id && String(pr.id).trim() !== "") {
+    return String(pr.id);
+  }
+  const linkCandidates = [pr?.link, run.meta.commit?.ghaEventData?.htmlUrl];
+  for (const link of linkCandidates) {
+    if (!link) {
+      continue;
+    }
+    const m = link.match(
+      /^https?:\/\/(?:www\.)?github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/i,
+    );
+    if (m) {
+      return `github:github.com/${m[1]}#${m[2]}`;
+    }
+  }
+  return null;
+}
+
+/** Stable key + header label for PR grouping. */
 export function getPrGroupKeyAndLabel(run: RunFeedItem): {
   key: string;
   label: string;
 } {
-  const pr = run.meta.pr;
-  if (pr?.id) {
-    const id = pr.id;
-    const fromTitle = pr.title?.trim();
+  const id = derivePrIdentifier(run);
+  if (id) {
+    const fromTitle = run.meta.pr?.title?.trim();
+    const fromGha = run.meta.commit?.ghaEventData?.prTitle?.trim();
     const fromId = getPRTitleFromCanonicalId(id);
     const fromResolve = resolveRunTitleFromFeedItem(run);
-    const label = fromTitle || fromId || fromResolve;
+    const label = fromTitle || fromGha || fromId || fromResolve;
     return { key: `pr:${id}`, label };
   }
   return { key: "__no_pr__", label: "No PR" };
