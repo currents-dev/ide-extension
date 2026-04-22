@@ -178,6 +178,14 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
       runsProvider.clearFilters();
     }),
 
+    vscode.commands.registerCommand("currents.enableRunsViewByPullRequest", () => {
+      runsProvider.toggleGroupRunsByPullRequest();
+    }),
+
+    vscode.commands.registerCommand("currents.disableRunsViewByPullRequest", () => {
+      runsProvider.toggleGroupRunsByPullRequest();
+    }),
+
     vscode.commands.registerCommand(
       "currents.openRun",
       async (run: RunFeedItem) => {

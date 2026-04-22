@@ -83,6 +83,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 
   constructor(private readonly extensionUri: vscode.Uri) {
     this.setAutoRefreshContext(true);
+    this.setRunsGroupedByPullRequestContext();
   }
 
   /** Runs once on first view resolve when extension registers a handler (no saved project at startup). */
@@ -112,6 +113,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       this.projectDisplayName = projectDisplayName;
     }
     this.groupingMode = "none";
+    this.setRunsGroupedByPullRequestContext();
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
@@ -150,6 +152,12 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 
   clearFilters(): void {
     this.setFilters({});
+  }
+
+  toggleGroupRunsByPullRequest(): void {
+    this.groupingMode = this.groupingMode === "pr" ? "none" : "pr";
+    this.setRunsGroupedByPullRequestContext();
+    this.sendState();
   }
 
   setActiveRunId(runId: string | undefined): void {
@@ -288,6 +296,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           const m = message.mode;
           if (m === "pr" || m === "none") {
             this.groupingMode = m;
+            this.setRunsGroupedByPullRequestContext();
             this.sendState();
           }
           break;
@@ -503,6 +512,14 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       "setContext",
       "currents.autoRefreshEnabled",
       enabled,
+    );
+  }
+
+  private setRunsGroupedByPullRequestContext(): void {
+    vscode.commands.executeCommand(
+      "setContext",
+      "currents.runsGroupedByPullRequest",
+      this.groupingMode === "pr",
     );
   }
 

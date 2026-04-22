@@ -216,27 +216,6 @@
         opacity: 0.92;
       }
 
-      .grouping-bar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 0 0 6px;
-        font-size: 11px;
-        color: var(--vscode-descriptionForeground);
-      }
-      .grouping-bar label {
-        white-space: nowrap;
-      }
-      .grouping-select {
-        max-width: 200px;
-        background: var(--vscode-dropdownBackground);
-        color: var(--vscode-dropdownForeground);
-        border: 1px solid var(--vscode-dropdown-border, var(--vscode-widget-border));
-        border-radius: 4px;
-        padding: 2px 6px;
-        font-family: var(--vscode-font-family);
-        font-size: 11px;
-      }
       .run-group {
         margin: 4px 0 10px;
         border: 1px solid
@@ -332,7 +311,6 @@
   </head>
   <body>
     <div id="filters-bar" class="filters-bar"></div>
-    <div id="grouping-bar" class="grouping-bar" hidden></div>
     <div id="runs-container"></div>
     <script>
       const vscode = acquireVsCodeApi();
@@ -589,13 +567,10 @@
       function render() {
         const container = document.getElementById("runs-container");
         const filtersBar = document.getElementById("filters-bar");
-        const groupingBar = document.getElementById("grouping-bar");
         const { runs, hasMore, loading, filters, groupingMode } = currentState;
 
         if (currentState.authenticated === false) {
           filtersBar.innerHTML = "";
-          groupingBar.hidden = true;
-          groupingBar.innerHTML = "";
           container.innerHTML =
             '<div class="empty-state" style="padding:32px 12px">' +
             '<div style="margin-bottom:8px">Connect your Currents.dev account to see test runs.</div>' +
@@ -639,6 +614,7 @@
               "</span>",
           );
         }
+        var gm = groupingMode === "pr" ? "pr" : "none";
         if (filters.branches && filters.branches.length) {
           chips.push(
             '<span class="filter-chip">' +
@@ -693,28 +669,6 @@
             }
           : null;
 
-        groupingBar.hidden = false;
-        const gm = groupingMode === "pr" ? "pr" : "none";
-        groupingBar.innerHTML =
-          "<label for=\"grouping-select\">Group by</label>" +
-          "<select id=\"grouping-select\" class=\"grouping-select\" title=\"Group runs; more criteria can be added over time\">" +
-          "<option value=\"none\">Ungrouped</option>" +
-          "<option value=\"pr\">Pull request</option>" +
-          "</select>" +
-          "<span style=\"max-width:160px;opacity:0.85;font-size:10px\" title=\"The feed is paged globally; " +
-          "per-group &quot;load more&quot; fetches the next page until it finds new runs in this group.\">" +
-          "Picks up runs from the global feed" +
-          "</span>";
-        const groupingSelect = document.getElementById("grouping-select");
-        groupingSelect.value = gm;
-        groupingSelect.addEventListener("change", function () {
-          const v = groupingSelect.value;
-          vscode.postMessage({
-            type: "setGroupingMode",
-            mode: v === "pr" ? "pr" : "none",
-          });
-        });
-
         if (loading && runs.length === 0) {
           container.innerHTML = '<div class="loading">Loading runs\u2026</div>';
           return;
@@ -744,8 +698,7 @@
         }
 
         var html = "";
-        var gMode = groupingMode === "pr" ? "pr" : "none";
-        if (gMode === "pr") {
+        if (gm === "pr") {
           var built = buildGroupsForStrategy(runs, GROUPING_STRATEGY);
           for (var gi = 0; gi < built.groups.length; gi++) {
             var g = built.groups[gi];
