@@ -59,6 +59,33 @@ export async function pickProjectWithLatestRun(
   return scored[0]?.project;
 }
 
+/** Quick pick (or no-op return when there is a single project). */
+export async function pickProjectManually(
+  projects: Project[],
+): Promise<Project | undefined> {
+  if (projects.length === 0) {
+    return undefined;
+  }
+  if (projects.length === 1) {
+    return projects[0];
+  }
+  const pick = await vscode.window.showQuickPick(
+    projects.map((p) => ({
+      label: p.name,
+      description: p.projectId,
+      projectId: p.projectId,
+    })),
+    {
+      title: "Select a Currents Project",
+      placeHolder: "Choose a project",
+    },
+  );
+  if (!pick) {
+    return undefined;
+  }
+  return projects.find((p) => p.projectId === pick.projectId);
+}
+
 export async function applySelectedProjectToWorkspace(
   deps: ProjectSelectionDeps,
   project: { projectId: string; name: string },
