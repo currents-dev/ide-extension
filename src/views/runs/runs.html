@@ -474,7 +474,8 @@
         const ago = timeAgo(run.createdAt);
         const statusLower = (run.status || "").toLowerCase();
         const isLive = isRunInProgress(run.completionState);
-        let html = '<div class="run-card" data-run-id="' + run.runId + '">';
+        let html =
+          '<div class="run-card" data-run-id="' + escAttr(run.runId) + '">';
         html += '  <div class="run-header">';
         html +=
           '    <span class="run-status status-' +
@@ -521,7 +522,7 @@
         html += '  <div class="run-actions">';
         html +=
           '    <button class="action-btn" data-action="dashboard" data-run-id="' +
-          run.runId +
+          escAttr(run.runId) +
           '"><i class="codicon codicon-forward"></i> Dashboard</button>';
         html += "  </div>";
         html += "</div>";
