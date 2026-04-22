@@ -62,6 +62,11 @@ export interface RunGroup {
 
 export interface RunMeta {
   ciBuildId: string;
+  title?: string | null;
+  pr?: {
+    id?: string | null;
+    title?: string | null;
+  } | null;
   commit: {
     sha: string;
     branch: string;
@@ -69,6 +74,11 @@ export interface RunMeta {
     authorEmail: string;
     message: string;
     remoteOrigin: string;
+    ghaEventData?: {
+      prTitle?: string;
+      htmlUrl?: string;
+      issueUrl?: string;
+    };
   };
   framework: {
     type: string;

@@ -7,6 +7,11 @@ import { SettingsWebviewProvider } from "./views/settings/settingsWebviewProvide
 import type { TestExplorerWebviewProvider } from "./views/testExplorer/testExplorerWebviewProvider.js";
 import { getCurrentBranch } from "./lib/git.js";
 import { log } from "./lib/log.js";
+import {
+  applySelectedProjectToWorkspace,
+  fetchActiveProjects,
+  pickProjectManually,
+} from "./projectWorkspace.js";
 
 interface AppState {
   auth: AuthManager;
@@ -28,6 +33,11 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
   } = state;
 
   return [
+    vscode.commands.registerCommand("currents.openSettingsView", async () => {
+      await vscode.commands.executeCommand("workbench.view.extension.currents");
+      await vscode.commands.executeCommand("currents-settings.focus");
+    }),
+
     vscode.commands.registerCommand("currents.setApiKey", async () => {
       const success = await auth.promptForApiKey();
       if (success) {
@@ -72,13 +82,15 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
         return;
       }
 
+      const deps = {
+        context,
+        runsProvider,
+        testExplorerProvider,
+        settingsProvider,
+      };
+
       try {
-        const { data: allProjects } = await auth.client.getProjects({
-          fetchAll: true,
-        });
-        const projects = allProjects.filter(
-          (p) => !p.name.toLowerCase().includes("[archived]"),
-        );
+        const projects = await fetchActiveProjects(auth.client);
         if (projects.length === 0) {
           vscode.window.showWarningMessage(
             "Currents: No active projects found for this API key.",
@@ -86,55 +98,9 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
           return;
         }
 
-        if (projects.length === 1) {
-          const project = projects[0];
-          context.workspaceState.update(
-            "currents.projectId",
-            project.projectId,
-          );
-          context.workspaceState.update("currents.projectName", project.name);
-          await vscode.commands.executeCommand(
-            "setContext",
-            "currents.projectSelected",
-            true,
-          );
-          settingsProvider.setProjectName(project.name);
-          await autoSetBranchFilter(runsProvider);
-          runsProvider.setProjectId(project.projectId);
-          testExplorerProvider.setProjectId(project.projectId);
-          vscode.window.showInformationMessage(
-            `Currents: Selected project "${project.name}"`,
-          );
-          return;
-        }
-
-        const pick = await vscode.window.showQuickPick(
-          projects.map((p) => ({
-            label: p.name,
-            description: p.projectId,
-            projectId: p.projectId,
-          })),
-          {
-            title: "Select a Currents Project",
-            placeHolder: "Choose a project",
-          },
-        );
-
-        if (pick) {
-          context.workspaceState.update("currents.projectId", pick.projectId);
-          context.workspaceState.update("currents.projectName", pick.label);
-          await vscode.commands.executeCommand(
-            "setContext",
-            "currents.projectSelected",
-            true,
-          );
-          settingsProvider.setProjectName(pick.label);
-          await autoSetBranchFilter(runsProvider);
-          runsProvider.setProjectId(pick.projectId);
-          testExplorerProvider.setProjectId(pick.projectId);
-          vscode.window.showInformationMessage(
-            `Currents: Selected project "${pick.label}"`,
-          );
+        const chosen = await pickProjectManually(projects);
+        if (chosen) {
+          await applySelectedProjectToWorkspace(deps, chosen);
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
@@ -146,7 +112,9 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
 
     vscode.commands.registerCommand("currents.refreshRuns", () => {
       runsProvider.setProjectId(
-        context.workspaceState.get("currents.projectId"),
+        context.workspaceState.get<string>("currents.projectId"),
+        context.workspaceState.get<string>("currents.projectName") ??
+          undefined,
       );
     }),
 
@@ -296,19 +264,4 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
       },
     ),
   ];
-}
-
-async function autoSetBranchFilter(
-  runsProvider: RunsWebviewProvider,
-): Promise<void> {
-  const enabled = vscode.workspace
-    .getConfiguration("currents")
-    .get<boolean>("filterByCurrentBranch", true);
-  if (!enabled) {
-    return;
-  }
-  const branch = await getCurrentBranch();
-  if (branch) {
-    runsProvider.setFilters({ branches: [branch] });
-  }
 }

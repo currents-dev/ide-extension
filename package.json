@@ -83,7 +83,7 @@
         },
         "currents.filterByCurrentBranch": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Automatically filter runs by the current git branch when a project is selected."
         },
         "currents.analyzeTestDisplay": {
@@ -137,6 +137,12 @@
         "title": "Select Project",
         "category": "Currents",
         "icon": "$(project)"
+      },
+      {
+        "command": "currents.openSettingsView",
+        "title": "Open Settings",
+        "category": "Currents",
+        "icon": "$(gear)"
       },
       {
         "command": "currents.refreshRuns",

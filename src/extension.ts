@@ -7,6 +7,12 @@ import { TestExplorerWebviewProvider } from "./views/testExplorer/testExplorerWe
 import { registerCommands } from "./commands.js";
 import { getCurrentBranch } from "./lib/git.js";
 import { initLog, log } from "./lib/log.js";
+import {
+  applySelectedProjectToWorkspace,
+  fetchActiveProjects,
+  pickProjectManually,
+  pickProjectWithLatestRun,
+} from "./projectWorkspace.js";
 import { initMcpServer } from "./mcp.js";
 import { registerTestAnalysis } from "./testCodeLensProvider.js";
 
@@ -91,14 +97,57 @@ export async function activate(
           runsProvider.setFilters({ branches: [branch] });
         }
       }
-      runsProvider.setProjectId(savedProjectId);
+      runsProvider.setProjectId(
+        savedProjectId,
+        savedProjectName ?? undefined,
+      );
       testExplorerProvider.setProjectId(savedProjectId);
     } else {
-      await vscode.commands.executeCommand(
-        "setContext",
-        "currents.projectSelected",
-        false,
-      );
+      const projectDeps = {
+        context,
+        runsProvider,
+        testExplorerProvider,
+        settingsProvider,
+      };
+      const applyIfChosen = async (
+        project: { projectId: string; name: string },
+      ) => {
+        await applySelectedProjectToWorkspace(projectDeps, project, {
+          showToast: false,
+        });
+      };
+      const clearProjectContext = () =>
+        vscode.commands.executeCommand(
+          "setContext",
+          "currents.projectSelected",
+          false,
+        );
+      try {
+        const projects = await fetchActiveProjects(auth.client!);
+        let chosen = await pickProjectWithLatestRun(auth.client!, projects);
+        if (!chosen && projects.length > 0) {
+          chosen = await pickProjectManually(projects);
+        }
+        if (chosen) {
+          await applyIfChosen(chosen);
+        } else {
+          await clearProjectContext();
+        }
+      } catch (err) {
+        log("Currents: auto-select default project failed:", err);
+        try {
+          const projects = await fetchActiveProjects(auth.client!);
+          const manual = await pickProjectManually(projects);
+          if (manual) {
+            await applyIfChosen(manual);
+          } else {
+            await clearProjectContext();
+          }
+        } catch (err2) {
+          log("Currents: manual project pick after auto failure failed:", err2);
+          await clearProjectContext();
+        }
+      }
     }
   }
 }

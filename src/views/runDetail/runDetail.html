@@ -544,7 +544,8 @@
         statusBadge.className = "status-badge status-" + data.status;
         statusBadge.textContent = data.status;
 
-        document.getElementById("commit-message").textContent = data.commitMsg;
+        document.getElementById("commit-message").textContent =
+          data.displayTitle || "";
 
         var metaHtml = "";
         if (data.sha)
@@ -638,6 +639,10 @@
         var msg = event.data;
         if (msg.type === "runData") {
           lastAllSpecs = msg.allSpecs || [];
+          if (msg.displayTitle) {
+            document.getElementById("commit-message").textContent =
+              msg.displayTitle;
+          }
           renderSpecs(msg.specs);
           updateLiveState(msg);
           var hasFailures = msg.specs.some(function (s) {
