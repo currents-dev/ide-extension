@@ -41,22 +41,29 @@ export async function pickProjectWithLatestRun(
       try {
         const res = await client.getProjectRuns(p.projectId, { limit: 1 });
         const created = res.data[0]?.createdAt;
-        const latest = created ? new Date(created).getTime() : 0;
+        const latest =
+          created != null ? new Date(created).getTime() : null;
         return { project: p, latest };
       } catch {
-        return { project: p, latest: 0 };
+        return { project: p, latest: null };
       }
     }),
   );
 
   scored.sort((a, b) => {
-    if (b.latest !== a.latest) {
-      return b.latest - a.latest;
+    const aTime = a.latest ?? -Infinity;
+    const bTime = b.latest ?? -Infinity;
+    if (aTime !== bTime) {
+      return bTime - aTime;
     }
     return a.project.name.localeCompare(b.project.name);
   });
 
-  return scored[0]?.project;
+  const top = scored[0];
+  if (top?.latest == null) {
+    return undefined;
+  }
+  return top.project;
 }
 
 /** Quick pick (or no-op return when there is a single project). */
