@@ -140,6 +140,10 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
       await showRunFiltersMenu(runsProvider);
     }),
 
+    vscode.commands.registerCommand("currents.filterRunsActive", async () => {
+      await showRunFiltersMenu(runsProvider);
+    }),
+
     vscode.commands.registerCommand("currents.filterByBranch", async () => {
       await promptFilterByBranch(runsProvider);
     }),

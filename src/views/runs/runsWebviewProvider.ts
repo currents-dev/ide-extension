@@ -118,8 +118,6 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     } else if (projectId !== previousProjectId) {
       this.projectDisplayName = undefined;
     }
-    this.groupingMode = "none";
-    this.setRunsGroupedByPullRequestContext();
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;

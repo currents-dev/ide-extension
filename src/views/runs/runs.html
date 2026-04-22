@@ -265,13 +265,10 @@
       .run-group-body {
         padding: 0 6px 4px;
       }
-      .run-group-body.hidden {
-        display: none;
-      }
       .run-group-load {
         display: block;
         width: calc(100% - 8px);
-        margin: 0 4px 6px;
+        margin: 8px 4px 6px;
         padding: 4px 8px;
         font-size: 11px;
         background: transparent;
@@ -378,7 +375,7 @@
         if (m[groupKey] === true) {
           return true;
         }
-        return true;
+        return false;
       }
 
       window.addEventListener("message", (event) => {
@@ -703,13 +700,12 @@
           for (var gi = 0; gi < built.groups.length; gi++) {
             var g = built.groups[gi];
             var expanded = isGroupExpanded(g.key);
+            var visibleRuns = expanded ? g.runs : g.runs.slice(0, 1);
             var chevClass = expanded
               ? "codicon-chevron-down"
               : "codicon-chevron-right";
             var headClass =
               "run-group-header" + (expanded ? "" : " collapsed");
-            var bodyClass =
-              "run-group-body" + (expanded ? "" : " hidden");
             html += '<div class="run-group" data-group-key="' + escAttr(g.key) + '">';
             html +=
               '<button type="button" class="' +
@@ -722,9 +718,9 @@
             html +=
               '<span class="run-group-count">(' + g.runs.length + ")</span>";
             html += "</button>";
-            html += '<div class="' + bodyClass + '">';
-            for (var rj = 0; rj < g.runs.length; rj++) {
-              html += buildRunCardHtml(g.runs[rj]);
+            html += '<div class="run-group-body">';
+            for (var rj = 0; rj < visibleRuns.length; rj++) {
+              html += buildRunCardHtml(visibleRuns[rj]);
             }
             html += "</div>";
             if (hasMore) {
