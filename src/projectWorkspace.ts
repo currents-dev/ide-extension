@@ -150,9 +150,12 @@ async function autoSetBranchFilter(
   }
   const branch = await getCurrentBranch();
   if (branch) {
-    runsProvider.setFilters({
-      ...runsProvider.getFilters(),
-      branches: [branch],
-    });
+    runsProvider.setFilters(
+      {
+        ...runsProvider.getFilters(),
+        branches: [branch],
+      },
+      { fetch: false },
+    );
   }
 }

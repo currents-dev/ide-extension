@@ -108,13 +108,19 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     return { ...this.filters };
   }
 
-  setFilters(filters: RunFilters): void {
+  setFilters(
+    filters: RunFilters,
+    options?: { fetch?: boolean },
+  ): void {
     this.filters = { ...filters };
     vscode.commands.executeCommand(
       "setContext",
       "currents.hasFilters",
       Boolean(filters.branches?.length || filters.authors?.length),
     );
+    if (options?.fetch === false) {
+      return;
+    }
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
