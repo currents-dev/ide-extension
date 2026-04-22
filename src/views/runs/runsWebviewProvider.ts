@@ -79,6 +79,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private groupingMode: "none" | "pr" = "none";
   private groupedLoadTargetKey: string | null = null;
   private static readonly maxGroupLoadPages = 20;
+  private currentRequestToken: string | null = null;
 
   constructor(private readonly extensionUri: vscode.Uri) {
     this.setAutoRefreshContext(true);
@@ -161,6 +162,18 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  /** Binds a single getProjectRuns request; stale responses are ignored. */
+  private makeRunsRequestToken(
+    requestStartingAfter: string | undefined,
+  ): string {
+    return JSON.stringify({
+      projectId: this.projectId,
+      filters: this.filters,
+      groupedLoadTargetKey: this.groupedLoadTargetKey,
+      requestStartingAfter: requestStartingAfter ?? null,
+    });
+  }
+
   async loadMore(): Promise<void> {
     if (!this.hasMore || this.loading) {
       return;
@@ -189,15 +202,22 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     this.loading = true;
     this.sendState();
 
+    let lastRequestToken: string | undefined;
     try {
       let pages = 0;
       while (this.hasMore && pages < RunsWebviewProvider.maxGroupLoadPages) {
         const startingAfter = this.lastCursor;
+        const localToken = this.makeRunsRequestToken(startingAfter);
+        lastRequestToken = localToken;
+        this.currentRequestToken = localToken;
         const response = await this.client.getProjectRuns(this.projectId, {
           limit: 10,
           starting_after: startingAfter,
           ...this.filters,
         });
+        if (this.currentRequestToken !== localToken) {
+          break;
+        }
         this.applyRunsResponse(response, startingAfter);
         pages += 1;
         const countAfter = this.runs.filter((r) => keyFor(r) === groupKey).length;
@@ -210,11 +230,16 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         }
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      vscode.window.showErrorMessage(`Currents: Failed to load runs. ${msg}`);
+      if (lastRequestToken && this.currentRequestToken === lastRequestToken) {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        vscode.window.showErrorMessage(`Currents: Failed to load runs. ${msg}`);
+      }
     } finally {
       this.groupedLoadTargetKey = null;
-      this.loading = false;
+      if (lastRequestToken && this.currentRequestToken === lastRequestToken) {
+        this.currentRequestToken = null;
+        this.loading = false;
+      }
       this.sendState();
     }
   }
@@ -319,6 +344,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
+    const localToken = this.makeRunsRequestToken(startingAfter);
+    this.currentRequestToken = localToken;
     this.loading = true;
     this.sendState();
 
@@ -328,12 +355,20 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         starting_after: startingAfter,
         ...this.filters,
       });
+      if (this.currentRequestToken !== localToken) {
+        return;
+      }
       this.applyRunsResponse(response, startingAfter);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      vscode.window.showErrorMessage(`Currents: Failed to fetch runs. ${msg}`);
+      if (this.currentRequestToken === localToken) {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        vscode.window.showErrorMessage(`Currents: Failed to fetch runs. ${msg}`);
+      }
     } finally {
-      this.loading = false;
+      if (this.currentRequestToken === localToken) {
+        this.currentRequestToken = null;
+        this.loading = false;
+      }
       this.sendState();
     }
   }
