@@ -7,6 +7,8 @@ import type { RunFeedItem, RunFilters } from "../../api/types.js";
 import { SettingsWebviewProvider } from "../settings/settingsWebviewProvider.js";
 import { getCodiconCss } from "../codiconCss.js";
 import { log } from "../../lib/log.js";
+import { resolveRunTitleFromFeedItem } from "../../lib/runTitle.js";
+import type { ApiListResponse } from "../../api/types.js";
 
 function powershellToast(exe: string, title: string, body: string): string {
   const t = title.replace(/"/g, '\\"');
@@ -56,6 +58,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
   private client: CurrentsApiClient | undefined;
   private projectId: string | undefined;
+  private projectDisplayName: string | undefined;
   private runs: RunFeedItem[] = [];
   private hasMore = false;
   private lastCursor: string | undefined;
@@ -77,8 +80,16 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     this.sendState();
   }
 
-  setProjectId(projectId: string | undefined): void {
+  setProjectId(
+    projectId: string | undefined,
+    projectDisplayName?: string | undefined,
+  ): void {
     this.projectId = projectId;
+    if (!projectId) {
+      this.projectDisplayName = undefined;
+    } else if (projectDisplayName !== undefined) {
+      this.projectDisplayName = projectDisplayName;
+    }
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
@@ -158,7 +169,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
           break;
         }
         case "loadMore":
-          this.loadMore();
+          void this.loadMore();
           break;
         case "openInDashboard": {
           const dashRun = this.runs.find((r) => r.runId === message.runId);
@@ -173,8 +184,26 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         case "setApiKey":
           vscode.commands.executeCommand("currents.setApiKey");
           break;
+        case "openSettings":
+          void vscode.commands.executeCommand("currents.openSettingsView");
+          break;
       }
     });
+  }
+
+  private applyRunsResponse(
+    response: ApiListResponse<RunFeedItem>,
+    startingAfter: string | undefined,
+  ): void {
+    if (!startingAfter) {
+      this.detectCompletedRuns(response.data);
+    }
+    this.runs.push(...response.data);
+    this.hasMore = response.has_more;
+    if (response.data.length > 0) {
+      this.lastCursor = response.data[response.data.length - 1].cursor;
+    }
+    this.trackInProgressRuns(response.data);
   }
 
   private async fetchRuns(startingAfter?: string): Promise<void> {
@@ -191,15 +220,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         starting_after: startingAfter,
         ...this.filters,
       });
-      if (!startingAfter) {
-        this.detectCompletedRuns(response.data);
-      }
-      this.runs.push(...response.data);
-      this.hasMore = response.has_more;
-      if (response.data.length > 0) {
-        this.lastCursor = response.data[response.data.length - 1].cursor;
-      }
-      this.trackInProgressRuns(response.data);
+      this.applyRunsResponse(response, startingAfter);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       vscode.window.showErrorMessage(`Currents: Failed to fetch runs. ${msg}`);
@@ -252,15 +273,14 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     if (!enabled) {
       return;
     }
-    const commitMsg =
-      run.meta.commit?.message?.split("\n")[0]?.slice(0, 60) || "Run";
+    const runTitle = resolveRunTitleFromFeedItem(run).slice(0, 60);
     const status = run.status.toLowerCase();
     const label =
       status === "passed"
-        ? `\u2714 Run passed: ${commitMsg}`
+        ? `\u2714 Run passed: ${runTitle}`
         : status === "failed"
-          ? `\u2716 Run failed: ${commitMsg}`
-          : `Run ${status}: ${commitMsg}`;
+          ? `\u2716 Run failed: ${runTitle}`
+          : `Run ${status}: ${runTitle}`;
 
     const showFn =
       status === "failed"
@@ -290,6 +310,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       filters: this.filters,
       activeRunId: this.activeRunId,
       authenticated: this.authenticated,
+      projectName: this.projectId ? this.projectDisplayName ?? null : null,
     });
   }
 
@@ -365,6 +386,7 @@ function serializeRun(run: RunFeedItem) {
     completionState: run.completionState,
     createdAt: run.createdAt,
     durationMs: run.durationMs,
+    displayTitle: resolveRunTitleFromFeedItem(run),
     commitMessage: run.meta.commit?.message?.split("\n")[0] || "",
     branch: run.meta.commit?.branch || "",
     authorName: run.meta.commit?.authorName || "",

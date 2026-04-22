@@ -206,6 +206,14 @@
         align-items: center;
         gap: 4px;
       }
+      .project-scope-chip {
+        border: 1px solid
+          var(--vscode-widget-border, var(--vscode-editorGroup-border));
+        cursor: pointer;
+      }
+      .project-scope-chip:hover {
+        opacity: 0.92;
+      }
 
       .live-indicator {
         font-size: 10px;
@@ -238,6 +246,7 @@
         loading: false,
         filters: {},
         activeRunId: null,
+        projectName: null,
       };
 
       window.addEventListener("message", (event) => {
@@ -291,7 +300,7 @@
           skipped = 0,
           pending = 0,
           flaky = 0;
-        for (const g of run.groups) {
+        for (const g of run.groups || []) {
           passes += g.tests.passes;
           failures += g.tests.failures;
           skipped += g.tests.skipped;
@@ -325,6 +334,17 @@
         const chips = [];
         var filterIcon =
           '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M6 12v-1h4v1H6zM4 8v-1h8v1H4zM2 4v-1h12v1H2z"/></svg> ';
+        var projectIcon =
+          '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px"><path d="M2 3h4l1 1h7v9H2V3zm1 2v6h10V6H8.5L7.5 5H3z"/></svg> ';
+        if (currentState.projectName) {
+          chips.push(
+            '<span class="filter-chip project-scope-chip" title="Open Settings to change project">' +
+              projectIcon +
+              "Project: " +
+              escHtml(currentState.projectName) +
+              "</span>",
+          );
+        }
         if (filters.branches && filters.branches.length) {
           chips.push(
             '<span class="filter-chip">' +
@@ -342,6 +362,13 @@
           );
         }
         filtersBar.innerHTML = chips.join("");
+        filtersBar.onclick = currentState.projectName
+          ? function (e) {
+              if (e.target.closest(".project-scope-chip")) {
+                vscode.postMessage({ type: "openSettings" });
+              }
+            }
+          : null;
 
         if (loading && runs.length === 0) {
           container.innerHTML = '<div class="loading">Loading runs\u2026</div>';
@@ -372,7 +399,11 @@
         let html = "";
         for (const run of runs) {
           const stats = aggregateTests(run);
-          const commitMsg = (run.commitMessage || "No title").slice(0, 70);
+          const runTitle = (
+            run.displayTitle ||
+            run.commitMessage ||
+            "No title"
+          ).slice(0, 70);
           const branch = run.branch || "\u2014";
           const author = run.authorName || "";
           const duration = formatDuration(run.durationMs);
@@ -397,7 +428,7 @@
             ago +
             "</span>";
           html += "  </div>";
-          html += '  <div class="run-title">' + escHtml(commitMsg) + "</div>";
+          html += '  <div class="run-title">' + escHtml(runTitle) + "</div>";
           html += '  <div class="run-meta">';
           html += "    <span>\u2387 " + escHtml(branch) + "</span>";
           if (author) {

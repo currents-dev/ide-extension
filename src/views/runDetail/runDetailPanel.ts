@@ -11,6 +11,7 @@ import type {
   RunSpec,
 } from "../../api/types.js";
 import { log } from "../../lib/log.js";
+import { resolveRunTitleFromFeedItem } from "../../lib/runTitle.js";
 import {
   buildBasicPrompt,
   buildPromptMarkdown,
@@ -72,10 +73,14 @@ export class RunDetailPanelProvider {
       return;
     }
 
-    const commitMsg = run.meta.commit?.message?.split("\n")[0] || "Run";
+    const displayTitle = resolveRunTitleFromFeedItem(run);
+    const panelTitle =
+      displayTitle.length > 50
+        ? `${displayTitle.slice(0, 50)}\u2026`
+        : displayTitle;
     const panel = vscode.window.createWebviewPanel(
       "currents-run-detail",
-      `${commitMsg.slice(0, 50)}`,
+      panelTitle,
       vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -243,8 +248,15 @@ export class RunDetailPanelProvider {
 
       this.lastSpecErrors.set(run.runId, specErrors);
 
+      const resolvedTitle = resolveRunTitleFromFeedItem(fullRun);
+      panel.title =
+        resolvedTitle.length > 50
+          ? `${resolvedTitle.slice(0, 50)}\u2026`
+          : resolvedTitle;
+
       panel.webview.postMessage({
         type: "runData",
+        displayTitle: resolvedTitle,
         specs: specErrors,
         completionState: fullRun.completionState,
         status: fullRun.status,
@@ -518,7 +530,7 @@ export class RunDetailPanelProvider {
     );
 
     const commit = run.meta.commit;
-    const commitMsg = commit?.message?.split("\n")[0] || "No title";
+    const displayTitle = resolveRunTitleFromFeedItem(run);
 
     let totalPasses = 0,
       totalFailures = 0,
@@ -537,7 +549,7 @@ export class RunDetailPanelProvider {
 
     const initData = {
       status: run.status.toLowerCase(),
-      commitMsg,
+      displayTitle,
       sha: commit?.sha?.slice(0, 7) || "",
       branch: commit?.branch || "",
       author: commit?.authorName || "",

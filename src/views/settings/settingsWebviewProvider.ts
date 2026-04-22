@@ -101,7 +101,7 @@ export class SettingsWebviewProvider implements vscode.WebviewViewProvider {
   static getFilterByCurrentBranch(): boolean {
     return vscode.workspace
       .getConfiguration("currents")
-      .get<boolean>("filterByCurrentBranch", true);
+      .get<boolean>("filterByCurrentBranch", false);
   }
 
   static getApiBaseUrl(): string {

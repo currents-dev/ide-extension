@@ -7,6 +7,11 @@ import { TestExplorerWebviewProvider } from "./views/testExplorer/testExplorerWe
 import { registerCommands } from "./commands.js";
 import { getCurrentBranch } from "./lib/git.js";
 import { initLog, log } from "./lib/log.js";
+import {
+  applySelectedProjectToWorkspace,
+  fetchActiveProjects,
+  pickProjectWithLatestRun,
+} from "./projectWorkspace.js";
 import { initMcpServer } from "./mcp.js";
 import { registerTestAnalysis } from "./testCodeLensProvider.js";
 
@@ -91,14 +96,40 @@ export async function activate(
           runsProvider.setFilters({ branches: [branch] });
         }
       }
-      runsProvider.setProjectId(savedProjectId);
+      runsProvider.setProjectId(
+        savedProjectId,
+        savedProjectName ?? undefined,
+      );
       testExplorerProvider.setProjectId(savedProjectId);
     } else {
-      await vscode.commands.executeCommand(
-        "setContext",
-        "currents.projectSelected",
-        false,
-      );
+      const projectDeps = {
+        context,
+        runsProvider,
+        testExplorerProvider,
+        settingsProvider,
+      };
+      try {
+        const projects = await fetchActiveProjects(auth.client!);
+        const chosen = await pickProjectWithLatestRun(auth.client!, projects);
+        if (chosen) {
+          await applySelectedProjectToWorkspace(projectDeps, chosen, {
+            showToast: false,
+          });
+        } else {
+          await vscode.commands.executeCommand(
+            "setContext",
+            "currents.projectSelected",
+            false,
+          );
+        }
+      } catch (err) {
+        log("Currents: auto-select default project failed:", err);
+        await vscode.commands.executeCommand(
+          "setContext",
+          "currents.projectSelected",
+          false,
+        );
+      }
     }
   }
 }
