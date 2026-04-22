@@ -72,7 +72,8 @@
         );
       }
       .status-cancelled,
-      .status-timedout {
+      .status-timedout,
+      .status-unknown {
         color: var(--vscode-disabledForeground);
         background: color-mix(
           in srgb,
@@ -459,14 +460,33 @@
         return { passes, failures, skipped, pending, flaky };
       }
 
+      function normalizeStatusForClass(s) {
+        var t = (s == null ? "" : String(s)).toLowerCase().replace(/_/g, "");
+        return t || "unknown";
+      }
       function statusApiLabel(s) {
         var m = {
           PASSED: "Passed",
           FAILED: "Failed",
           RUNNING: "Running",
           FAILING: "Failing",
+          TIMED_OUT: "Timed out",
+          CANCELLED: "Cancelled",
         };
-        return m[s] || s;
+        if (m[s] != null) {
+          return m[s];
+        }
+        if (!s) {
+          return "";
+        }
+        return s
+          .toLowerCase()
+          .split("_")
+          .filter(Boolean)
+          .map(function (w) {
+            return w.charAt(0).toUpperCase() + w.slice(1);
+          })
+          .join(" ");
       }
 
       function buildRunCardHtml(run) {
@@ -480,16 +500,17 @@
         const author = run.authorName || "";
         const duration = formatDuration(run.durationMs);
         const ago = timeAgo(run.createdAt);
-        const statusLower = (run.status || "").toLowerCase();
+        const rawStatus = run.status || "";
+        const statusMod = normalizeStatusForClass(rawStatus);
         const isLive = isRunInProgress(run.completionState);
         let html =
           '<div class="run-card" data-run-id="' + escAttr(run.runId) + '">';
         html += '  <div class="run-header">';
         html +=
           '    <span class="run-status status-' +
-          escHtml(statusLower) +
+          escHtml(statusMod) +
           '">' +
-          escHtml(statusLower) +
+          escHtml(statusApiLabel(rawStatus)) +
           "</span>";
         if (isLive) {
           html += '    <span class="live-indicator">\u25CF live</span>';
