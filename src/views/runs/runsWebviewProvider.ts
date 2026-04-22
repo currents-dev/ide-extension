@@ -130,6 +130,10 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     );
   }
 
+  private hasActiveStatusFilter(filters: RunFilters = this.filters): boolean {
+    return Boolean(filters.status?.length);
+  }
+
   private updateHasFiltersContext(filters: RunFilters): void {
     vscode.commands.executeCommand(
       "setContext",
@@ -226,7 +230,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     response: ApiListResponse<RunFeedItem>,
     startingAfter: string | undefined,
   ): void {
-    if (this.hasActiveFeedFilters()) {
+    if (this.hasActiveStatusFilter()) {
       this.inProgressRunIds.clear();
     } else {
       if (!startingAfter) {
