@@ -17,6 +17,30 @@ export function filterActiveProjects(all: Project[]): Project[] {
   return all.filter((p) => !p.name.toLowerCase().includes("[archived]"));
 }
 
+async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  if (items.length === 0) {
+    return [];
+  }
+  const results: R[] = new Array(items.length);
+  let next = 0;
+  const workerCount = Math.min(concurrency, items.length);
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (true) {
+      const i = next++;
+      if (i >= items.length) {
+        return;
+      }
+      results[i] = await fn(items[i]!);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
 export async function fetchActiveProjects(
   client: CurrentsApiClient,
 ): Promise<Project[]> {
@@ -36,27 +60,58 @@ export async function pickProjectWithLatestRun(
     return projects[0];
   }
 
-  const scored = await Promise.all(
-    projects.map(async (p) => {
-      try {
-        const res = await client.getProjectRuns(p.projectId, { limit: 1 });
-        const created = res.data[0]?.createdAt;
-        const latest = created ? new Date(created).getTime() : 0;
-        return { project: p, latest };
-      } catch {
-        return { project: p, latest: 0 };
-      }
-    }),
-  );
+  const scored = await mapWithConcurrency(projects, 5, async (p) => {
+    try {
+      const res = await client.getProjectRuns(p.projectId, { limit: 1 });
+      const created = res.data[0]?.createdAt;
+      const latest = created != null ? new Date(created).getTime() : null;
+      return { project: p, latest };
+    } catch {
+      return { project: p, latest: null };
+    }
+  });
 
   scored.sort((a, b) => {
-    if (b.latest !== a.latest) {
-      return b.latest - a.latest;
+    const aTime = a.latest ?? -Infinity;
+    const bTime = b.latest ?? -Infinity;
+    if (aTime !== bTime) {
+      return bTime - aTime;
     }
     return a.project.name.localeCompare(b.project.name);
   });
 
-  return scored[0]?.project;
+  const top = scored[0];
+  if (top?.latest == null) {
+    return undefined;
+  }
+  return top.project;
+}
+
+/** Quick pick (or no-op return when there is a single project). */
+export async function pickProjectManually(
+  projects: Project[],
+): Promise<Project | undefined> {
+  if (projects.length === 0) {
+    return undefined;
+  }
+  if (projects.length === 1) {
+    return projects[0];
+  }
+  const pick = await vscode.window.showQuickPick(
+    projects.map((p) => ({
+      label: p.name,
+      description: p.projectId,
+      projectId: p.projectId,
+    })),
+    {
+      title: "Select a Currents Project",
+      placeHolder: "Choose a project",
+    },
+  );
+  if (!pick) {
+    return undefined;
+  }
+  return projects.find((p) => p.projectId === pick.projectId);
 }
 
 export async function applySelectedProjectToWorkspace(
@@ -95,7 +150,7 @@ async function autoSetBranchFilter(
   }
   const branch = await getCurrentBranch();
   if (branch) {
-    runsProvider.setFilters({
+    runsProvider.setFiltersSilently({
       ...runsProvider.getFilters(),
       branches: [branch],
     });

@@ -106,11 +106,17 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     projectId: string | undefined,
     projectDisplayName?: string | undefined,
   ): void {
+    const previousProjectId = this.projectId;
     this.projectId = projectId;
+    if (projectId !== previousProjectId) {
+      this.inProgressRunIds.clear();
+    }
     if (!projectId) {
       this.projectDisplayName = undefined;
     } else if (projectDisplayName !== undefined) {
       this.projectDisplayName = projectDisplayName;
+    } else if (projectId !== previousProjectId) {
+      this.projectDisplayName = undefined;
     }
     this.groupingMode = "none";
     this.setRunsGroupedByPullRequestContext();
@@ -123,6 +129,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         this.startAutoRefresh();
       }
     } else {
+      this.currentRequestToken = null;
       this.stopAutoRefresh();
       this.sendState();
     }
@@ -132,18 +139,35 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     return { ...this.filters };
   }
 
-  setFilters(filters: RunFilters): void {
-    this.filters = { ...filters };
+  private hasActiveFeedFilters(filters: RunFilters = this.filters): boolean {
+    return Boolean(
+      filters.branches?.length ||
+        filters.authors?.length ||
+        filters.tags?.length ||
+        filters.status?.length,
+    );
+  }
+
+  private hasActiveStatusFilter(filters: RunFilters = this.filters): boolean {
+    return Boolean(filters.status?.length);
+  }
+
+  private updateHasFiltersContext(filters: RunFilters): void {
     vscode.commands.executeCommand(
       "setContext",
       "currents.hasFilters",
-      Boolean(
-        filters.branches?.length ||
-          filters.authors?.length ||
-          filters.tags?.length ||
-          filters.status?.length,
-      ),
+      this.hasActiveFeedFilters(filters),
     );
+  }
+
+  setFiltersSilently(filters: RunFilters): void {
+    this.filters = { ...filters };
+    this.updateHasFiltersContext(filters);
+  }
+
+  setFilters(filters: RunFilters): void {
+    this.filters = { ...filters };
+    this.updateHasFiltersContext(filters);
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
@@ -337,15 +361,19 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     response: ApiListResponse<RunFeedItem>,
     startingAfter: string | undefined,
   ): void {
-    if (!startingAfter) {
-      this.detectCompletedRuns(response.data);
+    if (this.hasActiveStatusFilter()) {
+      this.inProgressRunIds.clear();
+    } else {
+      if (!startingAfter) {
+        this.detectCompletedRuns(response.data);
+      }
+      this.trackInProgressRuns(response.data);
     }
     this.runs.push(...response.data);
     this.hasMore = response.has_more;
     if (response.data.length > 0) {
       this.lastCursor = response.data[response.data.length - 1].cursor;
     }
-    this.trackInProgressRuns(response.data);
   }
 
   private async fetchRuns(startingAfter?: string): Promise<void> {

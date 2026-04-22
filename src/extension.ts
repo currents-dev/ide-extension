@@ -10,6 +10,7 @@ import { initLog, log } from "./lib/log.js";
 import {
   applySelectedProjectToWorkspace,
   fetchActiveProjects,
+  pickProjectManually,
   pickProjectWithLatestRun,
 } from "./projectWorkspace.js";
 import { initMcpServer } from "./mcp.js";
