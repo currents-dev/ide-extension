@@ -336,6 +336,9 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         case "setApiKey":
           vscode.commands.executeCommand("currents.setApiKey");
           break;
+        case "selectProject":
+          void vscode.commands.executeCommand("currents.selectProject");
+          break;
         case "openSettings":
           void vscode.commands.executeCommand("currents.openSettingsView");
           break;
@@ -394,6 +397,41 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         return;
       }
       this.applyRunsResponse(response, startingAfter);
+    } catch (err) {
+      if (this.currentRequestToken === localToken) {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        vscode.window.showErrorMessage(`Currents: Failed to fetch runs. ${msg}`);
+      }
+    } finally {
+      if (this.currentRequestToken === localToken) {
+        this.currentRequestToken = null;
+        this.loading = false;
+      }
+      this.sendState();
+    }
+  }
+
+  private async refreshRunsSilently(): Promise<void> {
+    if (!this.client || !this.projectId) {
+      return;
+    }
+
+    const localToken = this.makeRunsRequestToken(undefined);
+    this.currentRequestToken = localToken;
+    this.loading = true;
+
+    try {
+      const response = await this.client.getProjectRuns(this.projectId, {
+        limit: 10,
+        ...this.filters,
+      });
+      if (this.currentRequestToken !== localToken) {
+        return;
+      }
+      this.runs = [];
+      this.hasMore = false;
+      this.lastCursor = undefined;
+      this.applyRunsResponse(response, undefined);
     } catch (err) {
       if (this.currentRequestToken === localToken) {
         const msg = err instanceof Error ? err.message : "Unknown error";
@@ -553,10 +591,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     this.stopAutoRefresh();
     this.autoRefreshTimer = setInterval(() => {
       if (this.client && this.projectId && !this.loading) {
-        this.runs = [];
-        this.hasMore = false;
-        this.lastCursor = undefined;
-        this.fetchRuns();
+        void this.refreshRunsSilently();
       }
     }, 30_000);
   }
