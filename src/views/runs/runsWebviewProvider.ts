@@ -11,7 +11,10 @@ import type {
 import { SettingsWebviewProvider } from "../settings/settingsWebviewProvider.js";
 import { getCodiconCss } from "../codiconCss.js";
 import { log } from "../../lib/log.js";
-import { resolveRunTitleFromFeedItem } from "../../lib/runTitle.js";
+import {
+  getPrGroupKeyAndLabel,
+  resolveRunTitleFromFeedItem,
+} from "../../lib/runTitle.js";
 import type { ApiListResponse } from "../../api/types.js";
 
 function powershellToast(exe: string, title: string, body: string): string {
@@ -73,6 +76,9 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
   private autoRefreshTimer: ReturnType<typeof setInterval> | undefined;
   private autoRefreshEnabled = true;
   private inProgressRunIds = new Set<string>();
+  private groupingMode: "none" | "pr" = "none";
+  private groupedLoadTargetKey: string | null = null;
+  private static readonly maxGroupLoadPages = 20;
 
   constructor(private readonly extensionUri: vscode.Uri) {
     this.setAutoRefreshContext(true);
@@ -94,6 +100,7 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     } else if (projectDisplayName !== undefined) {
       this.projectDisplayName = projectDisplayName;
     }
+    this.groupingMode = "none";
     this.runs = [];
     this.hasMore = false;
     this.lastCursor = undefined;
@@ -151,6 +158,57 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     await this.fetchRuns(this.lastCursor);
   }
 
+  async loadMoreForGroup(
+    groupKey: string,
+    groupMode: "pr",
+  ): Promise<void> {
+    if (groupMode !== "pr" || !this.client || !this.projectId) {
+      return;
+    }
+    if (this.groupedLoadTargetKey !== null || this.loading) {
+      return;
+    }
+    if (!this.hasMore) {
+      return;
+    }
+
+    const keyFor = (r: RunFeedItem) => getPrGroupKeyAndLabel(r).key;
+    const countBefore = this.runs.filter((r) => keyFor(r) === groupKey).length;
+
+    this.groupedLoadTargetKey = groupKey;
+    this.loading = true;
+    this.sendState();
+
+    try {
+      let pages = 0;
+      while (this.hasMore && pages < RunsWebviewProvider.maxGroupLoadPages) {
+        const startingAfter = this.lastCursor;
+        const response = await this.client.getProjectRuns(this.projectId, {
+          limit: 10,
+          starting_after: startingAfter,
+          ...this.filters,
+        });
+        this.applyRunsResponse(response, startingAfter);
+        pages += 1;
+        const countAfter = this.runs.filter((r) => keyFor(r) === groupKey).length;
+        if (countAfter > countBefore) {
+          break;
+        }
+        this.sendState();
+        if (!this.hasMore) {
+          break;
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      vscode.window.showErrorMessage(`Currents: Failed to load runs. ${msg}`);
+    } finally {
+      this.groupedLoadTargetKey = null;
+      this.loading = false;
+      this.sendState();
+    }
+  }
+
   resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
@@ -180,6 +238,23 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
         case "loadMore":
           void this.loadMore();
           break;
+        case "loadMoreForGroup": {
+          if (message.groupMode === "pr" && message.groupKey != null) {
+            void this.loadMoreForGroup(
+              String(message.groupKey),
+              "pr",
+            );
+          }
+          break;
+        }
+        case "setGroupingMode": {
+          const m = message.mode;
+          if (m === "pr" || m === "none") {
+            this.groupingMode = m;
+            this.sendState();
+          }
+          break;
+        }
         case "openInDashboard": {
           const dashRun = this.runs.find((r) => r.runId === message.runId);
           if (dashRun) {
@@ -320,6 +395,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
       activeRunId: this.activeRunId,
       authenticated: this.authenticated,
       projectName: this.projectId ? this.projectDisplayName ?? null : null,
+      groupingMode: this.groupingMode,
+      groupedLoadTargetKey: this.groupedLoadTargetKey,
     });
   }
 
@@ -407,6 +484,8 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
 }
 
 function serializeRun(run: RunFeedItem) {
+  const { key: prGroupKey, label: prGroupLabel } = getPrGroupKeyAndLabel(run);
+  const pr = run.meta.pr;
   return {
     runId: run.runId,
     status: run.status,
@@ -418,5 +497,11 @@ function serializeRun(run: RunFeedItem) {
     branch: run.meta.commit?.branch || "",
     authorName: run.meta.commit?.authorName || "",
     groups: run.groups,
+    prGroupKey,
+    prGroupLabel,
+    pr:
+      pr?.id != null && String(pr.id) !== ""
+        ? { id: pr.id, title: pr.title ?? null }
+        : null,
   };
 }

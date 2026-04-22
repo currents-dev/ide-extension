@@ -93,3 +93,20 @@ export function resolveRunTitleFromFeedItem(run: RunFeedItem): string {
     runId: run.runId,
   });
 }
+
+/** Stable key + header label for PR grouping (uses canonical `meta.pr.id` only). */
+export function getPrGroupKeyAndLabel(run: RunFeedItem): {
+  key: string;
+  label: string;
+} {
+  const pr = run.meta.pr;
+  if (pr?.id) {
+    const id = pr.id;
+    const fromTitle = pr.title?.trim();
+    const fromId = getPRTitleFromCanonicalId(id);
+    const fromResolve = resolveRunTitleFromFeedItem(run);
+    const label = fromTitle || fromId || fromResolve;
+    return { key: `pr:${id}`, label };
+  }
+  return { key: "__no_pr__", label: "No PR" };
+}
