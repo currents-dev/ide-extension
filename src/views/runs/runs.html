@@ -338,6 +338,8 @@
       const vscode = acquireVsCodeApi();
 
       const GROUP_EXPANDED_KEY = "currents.runs.groupExpanded";
+      /** Lazy-init object; source of truth for expanded state (sessionStorage is best-effort). */
+      let GROUP_EXPANDED_MAP = null;
       const GROUPING_STRATEGY = "pr";
       const groupingStrategies = {
         pr: {
@@ -363,13 +365,16 @@
       };
 
       function getGroupExpandedMap() {
-        try {
-          return JSON.parse(
-            sessionStorage.getItem(GROUP_EXPANDED_KEY) || "{}",
-          );
-        } catch (e) {
-          return {};
+        if (GROUP_EXPANDED_MAP === null) {
+          try {
+            GROUP_EXPANDED_MAP = JSON.parse(
+              sessionStorage.getItem(GROUP_EXPANDED_KEY) || "{}",
+            );
+          } catch (e) {
+            GROUP_EXPANDED_MAP = {};
+          }
         }
+        return GROUP_EXPANDED_MAP;
       }
       function setGroupExpandedState(groupKey, expanded) {
         const m = getGroupExpandedMap();
