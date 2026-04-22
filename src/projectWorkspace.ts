@@ -17,6 +17,30 @@ export function filterActiveProjects(all: Project[]): Project[] {
   return all.filter((p) => !p.name.toLowerCase().includes("[archived]"));
 }
 
+async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  if (items.length === 0) {
+    return [];
+  }
+  const results: R[] = new Array(items.length);
+  let next = 0;
+  const workerCount = Math.min(concurrency, items.length);
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (true) {
+      const i = next++;
+      if (i >= items.length) {
+        return;
+      }
+      results[i] = await fn(items[i]!);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
 export async function fetchActiveProjects(
   client: CurrentsApiClient,
 ): Promise<Project[]> {
@@ -36,19 +60,16 @@ export async function pickProjectWithLatestRun(
     return projects[0];
   }
 
-  const scored = await Promise.all(
-    projects.map(async (p) => {
-      try {
-        const res = await client.getProjectRuns(p.projectId, { limit: 1 });
-        const created = res.data[0]?.createdAt;
-        const latest =
-          created != null ? new Date(created).getTime() : null;
-        return { project: p, latest };
-      } catch {
-        return { project: p, latest: null };
-      }
-    }),
-  );
+  const scored = await mapWithConcurrency(projects, 5, async (p) => {
+    try {
+      const res = await client.getProjectRuns(p.projectId, { limit: 1 });
+      const created = res.data[0]?.createdAt;
+      const latest = created != null ? new Date(created).getTime() : null;
+      return { project: p, latest };
+    } catch {
+      return { project: p, latest: null };
+    }
+  });
 
   scored.sort((a, b) => {
     const aTime = a.latest ?? -Infinity;
