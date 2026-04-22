@@ -88,11 +88,14 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     projectId: string | undefined,
     projectDisplayName?: string | undefined,
   ): void {
+    const previousProjectId = this.projectId;
     this.projectId = projectId;
     if (!projectId) {
       this.projectDisplayName = undefined;
     } else if (projectDisplayName !== undefined) {
       this.projectDisplayName = projectDisplayName;
+    } else if (projectId !== previousProjectId) {
+      this.projectDisplayName = undefined;
     }
     this.runs = [];
     this.hasMore = false;
