@@ -216,15 +216,18 @@ export class RunsWebviewProvider implements vscode.WebviewViewProvider {
     response: ApiListResponse<RunFeedItem>,
     startingAfter: string | undefined,
   ): void {
-    if (!startingAfter) {
-      this.detectCompletedRuns(response.data);
+    const statusFilterActive = Boolean(this.filters.status?.length);
+    if (!statusFilterActive) {
+      if (!startingAfter) {
+        this.detectCompletedRuns(response.data);
+      }
+      this.trackInProgressRuns(response.data);
     }
     this.runs.push(...response.data);
     this.hasMore = response.has_more;
     if (response.data.length > 0) {
       this.lastCursor = response.data[response.data.length - 1].cursor;
     }
-    this.trackInProgressRuns(response.data);
   }
 
   private async fetchRuns(startingAfter?: string): Promise<void> {
