@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -40,7 +41,8 @@ export async function writeContextFiles(
   }
   try {
     const content = await client.fetchUrl(errorContextUrl);
-    const dir = ensureContextDir();
+    const dir = path.join(ensureContextDir(), randomUUID());
+    fs.mkdirSync(dir, { recursive: true });
     const filePath = path.join(dir, "error-context.md");
     fs.writeFileSync(filePath, content, "utf8");
     return [vscode.Uri.file(filePath)];
