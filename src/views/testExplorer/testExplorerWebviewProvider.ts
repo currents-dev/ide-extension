@@ -4,8 +4,6 @@ import * as path from "path";
 import type { CurrentsApiClient } from "../../api/client.js";
 import type { TestExplorerItem } from "../../api/types.js";
 import { getCodiconCss } from "../codiconCss.js";
-import { buildPromptMarkdown, writeContextFiles } from "../../aiContext.js";
-import { isAiContextFetchEnabled } from "../../featureFlags.js";
 import { log } from "../../lib/log.js";
 
 type DateRange = "14d" | "30d" | "60d" | "90d";
@@ -221,38 +219,11 @@ export class TestExplorerWebviewProvider implements vscode.WebviewViewProvider {
       },
       async () => {
         const mode = msg.sortMode === "slowest" ? "slowest" : "flakiest";
-        let prompt: string;
-        let attachFiles: vscode.Uri[] = [];
-
-        if (
-          isAiContextFetchEnabled() &&
-          this.client &&
-          this.projectId &&
-          msg.signature
-        ) {
-          try {
-            const payload = await this.client.getAiContextBySignature(
-              this.projectId,
-              msg.signature,
-            );
-            const contextMarkdown = buildPromptMarkdown(payload);
-            prompt = this.buildExplorerPrompt(mode, msg, this.projectId, contextMarkdown);
-            attachFiles = await writeContextFiles(this.client, payload);
-          } catch (err) {
-            log(
-              "TestExplorer: AI context fetch failed, using basic prompt:",
-              err,
-            );
-            prompt = this.buildExplorerPrompt(mode, msg, this.projectId);
-          }
-        } else {
-          prompt = this.buildExplorerPrompt(mode, msg, this.projectId);
-        }
+        const prompt = this.buildExplorerPrompt(mode, msg, this.projectId);
 
         try {
           await vscode.commands.executeCommand("workbench.action.chat.open", {
             query: prompt,
-            ...(attachFiles.length > 0 ? { attachFiles } : {}),
           });
         } catch {
           await vscode.env.clipboard.writeText(prompt);
