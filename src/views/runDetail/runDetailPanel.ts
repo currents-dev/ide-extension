@@ -14,8 +14,9 @@ import { log } from "../../lib/log.js";
 import { resolveRunTitleFromFeedItem } from "../../lib/runTitle.js";
 import {
   buildBasicPrompt,
-  buildPromptMarkdown,
+  buildEnrichedPrompt,
   writeContextFiles,
+  writeRunContextFiles,
 } from "../../aiContext.js";
 import { isAiContextFetchEnabled } from "../../featureFlags.js";
 
@@ -348,18 +349,23 @@ export class RunDetailPanelProvider {
         ) {
           try {
             log("Fetching AI context for", msg.instanceId, msg.testId, "attempt:", msg.attempt);
-            const payload = await this.client.getAiContext(
-              msg.instanceId,
-              msg.testId,
-              msg.attempt,
-            );
+            const [markdown, errorContextUrl] = await Promise.all([
+              this.client.getAiContext(
+                msg.instanceId,
+                msg.testId,
+                msg.attempt,
+              ),
+              this.client
+                .getAiContextErrorContextUrl(
+                  msg.instanceId,
+                  msg.testId,
+                  msg.attempt,
+                )
+                .catch(() => null),
+            ]);
             log("AI context fetched successfully");
-            prompt = buildPromptMarkdown(payload);
-            attachFiles = await writeContextFiles(this.client, payload);
-            log(
-              "Context files written:",
-              attachFiles.map((u) => u.fsPath),
-            );
+            prompt = buildEnrichedPrompt(msg.spec, markdown);
+            attachFiles = await writeContextFiles(this.client, errorContextUrl);
           } catch (err) {
             log("AI context fetch failed, using basic prompt:", err);
             prompt = buildBasicPrompt(msg);
@@ -393,6 +399,53 @@ export class RunDetailPanelProvider {
         }
       },
     );
+  }
+
+  private buildBasicRunPrompt(
+    runId: string,
+    specErrors: SerializedSpec[],
+    failedTests: Array<{
+      spec: string;
+      instanceId: string;
+      title: string;
+      testId: string;
+      errorPreview: string;
+    }>,
+    projectId: string | undefined,
+  ): string {
+    const lines: string[] = [];
+    lines.push(
+      `This CI run has **${failedTests.length} failing test(s)** across ${specErrors.filter((s) => s.errors.some((e) => !e.isFlaky)).length} spec file(s).`,
+    );
+    lines.push("");
+    lines.push("Please:");
+    lines.push("1. For each failing test below, use `currents-get-spec-instance` with the instance ID to get full failure details and stack traces");
+    lines.push("2. Use `currents-get-tests-signatures` with the project ID, spec file path, and test title to get test signatures, then use `currents-get-test-results` to retrieve historical results and check for flakiness patterns");
+    lines.push("3. Open each spec file, locate the failing test, and analyze the root cause");
+    lines.push("4. Build a plan to fix all failures, then implement the fixes");
+    lines.push("");
+    lines.push("## Run metadata (for MCP queries)");
+    lines.push("");
+    if (projectId) lines.push(`- **Project ID:** \`${projectId}\``);
+    lines.push(`- **Run ID:** \`${runId}\``);
+    lines.push("");
+    lines.push("## Failing tests");
+    lines.push("");
+
+    for (const t of failedTests) {
+      lines.push(`### ${t.title}`);
+      lines.push(`- **Spec:** \`${t.spec}\``);
+      lines.push(`- **Instance ID:** \`${t.instanceId}\``);
+      lines.push(`- **Test ID:** \`${t.testId}\``);
+      if (t.errorPreview) lines.push(`- **Error:** \`${t.errorPreview}\``);
+      lines.push("");
+    }
+
+    lines.push(
+      "Use the Currents MCP tools (`currents-get-spec-instance`, `currents-get-tests-signatures`, `currents-get-test-results`, `currents-get-run-details`) with the identifiers above to retrieve full context before fixing.",
+    );
+
+    return lines.join("\n");
   }
 
   private async handleFixAllWithAgent(runId: string): Promise<void> {
@@ -434,50 +487,57 @@ export class RunDetailPanelProvider {
       return;
     }
 
-    const lines: string[] = [];
-    lines.push(
-      `This CI run has **${failedTests.length} failing test(s)** across ${specErrors.filter((s) => s.errors.some((e) => !e.isFlaky)).length} spec file(s).`,
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: "Currents: Loading run context...",
+        cancellable: false,
+      },
+      async () => {
+        let prompt: string | null = null;
+        let attachFiles: vscode.Uri[] = [];
+
+        if (isAiContextFetchEnabled() && this.client) {
+          try {
+            const [markdown, errorContexts] = await Promise.all([
+              this.client.getRunAiContext(runId),
+              this.client
+                .getRunAiContextErrorContexts(runId)
+                .catch(() => []),
+            ]);
+            prompt = `Fix the Playwright test failures in this run:\n\n${markdown}`;
+            attachFiles = await writeRunContextFiles(
+              this.client,
+              runId,
+              errorContexts,
+            );
+          } catch (err) {
+            log("Run AI context fetch failed, using basic prompt:", err);
+          }
+        }
+
+        if (!prompt) {
+          prompt = this.buildBasicRunPrompt(
+            runId,
+            specErrors,
+            failedTests,
+            projectId,
+          );
+        }
+
+        try {
+          await vscode.commands.executeCommand("workbench.action.chat.open", {
+            query: prompt,
+            ...(attachFiles.length > 0 ? { attachFiles } : {}),
+          });
+        } catch {
+          await vscode.env.clipboard.writeText(prompt);
+          vscode.window.showInformationMessage(
+            "Currents: Prompt copied to clipboard. Paste it in the AI chat.",
+          );
+        }
+      },
     );
-    lines.push("");
-    lines.push("Please:");
-    lines.push("1. For each failing test below, use `currents-get-spec-instance` with the instance ID to get full failure details and stack traces");
-    lines.push("2. Use `currents-get-tests-signatures` with the project ID, spec file path, and test title to get test signatures, then use `currents-get-test-results` to retrieve historical results and check for flakiness patterns");
-    lines.push("3. Open each spec file, locate the failing test, and analyze the root cause");
-    lines.push("4. Build a plan to fix all failures, then implement the fixes");
-    lines.push("");
-    lines.push("## Run metadata (for MCP queries)");
-    lines.push("");
-    if (projectId) lines.push(`- **Project ID:** \`${projectId}\``);
-    lines.push(`- **Run ID:** \`${runId}\``);
-    lines.push("");
-    lines.push("## Failing tests");
-    lines.push("");
-
-    for (const t of failedTests) {
-      lines.push(`### ${t.title}`);
-      lines.push(`- **Spec:** \`${t.spec}\``);
-      lines.push(`- **Instance ID:** \`${t.instanceId}\``);
-      lines.push(`- **Test ID:** \`${t.testId}\``);
-      if (t.errorPreview) lines.push(`- **Error:** \`${t.errorPreview}\``);
-      lines.push("");
-    }
-
-    lines.push(
-      "Use the Currents MCP tools (`currents-get-spec-instance`, `currents-get-tests-signatures`, `currents-get-test-results`, `currents-get-run-details`) with the identifiers above to retrieve full context before fixing.",
-    );
-
-    const prompt = lines.join("\n");
-
-    try {
-      await vscode.commands.executeCommand("workbench.action.chat.open", {
-        query: prompt,
-      });
-    } catch {
-      await vscode.env.clipboard.writeText(prompt);
-      vscode.window.showInformationMessage(
-        "Currents: Prompt copied to clipboard. Paste it in the AI chat.",
-      );
-    }
   }
 
   private async handleGoToFile(spec: string, testTitle: string): Promise<void> {
