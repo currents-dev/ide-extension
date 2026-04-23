@@ -23,6 +23,7 @@
         padding: 20px 24px 16px;
         border-bottom: 1px solid
           var(--vscode-widget-border, var(--vscode-editorGroup-border));
+        min-width: 0;
       }
 
       .header-top {
@@ -30,6 +31,7 @@
         align-items: center;
         gap: 10px;
         margin-bottom: 8px;
+        min-width: 0;
       }
 
       .status-badge {
@@ -76,6 +78,11 @@
       }
 
       .commit-message {
+        min-width: 0;
+        flex: 1 1 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         font-size: 16px;
         font-weight: 600;
         line-height: 1.3;

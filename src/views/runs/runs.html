@@ -72,7 +72,8 @@
         );
       }
       .status-cancelled,
-      .status-timedout {
+      .status-timedout,
+      .status-unknown {
         color: var(--vscode-disabledForeground);
         background: color-mix(
           in srgb,
@@ -215,6 +216,77 @@
         opacity: 0.92;
       }
 
+      .run-group {
+        margin: 4px 0 10px;
+        border: 1px solid
+          var(--vscode-widget-border, var(--vscode-editorGroup-border));
+        border-radius: 6px;
+        overflow: hidden;
+        background: var(--vscode-sideBar-background, transparent);
+      }
+      .run-group-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        text-align: left;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--vscode-editor-inactiveSelectionBackground, transparent);
+        border: none;
+        color: var(--vscode-foreground);
+        font-family: var(--vscode-font-family);
+      }
+      .run-group-header:hover {
+        background: var(--vscode-list-hoverBackground, transparent);
+      }
+      .run-group-header .group-chevron {
+        font-size: 12px;
+        flex-shrink: 0;
+        transition: transform 0.15s;
+      }
+      .run-group-header.collapsed .group-chevron {
+        transform: rotate(-90deg);
+      }
+      .run-group-title {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .run-group-count {
+        color: var(--vscode-descriptionForeground);
+        font-weight: 500;
+        flex-shrink: 0;
+      }
+      .run-group-body {
+        padding: 0 6px 4px;
+      }
+      .run-group-load {
+        display: block;
+        width: calc(100% - 8px);
+        margin: 8px 4px 6px;
+        padding: 4px 8px;
+        font-size: 11px;
+        background: transparent;
+        color: var(--vscode-textLink-foreground);
+        border: 1px dashed var(--vscode-widget-border, var(--vscode-editorGroup-border));
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: var(--vscode-font-family);
+      }
+      .run-group-load:disabled,
+      .run-group-load[disabled] {
+        opacity: 0.65;
+        cursor: default;
+      }
+      .run-group-load:hover:not(:disabled) {
+        background: var(--vscode-list-hoverBackground);
+      }
+
       .live-indicator {
         font-size: 10px;
         font-weight: 700;
@@ -240,6 +312,22 @@
     <script>
       const vscode = acquireVsCodeApi();
 
+      const GROUP_EXPANDED_KEY = "currents.runs.groupExpanded";
+      /** Lazy-init object; source of truth for expanded state (sessionStorage is best-effort). */
+      let GROUP_EXPANDED_MAP = null;
+      const GROUPING_STRATEGY = "pr";
+      const groupingStrategies = {
+        pr: {
+          keyOf: function (run) {
+            return run.prGroupKey || "__no_pr__";
+          },
+          labelOf: function (run) {
+            return run.prGroupLabel || "No PR";
+          },
+          perGroupButtonLabel: "Load more for this PR",
+        },
+      };
+
       let currentState = {
         runs: [],
         hasMore: false,
@@ -247,7 +335,48 @@
         filters: {},
         activeRunId: null,
         projectName: null,
+        groupingMode: "none",
+        groupedLoadTargetKey: null,
       };
+
+      function getGroupExpandedMap() {
+        if (GROUP_EXPANDED_MAP === null) {
+          try {
+            GROUP_EXPANDED_MAP = JSON.parse(
+              sessionStorage.getItem(GROUP_EXPANDED_KEY) || "{}",
+            );
+          } catch (e) {
+            GROUP_EXPANDED_MAP = {};
+          }
+        }
+        return GROUP_EXPANDED_MAP;
+      }
+      function setGroupExpandedState(groupKey, expanded) {
+        const m = getGroupExpandedMap();
+        m[groupKey] = expanded;
+        try {
+          sessionStorage.setItem(
+            GROUP_EXPANDED_KEY,
+            JSON.stringify(m),
+          );
+        } catch (e) {
+          console.warn(
+            "setGroupExpandedState: could not persist to sessionStorage",
+            GROUP_EXPANDED_KEY,
+            e,
+          );
+        }
+      }
+      function isGroupExpanded(groupKey) {
+        const m = getGroupExpandedMap();
+        if (m[groupKey] === false) {
+          return false;
+        }
+        if (m[groupKey] === true) {
+          return true;
+        }
+        return false;
+      }
 
       window.addEventListener("message", (event) => {
         const message = event.data;
@@ -300,7 +429,8 @@
           skipped = 0,
           pending = 0,
           flaky = 0;
-        for (const g of run.groups || []) {
+        const groupList = run.groups || [];
+        for (const g of groupList) {
           passes += g.tests.passes;
           failures += g.tests.failures;
           skipped += g.tests.skipped;
@@ -310,20 +440,131 @@
         return { passes, failures, skipped, pending, flaky };
       }
 
+      function normalizeStatusForClass(s) {
+        var t = (s == null ? "" : String(s)).toLowerCase().replace(/_/g, "");
+        return t || "unknown";
+      }
       function statusApiLabel(s) {
         var m = {
           PASSED: "Passed",
           FAILED: "Failed",
           RUNNING: "Running",
           FAILING: "Failing",
+          TIMED_OUT: "Timed out",
+          CANCELLED: "Cancelled",
         };
-        return m[s] || s;
+        if (m[s] != null) {
+          return m[s];
+        }
+        if (!s) {
+          return "";
+        }
+        return s
+          .toLowerCase()
+          .split("_")
+          .filter(Boolean)
+          .map(function (w) {
+            return w.charAt(0).toUpperCase() + w.slice(1);
+          })
+          .join(" ");
+      }
+
+      function buildRunCardHtml(run) {
+        const stats = aggregateTests(run);
+        const runTitle = (
+          run.displayTitle ||
+          run.commitMessage ||
+          "No title"
+        ).slice(0, 70);
+        const branch = run.branch || "\u2014";
+        const author = run.authorName || "";
+        const duration = formatDuration(run.durationMs);
+        const ago = timeAgo(run.createdAt);
+        const rawStatus = run.status || "";
+        const statusMod = normalizeStatusForClass(rawStatus);
+        const isLive = isRunInProgress(run.completionState);
+        let html =
+          '<div class="run-card" data-run-id="' + escAttr(run.runId) + '">';
+        html += '  <div class="run-header">';
+        html +=
+          '    <span class="run-status status-' +
+          escAttr(statusMod) +
+          '">' +
+          escHtml(statusApiLabel(rawStatus)) +
+          "</span>";
+        if (isLive) {
+          html += '    <span class="live-indicator">\u25CF live</span>';
+        }
+        html +=
+          '    <span class="run-duration">' +
+          (duration ? duration + " \u00B7 " : "") +
+          ago +
+          "</span>";
+        html += "  </div>";
+        html += '  <div class="run-title">' + escHtml(runTitle) + "</div>";
+        html += '  <div class="run-meta">';
+        html += "    <span>\u2387 " + escHtml(branch) + "</span>";
+        if (author) {
+          html += "    <span>\u263A " + escHtml(author) + "</span>";
+        }
+        html += "  </div>";
+        html += '  <div class="run-stats">';
+        html +=
+          '    <span class="stat stat-passed">\u2714 ' +
+          stats.passes +
+          "</span>";
+        html +=
+          '    <span class="stat stat-failed">\u2716 ' +
+          stats.failures +
+          "</span>";
+        html +=
+          '    <span class="stat stat-skipped">\u25CB ' +
+          stats.skipped +
+          "</span>";
+        if (stats.flaky > 0) {
+          html +=
+            '    <span class="stat stat-flaky">\u2744 ' +
+            stats.flaky +
+            "</span>";
+        }
+        html += "  </div>";
+        html += '  <div class="run-actions">';
+        html +=
+          '    <button class="action-btn" data-action="dashboard" data-run-id="' +
+          escAttr(run.runId) +
+          '"><i class="codicon codicon-forward"></i> Dashboard</button>';
+        html += "  </div>";
+        html += "</div>";
+        return html;
+      }
+
+      function buildGroupsForStrategy(runs, strategyId) {
+        const strat = groupingStrategies[strategyId];
+        if (!strat) {
+          return { groups: [] };
+        }
+        const order = [];
+        const byKey = {};
+        for (var i = 0; i < runs.length; i++) {
+          const run = runs[i];
+          const gk = strat.keyOf(run);
+          if (!Object.prototype.hasOwnProperty.call(byKey, gk)) {
+            byKey[gk] = {
+              key: gk,
+              label: strat.labelOf(run),
+              runs: [],
+            };
+            order.push(gk);
+          }
+          byKey[gk].runs.push(run);
+        }
+        return { groups: order.map(function (k) { return byKey[k]; }) };
       }
 
       function render() {
         const container = document.getElementById("runs-container");
         const filtersBar = document.getElementById("filters-bar");
-        const { runs, hasMore, loading, filters } = currentState;
+        const { runs, hasMore, loading, filters, groupingMode } = currentState;
 
         if (currentState.authenticated === false) {
           filtersBar.innerHTML = "";
@@ -363,13 +604,14 @@
           svgStrokeStart + "<polygon points=\"5 3 19 12 5 21 5 3\"/>" + svgEnd;
         if (currentState.projectName) {
           chips.push(
-            '<span class="filter-chip project-scope-chip" title="Open Settings to change project">' +
+            '<span class="filter-chip project-scope-chip" title="Select a different project">' +
               projectIcon +
               "Project: " +
               escHtml(currentState.projectName) +
               "</span>",
           );
         }
+        var gm = groupingMode === "pr" ? "pr" : "none";
         if (filters.branches && filters.branches.length) {
           chips.push(
             '<span class="filter-chip">' +
@@ -398,7 +640,7 @@
           chips.push(
             '<span class="filter-chip" title="Tags' +
               tagOp +
-              "— use Filter on Runs view title bar" +
+              "— use Filter button on Runs view title bar" +
               '">' +
               tagIcon +
               tagLabel +
@@ -419,7 +661,7 @@
         filtersBar.onclick = currentState.projectName
           ? function (e) {
               if (e.target.closest(".project-scope-chip")) {
-                vscode.postMessage({ type: "openSettings" });
+                vscode.postMessage({ type: "selectProject" });
               }
             }
           : null;
@@ -452,77 +694,64 @@
           return;
         }
 
-        let html = "";
-        for (const run of runs) {
-          const stats = aggregateTests(run);
-          const runTitle = (
-            run.displayTitle ||
-            run.commitMessage ||
-            "No title"
-          ).slice(0, 70);
-          const branch = run.branch || "\u2014";
-          const author = run.authorName || "";
-          const duration = formatDuration(run.durationMs);
-          const ago = timeAgo(run.createdAt);
-
-          const statusLower = (run.status || "").toLowerCase();
-          const isLive = isRunInProgress(run.completionState);
-          html += '<div class="run-card" data-run-id="' + run.runId + '">';
-          html += '  <div class="run-header">';
-          html +=
-            '    <span class="run-status status-' +
-            escHtml(statusLower) +
-            '">' +
-            escHtml(statusLower) +
-            "</span>";
-          if (isLive) {
-            html += '    <span class="live-indicator">\u25CF live</span>';
-          }
-          html +=
-            '    <span class="run-duration">' +
-            (duration ? duration + " \u00B7 " : "") +
-            ago +
-            "</span>";
-          html += "  </div>";
-          html += '  <div class="run-title">' + escHtml(runTitle) + "</div>";
-          html += '  <div class="run-meta">';
-          html += "    <span>\u2387 " + escHtml(branch) + "</span>";
-          if (author) {
-            html += "    <span>\u263A " + escHtml(author) + "</span>";
-          }
-          html += "  </div>";
-          html += '  <div class="run-stats">';
-          html +=
-            '    <span class="stat stat-passed">\u2714 ' +
-            stats.passes +
-            "</span>";
-          html +=
-            '    <span class="stat stat-failed">\u2716 ' +
-            stats.failures +
-            "</span>";
-          html +=
-            '    <span class="stat stat-skipped">\u25CB ' +
-            stats.skipped +
-            "</span>";
-          if (stats.flaky > 0) {
+        var html = "";
+        if (gm === "pr") {
+          var built = buildGroupsForStrategy(runs, GROUPING_STRATEGY);
+          for (var gi = 0; gi < built.groups.length; gi++) {
+            var g = built.groups[gi];
+            var expanded = isGroupExpanded(g.key);
+            var visibleRuns = expanded ? g.runs : g.runs.slice(0, 1);
+            var chevClass = expanded
+              ? "codicon-chevron-down"
+              : "codicon-chevron-right";
+            var headClass =
+              "run-group-header" + (expanded ? "" : " collapsed");
+            html += '<div class="run-group" data-group-key="' + escAttr(g.key) + '">';
             html +=
-              '    <span class="stat stat-flaky">\u2744 ' +
-              stats.flaky +
-              "</span>";
+              '<button type="button" class="' +
+              headClass +
+              '" data-group-toggle="' +
+              escAttr(g.key) +
+              '">';
+            html += '<i class="codicon ' + chevClass + ' group-chevron"></i>';
+            html += '<span class="run-group-title">' + escHtml(g.label) + "</span>";
+            html +=
+              '<span class="run-group-count">(' + g.runs.length + ")</span>";
+            html += "</button>";
+            html += '<div class="run-group-body">';
+            for (var rj = 0; rj < visibleRuns.length; rj++) {
+              html += buildRunCardHtml(visibleRuns[rj]);
+            }
+            html += "</div>";
+            if (hasMore) {
+              var gLoad =
+                currentState.groupedLoadTargetKey === g.key && loading;
+              var btnLabel = gLoad
+                ? "Loading\u2026"
+                : groupingStrategies[GROUPING_STRATEGY].perGroupButtonLabel;
+              var dAttr = loading ? " disabled" : "";
+              html +=
+                '<button type="button" class="run-group-load" data-group-load="' +
+                escAttr(g.key) +
+                '" data-group-mode="pr"' +
+                dAttr +
+                ">" +
+                escHtml(btnLabel) +
+                "</button>";
+            }
+            html += "</div>";
           }
-          html += "  </div>";
-          html += '  <div class="run-actions">';
-          html +=
-            '    <button class="action-btn" data-action="dashboard" data-run-id="' +
-            run.runId +
-            '"><i class="codicon codicon-forward"></i> Dashboard</button>';
-          html += "  </div>";
-          html += "</div>";
+        } else {
+          for (var ri = 0; ri < runs.length; ri++) {
+            html += buildRunCardHtml(runs[ri]);
+          }
         }
 
         if (hasMore) {
           html +=
-            '<button class="load-more" id="load-more-btn">' +
+            '<button class="load-more" id="load-more-btn"' +
+            (loading ? " disabled" : "") +
+            ">" +
             (loading ? "Loading\u2026" : "Load More Runs") +
             "</button>";
         }
@@ -556,6 +785,35 @@
           });
         }
 
+        document.querySelectorAll("[data-group-toggle]").forEach(function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const k = btn.getAttribute("data-group-toggle");
+            if (k == null) {
+              return;
+            }
+            setGroupExpandedState(k, !isGroupExpanded(k));
+            render();
+          });
+        });
+        document.querySelectorAll("[data-group-load]").forEach(function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            if (btn.disabled) {
+              return;
+            }
+            const gk = btn.getAttribute("data-group-load");
+            if (gk == null) {
+              return;
+            }
+            vscode.postMessage({
+              type: "loadMoreForGroup",
+              groupKey: gk,
+              groupMode: "pr",
+            });
+          });
+        });
+
         applyActiveState();
       }
 
@@ -568,6 +826,14 @@
         const d = document.createElement("div");
         d.textContent = s;
         return d.innerHTML;
+      }
+
+      function escAttr(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/'/g, "&#39;");
       }
 
       render();

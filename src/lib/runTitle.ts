@@ -13,6 +13,7 @@ export type RunTitleMeta = {
     message?: string | null;
     ghaEventData?: {
       prTitle?: string | null;
+      htmlUrl?: string | null;
     } | null;
   } | null;
   ciBuildId?: string | null;
@@ -92,4 +93,44 @@ export function resolveRunTitleFromFeedItem(run: RunFeedItem): string {
     ciBuildId: run.meta.ciBuildId,
     runId: run.runId,
   });
+}
+
+/**
+ * Derives a canonical PR id (matching `meta.pr.id` format) from a GitHub
+ * Actions PR html URL such as `https://github.com/owner/repo/pull/123`.
+ * Returns `null` for non-GitHub or non-PR URLs.
+ */
+function prIdFromGithubHtmlUrl(url: string | null | undefined): string | null {
+  if (!url) {
+    return null;
+  }
+  const m = url.match(
+    /^https?:\/\/(?:www\.)?github\.com\/([^/]+\/[^/]+)\/pull\/(\d+)/i,
+  );
+  return m ? `github:github.com/${m[1]}#${m[2]}` : null;
+}
+
+/**
+ * Stable key + header label for PR grouping. Prefers canonical `meta.pr.id`,
+ * and falls back to `meta.commit.ghaEventData.htmlUrl` for GitHub Actions
+ * runs (the list endpoint currently strips `meta.pr`).
+ */
+export function getPrGroupKeyAndLabel(run: RunFeedItem): {
+  key: string;
+  label: string;
+} {
+  const pr = run.meta.pr;
+  const idFromPr =
+    pr?.id != null && String(pr.id).trim() !== "" ? String(pr.id) : null;
+  const id =
+    idFromPr ?? prIdFromGithubHtmlUrl(run.meta.commit?.ghaEventData?.htmlUrl);
+  if (id) {
+    const fromTitle = pr?.title?.trim();
+    const fromGha = run.meta.commit?.ghaEventData?.prTitle?.trim();
+    const fromId = getPRTitleFromCanonicalId(id);
+    const fromResolve = resolveRunTitleFromFeedItem(run);
+    const label = fromTitle || fromGha || fromId || fromResolve;
+    return { key: `pr:${id}`, label };
+  }
+  return { key: "__no_pr__", label: "No PR" };
 }

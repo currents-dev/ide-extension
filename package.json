@@ -169,6 +169,33 @@
         "icon": "$(filter)"
       },
       {
+        "command": "currents.filterRunsActive",
+        "title": "Filter Runs",
+        "category": "Currents",
+        "icon": {
+          "light": "./resources/filter-active-light.svg",
+          "dark": "./resources/filter-active-dark.svg"
+        }
+      },
+      {
+        "command": "currents.enableRunsViewByPullRequest",
+        "title": "View by Pull Requests",
+        "category": "Currents",
+        "icon": {
+          "light": "./resources/git-pull-request-off-light.svg",
+          "dark": "./resources/git-pull-request-off-dark.svg"
+        }
+      },
+      {
+        "command": "currents.disableRunsViewByPullRequest",
+        "title": "View by Pull Requests",
+        "category": "Currents",
+        "icon": {
+          "light": "./resources/git-pull-request-active-light.svg",
+          "dark": "./resources/git-pull-request-active-dark.svg"
+        }
+      },
+      {
         "command": "currents.filterByBranch",
         "title": "Filter by Branch",
         "category": "Currents",
@@ -264,6 +291,18 @@
           "when": "currents.authenticated && currents.projectSelected"
         },
         {
+          "command": "currents.filterRunsActive",
+          "when": "false"
+        },
+        {
+          "command": "currents.enableRunsViewByPullRequest",
+          "when": "currents.authenticated && currents.projectSelected && !currents.runsGroupedByPullRequest"
+        },
+        {
+          "command": "currents.disableRunsViewByPullRequest",
+          "when": "currents.authenticated && currents.projectSelected && currents.runsGroupedByPullRequest"
+        },
+        {
           "command": "currents.filterByBranch",
           "when": "false"
         },
@@ -334,13 +373,28 @@
         },
         {
           "command": "currents.filterRuns",
-          "when": "view == currents-runs && currents.projectSelected",
+          "when": "view == currents-runs && currents.projectSelected && !currents.hasFilters",
           "group": "navigation@3"
+        },
+        {
+          "command": "currents.filterRunsActive",
+          "when": "view == currents-runs && currents.projectSelected && currents.hasFilters",
+          "group": "navigation@3"
+        },
+        {
+          "command": "currents.enableRunsViewByPullRequest",
+          "when": "view == currents-runs && currents.projectSelected && !currents.runsGroupedByPullRequest",
+          "group": "navigation@4"
+        },
+        {
+          "command": "currents.disableRunsViewByPullRequest",
+          "when": "view == currents-runs && currents.projectSelected && currents.runsGroupedByPullRequest",
+          "group": "navigation@4"
         },
         {
           "command": "currents.clearFilters",
           "when": "view == currents-runs && currents.hasFilters",
-          "group": "navigation@4"
+          "group": "navigation@5"
         },
         {
           "command": "currents.selectProject",

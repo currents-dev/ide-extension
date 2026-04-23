@@ -8,6 +8,8 @@ const GLYPHS: Record<string, string> = {
   sparkle: "\\ec10",
   "chat-sparkle": "\\ec4f",
   forward: "\\ec73",
+  "chevron-down": "\\eab4",
+  "chevron-right": "\\eab6",
 };
 
 export function getCodiconCss(

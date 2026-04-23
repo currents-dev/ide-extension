@@ -140,6 +140,10 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
       await showRunFiltersMenu(runsProvider);
     }),
 
+    vscode.commands.registerCommand("currents.filterRunsActive", async () => {
+      await showRunFiltersMenu(runsProvider);
+    }),
+
     vscode.commands.registerCommand("currents.filterByBranch", async () => {
       await promptFilterByBranch(runsProvider);
     }),
@@ -158,6 +162,14 @@ export function registerCommands(state: AppState): vscode.Disposable[] {
 
     vscode.commands.registerCommand("currents.clearFilters", () => {
       runsProvider.clearFilters();
+    }),
+
+    vscode.commands.registerCommand("currents.enableRunsViewByPullRequest", () => {
+      runsProvider.toggleGroupRunsByPullRequest();
+    }),
+
+    vscode.commands.registerCommand("currents.disableRunsViewByPullRequest", () => {
+      runsProvider.toggleGroupRunsByPullRequest();
     }),
 
     vscode.commands.registerCommand(
