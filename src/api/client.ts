@@ -1,5 +1,4 @@
 import type {
-  AiContextPayload,
   ApiListResponse,
   ApiResponse,
   Instance,
@@ -37,6 +36,23 @@ export class CurrentsApiClient {
     }
 
     return res.json() as Promise<T>;
+  }
+
+  private async requestText(path: string): Promise<string> {
+    const url = `${this.baseUrl}${path}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${this.apiKey}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Currents API ${res.status}: ${body}`);
+    }
+
+    return res.text();
   }
 
   async getProjects(
@@ -155,28 +171,72 @@ export class CurrentsApiClient {
     instanceId: string,
     testId: string,
     attempt?: number,
-  ): Promise<AiContextPayload> {
+  ): Promise<string> {
     const params = new URLSearchParams({
       instance_id: instanceId,
       test_id: testId,
-      format: "json",
+      format: "md",
     });
     if (attempt !== undefined) {
       params.set("attempt", String(attempt));
     }
-    return this.request(`/ai-context?${params}`);
+    return this.requestText(`/context?${params}`);
   }
 
-  async getAiContextBySignature(
-    projectId: string,
-    signature: string,
-  ): Promise<AiContextPayload> {
+  async getAiContextErrorContextUrl(
+    instanceId: string,
+    testId: string,
+    attempt?: number,
+  ): Promise<string | null> {
     const params = new URLSearchParams({
-      project_id: projectId,
-      signature,
+      instance_id: instanceId,
+      test_id: testId,
       format: "json",
+      detail: "summary",
     });
-    return this.request(`/ai-context?${params}`);
+    if (attempt !== undefined) {
+      params.set("attempt", String(attempt));
+    }
+    const res = await this.request<{
+      status: "OK";
+      data: { errorContext: { url: string } | null };
+    }>(`/context?${params}`);
+    return res.data.errorContext?.url ?? null;
+  }
+
+  async getRunAiContext(runId: string): Promise<string> {
+    const params = new URLSearchParams({
+      run_id: runId,
+      format: "md",
+      limit: "25",
+    });
+    return this.requestText(`/context?${params}`);
+  }
+
+  async getRunAiContextErrorContexts(
+    runId: string,
+  ): Promise<Array<{ testId: string; url: string }>> {
+    const params = new URLSearchParams({
+      run_id: runId,
+      format: "json",
+      detail: "summary",
+      limit: "5",
+    });
+    const res = await this.request<{
+      status: "OK";
+      data: {
+        list: Array<{
+          testId: string;
+          errorContext: { url: string } | null;
+        }>;
+      };
+    }>(`/context?${params}`);
+    return (res.data.list ?? [])
+      .filter(
+        (t): t is { testId: string; errorContext: { url: string } } =>
+          !!t.errorContext,
+      )
+      .map((t) => ({ testId: t.testId, url: t.errorContext.url }));
   }
 
   async fetchUrl(url: string): Promise<string> {
